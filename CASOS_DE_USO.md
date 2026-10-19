@@ -21,65 +21,57 @@ Documento formal de especificación y modelado de Casos de Uso para el sistema *
 ## 🗺️ Diagrama General de Casos de Uso (Mermaid)
 
 ```mermaid
-flowchart TB
-    %% Actores
-    subgraph Actores ["👥 Actores"]
-        A_Guest["👤 Visitante"]
-        A_User["🛒 Cliente"]
-        A_Business["🏢 Empresario"]
-        A_Admin["🛡️ Administrador"]
+flowchart LR
+    subgraph Actores["Actores del Sistema"]
+        A_Guest["Visitante (Guest)"]
+        A_User["Cliente (User)"]
+        A_Business["Empresario (Business)"]
+        A_Admin["Administrador (Admin)"]
     end
 
-    %% Módulo Autenticación
-    subgraph Mod_Auth ["🔐 Módulo de Autenticación y Cuenta"]
+    subgraph Mod_Auth["Modulo 1: Autenticacion y Cuenta"]
         CU01(["CU01: Registrarse"])
-        CU02(["CU02: Iniciar Sesión"])
-        CU03(["CU03: Autenticación con Google"])
-        CU04(["CU04: Verificar Código OTP Email"])
-        CU05(["CU05: Cerrar Sesión"])
+        CU02(["CU02: Iniciar Sesion"])
+        CU03(["CU03: Autenticacion con Google"])
+        CU04(["CU04: Verificar Codigo OTP Email"])
+        CU05(["CU05: Cerrar Sesion"])
         CU06(["CU06: Actualizar Perfil"])
     end
 
-    %% Módulo Marketplace y Compra
-    subgraph Mod_Commerce ["🛍️ Módulo Marketplace y Compras"]
-        CU07(["CU07: Explorar Catálogo y Empresas"])
-        CU08(["CU08: Ver Geolocalización en Mapa"])
+    subgraph Mod_Commerce["Modulo 2: Marketplace y Compras"]
+        CU07(["CU07: Explorar Catalogo y Empresas"])
+        CU08(["CU08: Ver Geolocalizacion en Mapa"])
         CU09(["CU09: Gestionar Carrito de Compras"])
         CU10(["CU10: Checkout y Procesamiento de Pago"])
         CU11(["CU11: Consultar Historial de Pedidos"])
     end
 
-    %% Módulo Gestión Empresarial
-    subgraph Mod_Business ["📈 Módulo de Gestión Empresarial"]
+    subgraph Mod_Business["Modulo 3: Gestion Empresarial"]
         CU12(["CU12: Gestionar Perfil de Empresa"])
-        CU13(["CU13: Solicitar Actualización de Documentos"])
+        CU13(["CU13: Solicitar Actualizacion de Documentos"])
         CU14(["CU14: Gestionar Productos (CRUD)"])
         CU15(["CU15: Gestionar Gastos Operativos (CRUD)"])
         CU16(["CU16: Visualizar Dashboard Empresarial"])
     end
 
-    %% Módulo Administración
-    subgraph Mod_Admin ["⚙️ Módulo de Administración"]
+    subgraph Mod_Admin["Modulo 4: Administracion"]
         CU17(["CU17: Administrar Usuarios"])
         CU18(["CU18: Administrar y Auditar Empresas"])
         CU19(["CU19: Moderar Productos de Tiendas"])
-        CU20(["CU20: Consultar Reportes y Métricas"])
+        CU20(["CU20: Consultar Reportes y Metricas"])
         CU21(["CU21: Visualizar Dashboard General"])
     end
 
-    %% Módulo Comunicación e IA
-    subgraph Mod_Communication ["💬 Comunicación e Inteligencia Artificial"]
-        CU22(["CU22: Mensajería Directa (Chat)"])
+    subgraph Mod_Communication["Modulo 5: Comunicacion e IA"]
+        CU22(["CU22: Mensajeria Directa (Chat)"])
         CU23(["CU23: Consultar Asistente IA (Spotlight)"])
     end
 
-    %% Relaciones Visitante
     A_Guest --> CU01
     A_Guest --> CU02
     A_Guest --> CU03
     A_Guest --> CU07
 
-    %% Relaciones Cliente
     A_User --> CU04
     A_User --> CU05
     A_User --> CU06
@@ -91,7 +83,6 @@ flowchart TB
     A_User --> CU22
     A_User --> CU23
 
-    %% Relaciones Empresario
     A_Business --> CU05
     A_Business --> CU12
     A_Business --> CU13
@@ -101,7 +92,6 @@ flowchart TB
     A_Business --> CU22
     A_Business --> CU23
 
-    %% Relaciones Administrador
     A_Admin --> CU05
     A_Admin --> CU17
     A_Admin --> CU18
@@ -118,31 +108,31 @@ flowchart TB
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Cliente as 🛒 Cliente
-    participant Vista as 🖥️ Vista Web (Cart/Checkout)
-    participant CartCtrl as ⚙️ CartController
-    participant BD as 🗄️ Base de Datos
-    actor Empresa as 🏢 Empresario
+    actor Cliente as Cliente
+    participant Vista as Vista Web (Cart/Checkout)
+    participant CartCtrl as CartController
+    participant BD as Base de Datos
+    actor Empresa as Empresario
 
-    Cliente->>Vista: Selecciona producto y hace clic en "Agregar al Carrito"
-    Vista->>CartCtrl: POST /user/cart/{product}
-    CartCtrl->>BD: Guardar/actualizar ítem en sesión o carrito
+    Cliente->>Vista: Selecciona producto y hace clic en Agregar al Carrito
+    Vista->>CartCtrl: POST /user/cart/product
+    CartCtrl->>BD: Guardar o actualizar item en sesion
     CartCtrl-->>Vista: Carrito actualizado
-    Cliente->>Vista: Clic en "Proceder al Checkout"
+    Cliente->>Vista: Clic en Proceder al Checkout
     Vista->>CartCtrl: GET /user/cart/checkout
     CartCtrl->>BD: Obtener resumen de productos y total
-    CartCtrl-->>Vista: Formulario de pago y dirección
+    CartCtrl-->>Vista: Formulario de pago y direccion
     Cliente->>Vista: Confirma orden y procesa pago
     Vista->>CartCtrl: POST /user/cart/checkout/process
-    CartCtrl->>BD: Iniciar Transacción DB
-    CartCtrl->>BD: Crear registro en 'orders'
-    CartCtrl->>BD: Crear detalle en 'order_details'
+    CartCtrl->>BD: Iniciar Transaccion DB
+    CartCtrl->>BD: Crear registro en tabla orders
+    CartCtrl->>BD: Crear detalle en tabla order_details
     CartCtrl->>BD: Actualizar stock de productos
     CartCtrl->>BD: Limpiar carrito
-    CartCtrl->>BD: Commit Transacción
-    CartCtrl-->>Vista: Redirección con mensaje de éxito
-    Vista-->>Cliente: Mostrar número de orden confirmada
-    CartCtrl--)Empresa: Notificación de nuevo pedido recibido
+    CartCtrl->>BD: Commit Transaccion
+    CartCtrl-->>Vista: Redireccion con mensaje de exito
+    Vista-->>Cliente: Mostrar numero de orden confirmada
+    CartCtrl-->>Empresa: Notificacion de nuevo pedido recibido
 ```
 
 ---
@@ -152,22 +142,22 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Usuario as 👤 Usuario / Empresario
-    participant Widget as 💬 Widget Chatbot (Blade/JS)
-    participant ChatbotCtrl as ⚙️ ChatbotController
-    participant AIService as 🧠 ChatbotService
-    participant Gemini as ☁️ Google Gemini 2.5 Flash API
+    actor Usuario as Usuario o Empresario
+    participant Widget as Widget Chatbot (Blade/JS)
+    participant ChatbotCtrl as ChatbotController
+    participant AIService as ChatbotService
+    participant Gemini as Google Gemini 2.5 Flash API
 
-    Usuario->>Widget: Escribe consulta o selecciona un chip rápido
-    Widget->>ChatbotCtrl: POST /chatbot/message { message, lang }
+    Usuario->>Widget: Escribe consulta o selecciona un chip rapido
+    Widget->>ChatbotCtrl: POST /chatbot/message (message, lang)
     ChatbotCtrl->>AIService: sendMessage(userPrompt, lang)
-    AIService->>AIService: Validar System Prompt & Principio Regulativo
-    AIService->>Gemini: HTTP POST https://generativelanguage.googleapis.com/...
-    Note over AIService,Gemini: Envío con cURL seguro y control de timeouts
+    AIService->>AIService: Validar System Prompt y Principio Regulativo
+    AIService->>Gemini: HTTP POST API Generative Language
+    Note over AIService,Gemini: Envio con cURL seguro y control de timeouts
     Gemini-->>AIService: Respuesta generada (JSON)
     AIService-->>ChatbotCtrl: Texto formateado en Markdown
-    ChatbotCtrl-->>Widget: Respuesta JSON { response: "..." }
-    Widget-->>Usuario: Muestra burbuja con tipografía fluida y animaciones
+    ChatbotCtrl-->>Widget: Respuesta JSON con texto procesado
+    Widget-->>Usuario: Muestra burbuja con tipografia fluida y animaciones
 ```
 
 ---
