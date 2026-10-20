@@ -217,6 +217,52 @@
                 </div>
 
                 <h6 class="fw-bold text-dark border-bottom pb-2 mb-4">
+                    <i class="bi bi-clock-history me-2 text-primary"></i>Horario de Atención
+                </h6>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label text-sm fw-semibold text-dark">Hora de Apertura</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-door-open text-success"></i></span>
+                            <input type="time" name="opening_time" class="form-control border-start-0"
+                                   value="{{ old('opening_time', $company->opening_time ? substr($company->opening_time, 0, 5) : '08:00') }}">
+                        </div>
+                        <small class="text-muted">Hora habitual en la que abre tu local o atención</small>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-sm fw-semibold text-dark">Hora de Cierre</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-door-closed text-danger"></i></span>
+                            <input type="time" name="closing_time" class="form-control border-start-0"
+                                   value="{{ old('closing_time', $company->closing_time ? substr($company->closing_time, 0, 5) : '19:00') }}">
+                        </div>
+                        <small class="text-muted">Hora habitual en la que finaliza la atención</small>
+                    </div>
+                    <div class="col-12 mt-2">
+                        <label class="form-label text-sm fw-semibold text-dark d-block">Días de Atención</label>
+                        @php
+                            $selectedDays = $company->operating_days ?? ['monday','tuesday','wednesday','thursday','friday','saturday'];
+                        @endphp
+                        <div class="d-flex flex-wrap gap-2">
+                            @foreach([
+                                'monday' => 'Lunes',
+                                'tuesday' => 'Martes',
+                                'wednesday' => 'Miércoles',
+                                'thursday' => 'Jueves',
+                                'friday' => 'Viernes',
+                                'saturday' => 'Sábado',
+                                'sunday' => 'Domingo'
+                            ] as $dayKey => $dayLabel)
+                                <div class="form-check form-check-inline bg-light px-3 py-2 rounded-pill border mb-0">
+                                    <input class="form-check-input" type="checkbox" name="operating_days[]" id="day_{{ $dayKey }}" value="{{ $dayKey }}" {{ in_array($dayKey, $selectedDays) ? 'checked' : '' }}>
+                                    <label class="form-check-label small fw-semibold cursor-pointer" for="day_{{ $dayKey }}">{{ $dayLabel }}</label>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+
+                <h6 class="fw-bold text-dark border-bottom pb-2 mb-4">
                     <i class="bi bi-geo-alt-fill me-2 text-danger"></i>Ubicación en el Mapa
                 </h6>
                 <div id="map" class="rounded-4 border mb-3 shadow-sm"></div>
@@ -254,6 +300,94 @@
             <div class="section-save-bar">
                 <button type="submit" class="btn btn-secondary px-4 fw-semibold rounded-pill">
                     <i class="bi bi-floppy me-1"></i> Guardar Redes y Contacto
+                </button>
+            </div>
+        </div>
+    </form>
+
+    {{-- ═══════════════════════════════════
+         SECCIÓN 4: DATOS BANCARIOS Y DISPERSIÓN DE PAGOS (WOMPI)
+    ═══════════════════════════════════ --}}
+    <form action="{{ route('business.company.update') }}" method="POST" id="form-banking">
+        @csrf
+        <input type="hidden" name="section" value="banking">
+
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+            <div class="card-header bg-dark text-white p-3 rounded-top-4 border-0 d-flex align-items-center justify-content-between">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-bank me-2 text-warning"></i>Datos Bancarios y Recaudación (Wompi)</h5>
+                <span class="badge rounded-pill fw-semibold" style="background: rgba(255,255,255,0.2); font-size: 0.75rem;">Dispersión Automática</span>
+            </div>
+            <div class="card-body p-4">
+                <div class="alert alert-info border-0 rounded-3 small mb-4">
+                    <i class="bi bi-info-circle me-1"></i> Estos datos permiten a la plataforma Spotlight transferir y liquidar de forma exacta el dinero correspondiente a las ventas y despachos de tu comercio procesados en Wompi.
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold text-dark small">Entidad Financiera / Banco</label>
+                        <select name="bank_name" class="form-select rounded-3">
+                            <option value="">-- Seleccionar Banco --</option>
+                            <option value="Bancolombia" {{ $company->bank_name === 'Bancolombia' ? 'selected' : '' }}>Bancolombia</option>
+                            <option value="Davivienda" {{ $company->bank_name === 'Davivienda' ? 'selected' : '' }}>Davivienda</option>
+                            <option value="Banco de Bogotá" {{ $company->bank_name === 'Banco de Bogotá' ? 'selected' : '' }}>Banco de Bogotá</option>
+                            <option value="BBVA Colombia" {{ $company->bank_name === 'BBVA Colombia' ? 'selected' : '' }}>BBVA Colombia</option>
+                            <option value="Banco de Occidente" {{ $company->bank_name === 'Banco de Occidente' ? 'selected' : '' }}>Banco de Occidente</option>
+                            <option value="Nequi" {{ $company->bank_name === 'Nequi' ? 'selected' : '' }}>Nequi</option>
+                            <option value="Daviplata" {{ $company->bank_name === 'Daviplata' ? 'selected' : '' }}>Daviplata</option>
+                            <option value="Banco Agrario" {{ $company->bank_name === 'Banco Agrario' ? 'selected' : '' }}>Banco Agrario de Colombia</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold text-dark small">Tipo de Cuenta</label>
+                        <select name="account_type" class="form-select rounded-3">
+                            <option value="ahorros" {{ $company->account_type === 'ahorros' ? 'selected' : '' }}>Cuenta de Ahorros</option>
+                            <option value="corriente" {{ $company->account_type === 'corriente' ? 'selected' : '' }}>Cuenta Corriente</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold text-dark small">Número de Cuenta Bancaria</label>
+                        <input type="text" name="account_number" class="form-control rounded-3" value="{{ old('account_number', $company->account_number) }}" placeholder="Ej. 123-456789-00">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold text-dark small">Nombre o Razón Social del Titular</label>
+                        <input type="text" name="account_holder_name" class="form-control rounded-3" value="{{ old('account_holder_name', $company->account_holder_name) }}" placeholder="Nombre tal como figura en el certificado">
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold text-dark small">Tipo Doc. Titular</label>
+                        <select name="account_holder_doc_type" class="form-select rounded-3">
+                            <option value="NIT" {{ $company->account_holder_doc_type === 'NIT' ? 'selected' : '' }}>NIT</option>
+                            <option value="CC" {{ $company->account_holder_doc_type === 'CC' ? 'selected' : '' }}>Cédula de Ciudadanía (CC)</option>
+                            <option value="CE" {{ $company->account_holder_doc_type === 'CE' ? 'selected' : '' }}>Cédula de Extranjería (CE)</option>
+                            <option value="PP" {{ $company->account_holder_doc_type === 'PP' ? 'selected' : '' }}>Pasaporte</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-8">
+                        <label class="form-label fw-semibold text-dark small">Número de Documento del Titular</label>
+                        <input type="text" name="account_holder_doc_number" class="form-control rounded-3" value="{{ old('account_holder_doc_number', $company->account_holder_doc_number) }}" placeholder="Ej. 901234567-8">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold text-dark small">ID de Comercio / Subcuenta Wompi (Opcional)</label>
+                        <input type="text" name="wompi_merchant_id" class="form-control rounded-3 font-monospace small" value="{{ old('wompi_merchant_id', $company->wompi_merchant_id) }}" placeholder="sub_test_... o ID Wompi propio">
+                        <div class="form-text text-muted small">Aplica si operas bajo esquema de subcuentas independientes en Wompi.</div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold text-dark small">ID Regla de Dispersión / Split Rule</label>
+                        <input type="text" name="split_rule_id" class="form-control rounded-3 font-monospace small" value="{{ old('split_rule_id', $company->split_rule_id) }}" placeholder="rule_...">
+                        <div class="form-text text-muted small">Regla configurada en Wompi para dispersión automática de comisiones.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-save-bar">
+                <button type="submit" class="btn btn-primary px-4 fw-semibold rounded-pill">
+                    <i class="bi bi-floppy me-1"></i> Guardar datos
                 </button>
             </div>
         </div>

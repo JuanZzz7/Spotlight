@@ -1,60 +1,209 @@
 @extends('layouts.app')
 @section('title','Registrarse - Spotlight')
 @push('styles')
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<style>
+    body, h1, h2, h3, h4, h5, h6, p, a, button, input, label { font-family: 'Plus Jakarta Sans', sans-serif; }
+    
+    /* Interactive Map Styles */
+    #company_reg_map {
+        width: 100%;
+        height: 100%;
+        min-height: 230px;
+        z-index: 1;
+    }
+    .leaflet-pane { z-index: 10 !important; }
+    .leaflet-top, .leaflet-bottom { z-index: 20 !important; }
+    
+    .btn-spotlight {
+        background: var(--sl-primary);
+        color: var(--sl-text-on-dark) !important;
+        border: none;
+        border-radius: var(--sl-radius-pill, 9999px);
+        transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
+        box-shadow: 0 4px 15px rgba(127, 29, 63, 0.25);
+    }
+    .btn-spotlight:hover { 
+        background: var(--sl-primary-dark);
+        transform: translateY(-2px); 
+        box-shadow: 0 8px 25px rgba(127, 29, 63, 0.35);
+        color: var(--sl-text-on-dark) !important;
+    }
+    .text-spotlight-magenta { color: var(--sl-primary) !important; }
+    .btn-outline-spotlight {
+        border: 2px solid var(--sl-primary);
+        color: var(--sl-primary) !important;
+        border-radius: var(--sl-radius-pill, 9999px);
+        background: transparent;
+        transition: all 0.2s;
+    }
+    .btn-outline-spotlight:hover {
+        background: var(--sl-primary-soft);
+        color: var(--sl-primary-dark);
+        transform: translateY(-1px);
+    }
+    
+    /* Mockup specifics */
+    .register-glass-card {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid var(--sl-border);
+        border-radius: 16px;
+        padding: 1.5rem;
+    }
+
+    /* Translation Logic */
+    html[lang="es"] .lang-en { display: none !important; }
+    html[lang="en"] .lang-es { display: none !important; }
+    
+    .role-circle-label {
+        width: 80px; height: 80px;
+        border: 2px solid var(--sl-border);
+        background: var(--sl-primary-soft);
+        color: var(--sl-text-muted);
+        border-radius: 50%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .role-circle-label:hover {
+        border-color: var(--sl-accent);
+        transform: translateY(-2px);
+    }
+    .btn-check:checked + .role-circle-label {
+        border-color: var(--sl-primary);
+        background: #ffffff;
+        color: var(--sl-primary);
+        box-shadow: 0 4px 14px rgba(127, 29, 63, 0.2);
+    }
+    .role-text { font-size: 0.75rem; font-weight: 700; color: var(--sl-text-heading); margin-top: 8px; text-align: center; }
+
+    /* Country Selection Cards */
+    .country-select-card {
+        border: 2px solid var(--sl-border, #e2e8f0);
+        background: #ffffff;
+        border-radius: 14px;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        color: var(--sl-text-body, #475569);
+    }
+    .country-select-card:hover {
+        border-color: var(--sl-accent, #D98C9A);
+        background: #FFFCF7;
+        transform: translateY(-2px);
+    }
+    .btn-check:checked + .country-select-card {
+        border-color: var(--sl-primary, #7F1D3F) !important;
+        background-color: #FFFCF7 !important;
+        color: var(--sl-primary, #7F1D3F) !important;
+        box-shadow: 0 4px 14px rgba(127, 29, 63, 0.15);
+    }
+    .btn-check:checked + .country-select-card .fw-bold {
+        color: var(--sl-primary, #7F1D3F) !important;
+    }
+
+    /* Moving background blobs */
+    .blob {
+        position: absolute;
+        filter: blur(80px);
+        z-index: 0;
+        opacity: 0.9;
+        border-radius: 50%;
+        animation: floatBlob 15s infinite alternate ease-in-out;
+    }
+    @keyframes floatBlob {
+        0% { transform: translate(0, 0) scale(1); }
+        50% { transform: translate(100px, 50px) scale(1.1); }
+        100% { transform: translate(-50px, 100px) scale(0.9); }
+    }
+</style>
 @endpush
 @section('content')
-<div class="min-vh-100 d-flex align-items-center justify-content-center" style="background-color: var(--vs-bg-color);">
-    <div class="vs-card border-0" style="width: 100%; max-width: 900px; border-radius: var(--vs-radius-xl); overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15);">
+<div class="min-vh-100 d-flex align-items-center justify-content-center position-relative py-5" style="background-color: var(--sl-bg); min-height: 100vh;">
+    
+    <!-- Animated Gradient Blobs in separate overflow-hidden container -->
+    <div class="position-absolute top-0 start-0 w-100 h-100 overflow-hidden" style="pointer-events: none; z-index: 0;">
+        <div class="blob" style="top: -10%; left: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, rgba(127,29,63,0.08) 0%, rgba(127,29,63,0) 70%); animation-delay: 0s;"></div>
+        <div class="blob" style="bottom: -20%; right: -10%; width: 60vw; height: 60vw; background: radial-gradient(circle, rgba(217,140,154,0.12) 0%, rgba(217,140,154,0) 70%); animation-delay: -5s;"></div>
+        <div class="blob" style="top: 20%; left: 30%; width: 40vw; height: 40vw; background: radial-gradient(circle, rgba(246,231,235,0.4) 0%, rgba(246,231,235,0) 70%); animation-delay: -10s;"></div>
+    </div>
+
+    <!-- Top Bar with Return Home & Language Toggle -->
+    <div class="position-absolute top-0 start-0 w-100 p-3 p-md-4 d-flex justify-content-between align-items-center" style="z-index: 10;">
+        <div>
+            <a href="{{ route('home') }}" class="btn btn-sm btn-pill-light fw-bold px-3 py-1 d-inline-flex align-items-center gap-2 shadow-xs border text-decoration-none" style="font-size: 0.78rem;">
+                <i class="bi bi-arrow-left"></i>
+                <span class="lang-en">Home</span><span class="lang-es">Inicio</span>
+            </a>
+        </div>
+        <div>
+            <button id="btnSwitchLang" class="btn btn-sm btn-white fw-bold border shadow-sm rounded-pill px-3 py-1" style="color: var(--sl-text-heading); font-size: 0.78rem;">EN / ES</button>
+        </div>
+    </div>
+
+    <div class="vs-card border-0" style="width: 100%; max-width: 820px; border-radius: 20px; overflow: hidden; box-shadow: var(--sl-shadow-xl); margin: 60px 15px 30px; z-index: 2;">
         <div class="row g-0">
-            <!-- Left Side: Branding -->
-            <div class="col-md-5 d-none d-md-block position-relative overflow-hidden" style="background: radial-gradient(circle, #2934ff, #111566);">
-                <div class="position-absolute top-0 start-0 w-100 h-100 bg-black opacity-25 z-1"></div>
-                <!-- Animated SVG Background -->
-                <div class="position-absolute top-0 start-0 w-100 h-100 z-0 login-bg-svg" style="opacity: 0;">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="none" style="width: 100%; height: 100%; display: block;">
-                      <defs />
-                      <linearGradient id="SVGID_1_" x1="2880" x2="2880" y1="909.66" y2="170.6" gradientUnits="userSpaceOnUse">
-                        <stop offset="0" stop-color="#1742ff" />
-                        <stop offset="1" stop-color="#22dd8a" />
-                      </linearGradient>
-
-                      <g>
-                        <g class="g">
-                          <path class="path" fill="url(#SVGID_1_)" d="m1920 538.5 8.6-.4h8.6l8.6.3 4.3.3 4.3.4c11.4 1.1 22.8 2.9 34 5.4 22.5 5 44.3 12.4 65.6 21a730.8 730.8 0 0 1 62.3 28.7c20.3 10.3 40.3 21 60.2 31.7l29.8 15.9c9.9 5.2 19.9 10.3 29.9 15.3a727 727 0 0 0 60.7 27.2 360.6 360.6 0 0 0 62.6 18.3c10.6 2 21.2 3.4 31.8 4l8 .3 7.7-.1c2.6-.2 5.1-.2 7.7-.5l3.9-.4 1.9-.2 1.9-.3a177 177 0 0 0 30.8-7.4c10.2-3.3 20.2-7.5 30.1-12.1a448 448 0 0 0 57.5-33.2c37.2-24.9 72.1-53.7 106.7-82.8 34.6-29.1 68.7-59.1 105.7-85.8 9.3-6.6 18.7-13.1 28.5-19.1 9.8-6.1 19.8-11.7 30.3-16.7s21.3-9.4 32.7-12.6c11.4-3.2 23-6.2 34.9-8.4 11.9-2.2 24.1-3.6 36.3-4l6.1-.1 6.1.1 12.3.5c16.3 1.2 32.7 3.4 48.7 6.6 16 3.2 31.7 7.5 46.8 12.6a451.6 451.6 0 0 1 80 36.6c24.6 14.8 47.7 32 68.4 51.5 10.4 9.8 20.1 20.2 29.3 31.2a472 472 0 0 1 45.4 68c12.2 24.2 21.5 50.1 27.2 76.9 2.9 13.4 4.8 27.2 5.6 41l.2 5.2.1 5.2c.1 6.9-.2 13.9-.9 20.9-1.3 14-3.8 27.9-7.4 41.6a386 386 0 0 1-27.2 76 387 387 0 0 1-45.7 68.5c-9.3 10.8-19.2 21.1-29.7 30.8-21 19.4-44.4 36.2-69.4 49.9a489.1 489.1 0 0 1-82.5 34c-14.4 4.2-29.2 7.3-44 9.6-14.8 2.3-29.8 3.5-44.8 3.5h-11.4l-11.4-.6c-15.1-1.3-30.2-3.8-44.8-7.5-14.6-3.7-29-8.4-42.6-14a511.6 511.6 0 0 1-72.3-38.6c-22-15-41.8-32.9-59-53-17.2-20.1-31.5-42.4-42.4-66.2a405.5 405.5 0 0 1-21-65.4c-4.8-22.9-7-46.7-6.2-70.5.4-11.9 1.5-23.7 3.3-35.4 1.8-11.7 4.2-23.2 7.3-34.5a350 350 0 0 1 20-56.6 348.6 348.6 0 0 1 31.8-51.4c12-15.7 25.5-30.2 40.2-43.2a343.3 343.3 0 0 1 50-36.4c18-10.4 37.1-18.7 57.1-24.8 10-3 20.3-5.5 30.7-7.2 10.4-1.7 21-2.6 31.6-2.6h7.9l7.9.4c10.5.8 21 2.3 31.2 4.4 10.2 2.1 20.2 5 30 8.3a258.8 258.8 0 0 1 53 25.6c16 10.3 30.8 22.5 44.1 36l19.2 21.2 17.1 22.9c10.8 15.6 20 32.5 27 50.3a277.6 277.6 0 0 1 14 56c1.6 10 2.2 20.2 2.1 30.3 0 5-.3 10-.7 15l-1.3 14.8c-.8 9.8-2.6 19.5-5 29a288.6 288.6 0 0 1-13.8 41 292 292 0 0 1-22.4 41c-8.7 12.9-18.7 24.8-29.8 35.6-22.2 21.6-48.4 38.6-77.2 49a341.6 341.6 0 0 1-42.5 11c-14.6 2.3-29.4 3.3-44.1 3.1h-11l-11-.6-10.9-1-21.7-3c-14.4-2.7-28.5-6.5-42-11.3s-26.6-10.6-38.9-17.5a435 435 0 0 1-65.7-46c-19.5-17.4-36.4-37.4-50.5-59a430.7 430.7 0 0 1-36.7-73.4c-8.9-25.5-14.3-52.2-16.1-79.3-.9-13.6-1-27.2-.3-40.8.7-13.6 2-27 4.1-40.4s5-26.4 8.7-39.2a488.2 488.2 0 0 1 45.4-100c19-30.8 42-59.1 68.3-84 26.3-24.9 55.8-46 87.7-62.8 16-8.4 32.4-15.8 49.3-21.8 16.9-6 34.3-11 51.9-14.6 17.6-3.6 35.5-6 53.6-7 9.1-.5 18.2-.7 27.3-.6h13.6l13.6.4 13.5.7c17.9 1.4 35.8 4.2 53.3 8.3 17.5 4.1 34.7 9.4 51.1 16 16.4 6.6 32.3 14.5 47.4 23.4l22.1 13.8 21.3 14.8c13.8 10 27.1 20.6 39.7 31.8 12.6 11.2 24.5 23 35.7 35.2a759.5 759.5 0 0 1 59.8 77.8c18 27.5 33.6 56.6 46.5 86.8 6.4 15.1 12.1 30.5 17.1 46 5 15.5 9.1 31.2 12.5 47 6.8 31.6 11.2 64 12.9 96.6 1.7 32.6.8 65.5-2.8 98l-2 16.1-2.4 16c-1.8 10.6-4.1 21-6.7 31.4-5.2 20.8-12.1 41-20.4 60.7-16.6 39.4-38.6 76.4-65 109.8a760.6 760.6 0 0 1-96 99.4c-35 29.3-73.6 54-114.7 73.5-20.5 9.7-41.7 18.2-63.3 25-21.6 6.8-43.7 12-66 15.5l-33.8 4.2h-34l-34-1.2-16.9-1.1c-11.2-1.1-22.4-2.6-33.5-4.5-22.2-3.8-44-9.5-65.1-16.7l-30.8-11.8c-10.1-4.2-20.1-8.7-29.8-13.7a740.3 740.3 0 0 1-54.8-31l-25.5-17.1c-8.3-5.9-16.4-12-24.2-18.4l-11.5-9.6-11.1-10c-14.5-13.6-28.3-27.9-41-43-25.4-30.2-47.5-63-65.7-98-18.2-35-32.3-71.9-42-110-4.8-19.1-8.6-38.4-11.1-58-.5-4.9-.9-9.8-1.2-14.7l-.4-14.8c-.3-19.7 1.1-39.6 4-59.2 5.8-39.2 16.9-77.5 32.7-113.8 15.8-36.3 36.2-70.5 60.5-101.8a719.5 719.5 0 0 1 82.2-85c30.2-25.4 63.3-47.1 98.4-64 35.1-16.9 71.8-29.4 109.4-37a760.3 760.3 0 0 1 113.9-8.4c37.9 1 75.3 7.8 111.4 19.9 36.1 12.1 70.5 29.5 102.3 51 15.9 10.8 31.1 22.5 45.4 35 14.3 12.5 28 25.8 40.8 40l18.4 21.8 17.2 22.8c11 15.4 21.3 31.4 30.6 47.9a785.4 785.4 0 0 1 48 107.5 798 798 0 0 1 25.5 119.5l2 20.3 1.3 20.4c1.3 27.2.5 54.6-2.5 81.7-6 54.2-20.1 107.2-41.2 157.4a841.5 841.5 0 0 1-73.1 138.3c-28.3 42-61.9 80-99.7 113.2a853.4 853.4 0 0 1-125 89c-44 24.3-90.8 43-139 55.4a867.7 867.7 0 0 1-146.5 20.1l-18.4.5h-18.5l-37-1.1c-24.6-1.5-49-4.5-73-8.8-48-8.6-94.6-23.7-138.8-44.5a862.6 862.6 0 0 1-123-74c-38.6-28.3-74-60.8-105-96.8s-58.4-75.7-81-118c-22.6-42.3-40.4-86.8-52.6-132.8-6.1-23-11.1-46.3-14.8-69.8l-4.5-35.3c-.3-5.9-.6-11.8-.8-17.7a877.8 877.8 0 0 1 4.7-142.6c9.8-47 25-92.6 44.9-136.1s44.6-84.6 73-122.9c28.4-38.3 60.5-73.4 95.5-104.7s73.3-59 113.5-82.6a855 855 0 0 1 129-57.5c22.3-7.5 45.1-13.8 68.3-18.8 23.2-5 46.7-8.8 70.4-11.2l35.8-2.6 36-.8c24-.2 48.2 1 72 3.5 47.6 5 94.3 15.6 139 30.7 44.7 15.1 87.5 35 127 59.1s76.3 52.8 109.8 85.5 63.3 69.2 89.6 107.5l23.5 36.3 21 37.8c12.7 25.6 23.6 52.1 32.5 79.1a880.8 880.8 0 0 1 20.3 84c5.1 28.5 8.6 57.3 10.3 86.4.8 14.5 1.2 29.1 1.2 43.6l-.6 21.8-.8 21.8c-1.7 29-5.4 58-10.9 86.6-11 57.2-29.3 112.5-54 164.2a893.3 893.3 0 0 1-90 142.1c-34.9 44-74.9 83.5-119 117.2s-92.4 62-142.6 83.8c-25.1 10.9-51.1 20.1-77.5 27.5l-39.9 10.1-20.1 4.5-20.2 3.8c-27.1 4.8-54.4 7.9-81.9 9.3-55 2.8-109.9-1-163.2-11-53.3-10-104.8-26.6-153-49.2-48.2-22.6-93.1-51.2-133.4-84.5-40.3-33.3-76.3-71.5-106.6-113.3-30.3-41.8-55.5-87-74.4-134.4s-31.5-96.6-36.6-146.9c-2.5-25.1-3.8-50.5-3.6-75.8.1-12.6.4-25.3 1.1-37.9l1.7-37.7c1.7-25 4.7-50 9-74.7 8.6-49.4 22.8-97.4 41.9-143.1 19.1-45.7 42.8-88.8 70.5-128.5A952.1 952.1 0 0 1 316.5 142c35-36 73.5-68.3 114.7-96A911 911 0 0 1 564.3 2l34.8-14.7c11.7-4.6 23.5-8.9 35.5-13l35.8-11.4c24.1-7.1 48.6-13 73.4-17.7a935.9 935.9 0 0 1 150.3-15c50.3 1.6 100.2 8.3 148.8 19.8 48.6 11.5 95.8 27.5 140.4 47.6 44.6 20.1 86.8 44 125.4 71.3 38.6 27.3 74 58.1 105 91.6A928.7 928.7 0 0 1 1461.6 195c32 40.8 59.8 84.7 82.6 130.6a958 958 0 0 1 65.5 190.5c15.2 65.4 23.6 132.3 24.8 199.7.6 33.7.1 67.4-1.6 101-.8 16.8-2 33.6-3.4 50.3l-2.4 25.1-2.9 25c-5 41.5-12.6 82.5-22.9 122.9a944.5 944.5 0 0 1-139 285.8c-32.9 44-70 84.5-110.6 120.7s-84.3 68.1-130.7 94.6a968.6 968.6 0 0 1-144.3 64.6l-37.4 12c-12.6 3.8-25.3 7.3-38.1 10.4-25.6 6.3-51.5 11.5-77.5 15.6a959.9 959.9 0 0 1-157.3 12c-52.6-3.1-104.7-12-155-26a978.7 978.7 0 0 1-146.4-56.5c-47.3-24.1-92-53.5-133-87s-77.8-71.7-110.8-113.6c-33-41.9-60.8-87.3-82.5-134.8A962.3 962.3 0 0 1 106 701c-13.6-50.6-22-102.5-25-154.6-1.5-26.1-1.9-52.3-1.1-78.4.4-13 .9-26.1 1.7-39.1.8-13 1.9-26 3.2-38.9l4.5-38.6c4.6-25.6 10.7-50.8 18.2-75.7C122.6 226 151.7 178 186.8 133A1020 1020 0 0 1 292.1 40c19-19.3 39-37.7 59.8-55" />
-                        </g>
-                      </g>
-                    </svg>
-                </div>
-
-                <div class="position-relative z-2 d-flex flex-column justify-content-between h-100 p-5 text-white">
-                    <div>
-                        <a href="{{ route('home') }}" class="text-white text-decoration-none d-inline-block">
-                            <img src="{{ asset('images/logo.png') }}" alt="Spotlight" class="vs-brand-logo-lg">
-                        </a>
+            <!-- Left Side: Branding with animated wave motion -->
+            <div class="col-md-5 d-none d-md-block overflow-hidden" style="background: radial-gradient(circle at 30% 30%, #5E122C 0%, #29252A 100%); position: relative;">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="none" class="login-bg-svg position-absolute top-0 start-0 w-100 h-100" style="opacity: 0; z-index: 0;">
+                  <defs>
+                    <linearGradient id="SVGID_1_" x1="2880" x2="2880" y1="909.66" y2="170.6" gradientUnits="userSpaceOnUse">
+                      <stop offset="0" stop-color="#D98C9A" />
+                      <stop offset="1" stop-color="#7F1D3F" />
+                    </linearGradient>
+                  </defs>
+                  <g>
+                    <g class="g"><path class="path" fill="url(#SVGID_1_)" d="m1920 538.5 8.6-.4h8.6l8.6.3 4.3.3 4.3.4c11.4 1.1 22.8 2.9 34 5.4 22.5 5 44.3 12.4 65.6 21a730.8 730.8 0 0 1 62.3 28.7c20.3 10.3 40.3 21 60.2 31.7l29.8 15.9c9.9 5.2 19.9 10.3 29.9 15.3a727 727 0 0 0 60.7 27.2 360.6 360.6 0 0 0 62.6 18.3c10.6 2 21.2 3.4 31.8 4l8 .3 7.7-.1c2.6-.2 5.1-.2 7.7-.5l3.9-.4 1.9-.2 1.9-.3a177 177 0 0 0 30.8-7.4c10.2-3.3 20.2-7.5 30.1-12.1a448 448 0 0 0 57.5-33.2c37.2-24.9 72.1-53.7 106.7-82.8 34.6-29.1 68.7-59.1 105.7-85.8 9.3-6.6 18.7-13.1 28.5-19.1 9.8-6.1 19.8-11.7 30.3-16.7s21.3-9.4 32.7-12.6c11.4-3.2 23.2-5.3 35.3-5.7 12.1-.3 24.2 1.1 35.8 3.7 11.7 2.6 23 6.4 33.8 11 21.8 9.1 42 20.9 61.2 33.7 9.6 6.4 19 13.1 28.2 20a934 934 0 0 1 27.1 21.1c17.8 14.3 35.1 29 52.4 43.6 34.6 29.2 68.9 58.3 104.9 83.9 9 6.4 18.2 12.5 27.4 18.3 9.3 5.8 18.7 11.2 28.2 16.1 19.1 9.7 39 17.4 59 20.9l3.8.6 3.8.5 7.5.7 3.8.1 3.8.1h5.9l2-.1a243.7 243.7 0 0 0 63-10.6 388 388 0 0 0 31-10.3 706.6 706.6 0 0 0 60.9-26.6c20.1-9.8 40-20.3 60-30.8 20-10.6 40-21.2 60.4-31.4a875.4 875.4 0 0 1 62.3-28.5 430.2 430.2 0 0 1 65.5-20.9c11.2-2.5 22.6-4.3 34-5.5l4.3-.4 4.3-.3 8.6-.4 4.3-.1h4.3c2.9 0 5.7.2 8.6.3v3c-22.5 1.4-44.5 6-65.7 12.8a449 449 0 0 0-61.8 25.5c-40.1 19.7-78.4 43.3-117.4 66.4a1413.4 1413.4 0 0 1-59.3 33.9 675.1 675.1 0 0 1-62.4 29.9c-21.5 8.8-44 16.3-67.5 20.8a250.2 250.2 0 0 1-35.8 4.5l-2.3.1-2.3.1-4.6.1h-4.7l-4.7-.1-9.4-.7-4.6-.6-4.6-.7c-12.3-2-24.2-5.3-35.6-9.4-11.4-4.1-22.4-9-32.9-14.5a454.2 454.2 0 0 1-59.3-37.5c-37.3-27.5-71.2-58-105.1-88-16.9-15-33.8-30-50.8-44.5a845.7 845.7 0 0 0-52.2-41.8c-8.9-6.5-18-12.8-27.3-18.7a297 297 0 0 0-28.5-16.1c-9.7-4.7-19.7-8.8-30-11.8a128 128 0 0 0-31.2-5.2c-21.1-.5-42.6 4.8-62.9 13.4-20.3 8.6-39.7 20-58.2 32.6a590.9 590.9 0 0 0-27.3 19.7l-13.3 10.4-13.1 10.6a1788.2 1788.2 0 0 0-51.4 44.2c-33.9 29.9-67.2 60.8-103.3 89-18.1 14-37 27.3-57.5 38.7a267 267 0 0 1-31.9 15.2 191.4 191.4 0 0 1-34.6 10.1l-2.2.4-2.3.3-4.5.7-9.2 1-4.6.2c-1.5 0-3.1.2-4.6.1l-9-.1c-12-.3-23.9-1.6-35.5-3.7a340 340 0 0 1-67.4-19.9 674.5 674.5 0 0 1-62.6-29.3c-10.1-5.3-20.1-10.9-30-16.5l-14.8-8.5-14.7-8.6c-39.1-22.9-77.5-46.3-117.6-66.1-20-9.8-40.6-18.7-61.8-25.5a279.8 279.8 0 0 0-65.6-13.2v-2.9z" /><path class="path" fill="url(#SVGID_1_)" d="m0 538.5 8.6-.4h8.6l8.6.3 4.3.3 4.3.4c11.4 1.1 22.8 2.9 34 5.4 22.5 5 44.3 12.4 65.6 21a730.8 730.8 0 0 1 62.3 28.7c20.3 10.3 40.3 21 60.2 31.7l29.8 15.9c9.9 5.2 19.9 10.3 29.9 15.3a727 727 0 0 0 60.7 27.2 360.6 360.6 0 0 0 62.6 18.3c10.6 2 21.2 3.4 31.8 4l8 .3 7.7-.1c2.6-.2 5.1-.2 7.7-.5l3.9-.4 1.9-.2 1.9-.3a177 177 0 0 0 30.8-7.4c10.2-3.3 20.2-7.5 30.1-12.1a448 448 0 0 0 57.5-33.2c37.2-24.9 72.1-53.7 106.7-82.8 34.6-29.1 68.7-59.1 105.7-85.8 9.3-6.6 18.7-13.1 28.5-19.1 9.8-6.1 19.8-11.7 30.3-16.7s21.3-9.4 32.7-12.6c11.4-3.2 23.2-5.3 35.3-5.7 12.1-.3 24.2 1.1 35.8 3.7 11.7 2.6 23 6.4 33.8 11 21.8 9.1 42 20.9 61.2 33.7 9.6 6.4 19 13.1 28.2 20a934 934 0 0 1 27.1 21.1c17.8 14.3 35.1 29 52.4 43.6 34.6 29.2 68.9 58.3 104.9 83.9 9 6.4 18.2 12.5 27.4 18.3 9.3 5.8 18.7 11.2 28.2 16.1 19.1 9.7 39 17.4 59 20.9l3.8.6 3.8.5 7.5.7 3.8.1 3.8.1h5.9l2-.1a243.7 243.7 0 0 0 63-10.6 388 388 0 0 0 31-10.3 706.6 706.6 0 0 0 60.9-26.6c20.1-9.8 40-20.3 60-30.8 20-10.6 40-21.2 60.4-31.4a875.4 875.4 0 0 1 62.3-28.5 430.2 430.2 0 0 1 65.5-20.9c11.2-2.5 22.6-4.3 34-5.5l4.3-.4 4.3-.3 8.6-.4 4.3-.1h4.3c2.9 0 5.7.2 8.6.3v3c-22.5 1.4-44.5 6-65.7 12.8a449 449 0 0 0-61.8 25.5c-40.1 19.7-78.4 43.3-117.4 66.4a1413.4 1413.4 0 0 1-59.3 33.9 675.1 675.1 0 0 1-62.4 29.9c-21.5 8.8-44 16.3-67.5 20.8a250.2 250.2 0 0 1-35.8 4.5l-2.3.1-2.3.1-4.6.1h-4.7l-4.7-.1-9.4-.7-4.6-.6-4.6-.7c-12.3-2-24.2-5.3-35.6-9.4-11.4-4.1-22.4-9-32.9-14.5a454.2 454.2 0 0 1-59.3-37.5c-37.3-27.5-71.2-58-105.1-88-16.9-15-33.8-30-50.8-44.5a845.7 845.7 0 0 0-52.2-41.8c-8.9-6.5-18-12.8-27.3-18.7a297 297 0 0 0-28.5-16.1c-9.7-4.7-19.7-8.8-30-11.8a128 128 0 0 0-31.2-5.2c-21.1-.5-42.6 4.8-62.9 13.4-20.3 8.6-39.7 20-58.2 32.6a590.9 590.9 0 0 0-27.3 19.7l-13.3 10.4-13.1 10.6a1788.2 1788.2 0 0 0-51.4 44.2c-33.9 29.9-67.2 60.8-103.3 89-18.1 14-37 27.3-57.5 38.7a267 267 0 0 1-31.9 15.2 191.4 191.4 0 0 1-34.6 10.1l-2.2.4-2.3.3-4.5.7-9.2 1-4.6.2c-1.5 0-3.1.2-4.6.1l-9-.1c-12-.3-23.9-1.6-35.5-3.7a340 340 0 0 1-67.4-19.9 674.5 674.5 0 0 1-62.6-29.3c-10.1-5.3-20.1-10.9-30-16.5l-14.8-8.5-14.7-8.6c-39.1-22.9-77.5-46.3-117.6-66.1-20-9.8-40.6-18.7-61.8-25.5A278.2 278.2 0 0 0 0 541.5v-3z" /></g>
+                  </g>
+                </svg>
+                <div class="position-absolute top-0 start-0 w-100 h-100" style="background: rgba(41, 37, 42, 0.35); z-index: 1;"></div>
+                <div class="position-relative d-flex flex-column align-items-center justify-content-center h-100 p-4 text-white text-center" style="z-index: 2;">
+                    <div class="bg-white rounded-circle shadow-lg mb-3 d-flex align-items-center justify-content-center" style="width: 84px; height: 84px; padding: 14px; box-shadow: 0 10px 25px rgba(0,0,0,0.25);">
+                        <img src="{{ asset('images/logo-symbol-burgundy.png') }}" alt="Spotlight Logo" style="width: 100%; height: 100%; object-fit: contain;">
                     </div>
-                    <div class="mt-auto">
-                        <h2 class="fw-bold mb-3 text-white">Únete a la comunidad.</h2>
-                        <p class="text-white opacity-75">Crea tu cuenta y empieza a comprar o vender en la plataforma más confiable.</p>
-                    </div>
+                    <h3 class="fw-bold text-white mb-2 fs-4" style="font-family: 'Outfit', sans-serif; letter-spacing: -0.5px;">SPOTLIGHT</h3>
+                    <p class="text-white-50 small px-2 mb-0" style="max-width: 250px; line-height: 1.5;">
+                        <span class="lang-en">Join the creative entrepreneurial community.</span>
+                        <span class="lang-es">Únete a la comunidad de emprendedores creativos.</span>
+                    </p>
                 </div>
             </div>
 
             <!-- Right Side: Register Form -->
-            <div class="col-md-7 p-4 p-md-5 bg-white">
-                <div class="text-center d-md-none mb-4">
-                    <a href="{{ route('home') }}" class="text-decoration-none d-inline-block">
-                        <img src="{{ asset('images/logo.png') }}" alt="Spotlight" class="vs-brand-logo-lg">
+            <div class="col-md-7 p-3 p-md-4 bg-white position-relative">
+                <div class="text-center d-md-none mb-3">
+                    <div class="d-inline-flex bg-white rounded-circle p-2 shadow-sm border" style="width: 58px; height: 58px; align-items: center; justify-content: center;">
+                        <img src="{{ asset('images/logo-symbol-burgundy.png') }}" alt="Spotlight Logo" style="width: 100%; height: 100%; object-fit: contain;">
+                    </div>
+                </div>
+                
+                <!-- Tabs Top -->
+                <div class="d-flex mb-4">
+                    <a href="{{ route('register') }}" class="fw-bold text-decoration-none text-center py-2" style="flex: 1; color: var(--sl-primary); border-bottom: 3px solid var(--sl-primary);">
+                        <span class="lang-en">Register</span><span class="lang-es">Registro</span>
+                    </a>
+                    <a href="{{ route('login') }}" class="text-muted fw-bold text-decoration-none text-center py-2" style="flex: 1; border-bottom: 2px solid var(--sl-border);">
+                        <span class="lang-en">Login</span><span class="lang-es">Iniciar Sesión</span>
                     </a>
                 </div>
 
-                <div class="mb-4">
-                    <h3 class="fw-bold text-dark">Crea tu cuenta</h3>
-                    <p class="text-muted">Completa los campos para registrarte en la plataforma.</p>
+                <div class="mb-3 text-center">
+                    <h3 class="fw-bold text-dark fs-4 mb-1" style="font-family: 'Outfit', sans-serif;">
+                        <span class="lang-en">Create Account</span><span class="lang-es">Crea tu cuenta</span>
+                    </h3>
+                    <p class="text-muted small mb-0">
+                        <span class="lang-en">Select your role to get started.</span><span class="lang-es">Completa los campos para registrarte en la plataforma.</span>
+                    </p>
                 </div>
 
                 @if($errors->any())
-                    <div class="alert alert-danger border-0 d-flex align-items-center" style="background-color: rgba(220, 38, 38, 0.1); color: #dc2626;">
+                    <div class="alert alert-danger border-0 d-flex align-items-center rounded-4 py-2 px-3 mb-3" style="background-color: rgba(220, 38, 38, 0.1); color: #dc2626; font-size: 0.85rem;">
                         <i class="bi bi-exclamation-circle-fill me-2 fs-5"></i>
                         <div>{{ $errors->first() }}</div>
                     </div>
@@ -63,85 +212,136 @@
                 <form action="{{ route('register') }}" method="POST" id="mainRegisterForm" enctype="multipart/form-data">
                     @csrf
                     <div id="step-1">
+                        <!-- Selector de País -->
                         <div class="mb-3">
-                            <label class="form-label text-sm fw-semibold text-dark mb-1">Nombre completo</label>
-                            <input type="text" name="name" id="reg_name" class="form-control form-control-lg text-sm" placeholder="Tu nombre completo" value="{{ old('name') }}" required pattern="^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$" oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]/g, '')" autocomplete="name">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label text-sm fw-semibold text-dark mb-1">Correo electrónico</label>
-                            <input type="email" name="email" class="form-control form-control-lg text-sm" placeholder="ejemplo@correo.com" value="{{ old('email') }}" required autocomplete="email">
-                        </div>
-                        <div class="row g-3 mb-2">
-                            <div class="col-6">
-                                <label class="form-label text-sm fw-semibold text-dark mb-1">Contraseña</label>
-                                <input type="password" name="password" id="reg_password" class="form-control form-control-lg text-sm" placeholder="••••••••" required autocomplete="new-password">
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label text-sm fw-semibold text-dark mb-1">Confirmar contraseña</label>
-                                <input type="password" name="password_confirmation" id="reg_password_conf" class="form-control form-control-lg text-sm" placeholder="••••••••" required autocomplete="new-password">
+                            <label class="form-label text-sm fw-semibold text-dark mb-2">
+                                <span class="lang-en">Select Country</span><span class="lang-es">Selecciona tu País</span>
+                            </label>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <input type="radio" class="btn-check country-radio" name="country" id="country_co" value="CO" {{ old('country', 'CO') === 'CO' ? 'checked' : '' }}>
+                                    <label class="country-select-card text-center w-100 p-2 rounded-3 h-100 d-flex flex-column align-items-center justify-content-center" for="country_co" style="cursor: pointer;">
+                                        <span class="fs-4 d-block mb-1">🇨🇴</span>
+                                        <span class="fw-bold small d-block">Colombia</span>
+                                        <span class="text-muted text-xs d-block">Ubaté (COP $)</span>
+                                    </label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="radio" class="btn-check country-radio" name="country" id="country_mx" value="MX" {{ old('country') === 'MX' ? 'checked' : '' }}>
+                                    <label class="country-select-card text-center w-100 p-2 rounded-3 h-100 d-flex flex-column align-items-center justify-content-center" for="country_mx" style="cursor: pointer;">
+                                        <span class="fs-4 d-block mb-1">🇲🇽</span>
+                                        <span class="fw-bold small d-block">México</span>
+                                        <span class="text-muted text-xs d-block">Puebla (MXN $)</span>
+                                    </label>
+                                </div>
                             </div>
                         </div>
 
-                        {{-- Widget: Términos mínimos para una contraseña segura --}}
-                        <div id="pwd-checklist-card" class="p-3 mb-3 rounded-3" style="background: rgba(13, 148, 136, 0.05); border: 1px solid rgba(13, 148, 136, 0.2); transition: all 0.3s ease;">
-                            <div class="d-flex align-items-center justify-content-between mb-2">
-                                <span class="text-xs fw-bold" style="color: var(--vs-primary);">
-                                    <i class="bi bi-shield-lock me-1"></i>Requisitos para una contraseña segura:
-                                </span>
-                                <span id="pwd-strength-badge" class="badge rounded-pill text-xs px-2 py-1" style="background-color: var(--vs-primary); color: #fff;">Pendiente</span>
+                        <div class="mb-3">
+                            <label class="form-label text-sm fw-semibold text-dark mb-1">
+                                <span class="lang-en">Full Name</span><span class="lang-es">Nombre completo</span>
+                            </label>
+                            <input type="text" name="name" class="form-control text-sm rounded-pill px-3 py-2" style="background-color: #f8fafc; border: 1px solid #e2e8f0;" placeholder="Tu nombre completo" value="{{ old('name') }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-sm fw-semibold text-dark mb-1">
+                                <span class="lang-en">Email Address</span><span class="lang-es">Correo electrónico</span>
+                            </label>
+                            <input type="email" name="email" class="form-control text-sm rounded-pill px-3 py-2" style="background-color: #f8fafc; border: 1px solid #e2e8f0;" placeholder="ejemplo@correo.com" value="{{ old('email') }}" required>
+                        </div>
+                        
+                        <!-- Teléfono con Indicativo Dinámico -->
+                        <div class="mb-3">
+                            <label class="form-label text-sm fw-semibold text-dark mb-1">
+                                <span class="lang-en">Phone Number</span><span class="lang-es">Número de teléfono</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-sm fw-bold border-end-0 rounded-start-pill px-3" id="step1_phone_badge">{{ old('country', 'CO') === 'MX' ? '+52' : '+57' }}</span>
+                                <input type="hidden" name="phone_prefix" id="step1_phone_prefix" value="{{ old('phone_prefix', old('country', 'CO') === 'MX' ? '+52' : '+57') }}">
+                                <input type="tel" name="phone" id="step1_phone_input" class="form-control text-sm border-start-0 rounded-end-pill px-3 py-2" style="background-color: #f8fafc; border: 1px solid #e2e8f0;" placeholder="{{ old('country', 'CO') === 'MX' ? '222 123 4567' : '300 123 4567' }}" value="{{ old('phone') }}">
                             </div>
-                            <ul class="list-unstyled mb-0 d-flex flex-column gap-1 text-xs">
-                                <li id="rule-min8" class="d-flex align-items-center gap-2 text-muted">
-                                    <i class="bi bi-circle text-muted" id="rule-icon-min8"></i>
-                                    <span>Mínimo 8 caracteres</span>
-                                </li>
-                                <li id="rule-casing" class="d-flex align-items-center gap-2 text-muted">
-                                    <i class="bi bi-circle text-muted" id="rule-icon-casing"></i>
-                                    <span>Al menos una letra (mayúscula o minúscula)</span>
-                                </li>
-                                <li id="rule-number" class="d-flex align-items-center gap-2 text-muted">
-                                    <i class="bi bi-circle text-muted" id="rule-icon-number"></i>
-                                    <span>Al menos un número o símbolo especial</span>
-                                </li>
-                                <li id="rule-match" class="d-flex align-items-center gap-2 text-muted">
-                                    <i class="bi bi-circle text-muted" id="rule-icon-match"></i>
-                                    <span>Las contraseñas deben coincidir</span>
-                                </li>
-                            </ul>
+                            <small class="text-muted" style="font-size: 0.72rem;">
+                                <span class="lang-en">For notifications and purchase tracking</span><span class="lang-es">Para notificaciones y seguimiento de compras</span>
+                            </small>
+                        </div>
+
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <label class="form-label text-sm fw-semibold text-dark mb-1">
+                                    <span class="lang-en">Password</span><span class="lang-es">Contraseña</span>
+                                </label>
+                                <input type="password" name="password" class="form-control text-sm rounded-pill px-3 py-2" style="background-color: #f8fafc; border: 1px solid #e2e8f0;" placeholder="••••••••" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label text-sm fw-semibold text-dark mb-1">
+                                    <span class="lang-en">Confirm Password</span><span class="lang-es">Confirmar contraseña</span>
+                                </label>
+                                <input type="password" name="password_confirmation" class="form-control text-sm rounded-pill px-3 py-2" style="background-color: #f8fafc; border: 1px solid #e2e8f0;" placeholder="••••••••" required>
+                            </div>
+                        </div>
+
+
+
+                        <!-- Role Selection UI matching Login -->
+                        <div class="mb-3">
+                            <label class="form-label text-sm fw-semibold text-dark mb-2">
+                                <span class="lang-en">Select your role to get started.</span><span class="lang-es">Selecciona tu rol para comenzar.</span>
+                            </label>
+                            <div class="d-flex justify-content-center gap-4">
+                                @foreach(['user'=>['en'=>'USER','es'=>'USUARIO', 'icon'=>'bi-person-fill'], 'business'=>['en'=>'ENTERPRISE','es'=>'EMPRESA', 'icon'=>'bi-shop']] as $val=>$data)
+                                <div class="text-center">
+                                    <input type="radio" class="btn-check role-radio" name="role_ui" id="role_ui_{{ $val }}" value="{{ $val }}" {{ old('role', 'user')===$val ? 'checked' : '' }}>
+                                    <label class="role-circle-label" for="role_ui_{{ $val }}">
+                                        <i class="bi {{ $data['icon'] }} fs-4 mb-1"></i>
+                                    </label>
+                                    <div class="role-text"><span class="lang-en">{{ $data['en'] }}</span><span class="lang-es">{{ $data['es'] }}</span></div>
+                                </div>
+                                @endforeach
+                            </div>
                         </div>
                         <input type="hidden" name="role" id="role_input" value="{{ old('role', 'user') }}">
 
-                    <div id="action-buttons-step1">
-                        <button type="submit" id="btn-submit-user" class="btn btn-primary btn-lg w-100 fw-semibold shadow-sm mb-3">Registrarse como Usuario</button>
-                        <button type="button" id="btn-next-step" class="btn btn-outline-dark btn-lg w-100 fw-semibold mb-4">Soy Empresario (Completar perfil) <i class="bi bi-arrow-right ms-2"></i></button>
-                    </div>
+                        <!-- Action Buttons Step 1 -->
+                        <div id="action-buttons-step1" class="mt-3">
+                            <!-- This button is shown if user role is selected -->
+                            <button type="submit" id="btn-submit-user" class="btn btn-spotlight w-100 fw-semibold shadow-sm mb-3 py-2" style="{{ old('role', 'user') === 'user' ? '' : 'display: none;' }}">
+                                <span class="lang-en">Register as User</span><span class="lang-es">Registrarse como Usuario</span>
+                            </button>
+                            <!-- This button is shown if business role is selected -->
+                            <button type="button" id="btn-next-step" class="btn btn-spotlight w-100 fw-semibold shadow-sm mb-3 py-2" style="{{ old('role', 'user') === 'business' ? '' : 'display: none;' }}">
+                                <span class="lang-en">Register as Entrepreneur</span><span class="lang-es">Continuar registro de empresa</span> <i class="bi bi-arrow-right ms-2"></i>
+                            </button>
+                        </div>
 
                         <div id="google-registration-section">
-                            <div class="position-relative mb-4 text-center">
-                                <hr class="text-muted opacity-25">
-                                <span class="position-absolute top-50 start-50 translate-middle bg-white px-3 text-muted text-sm fw-medium">O registrarse con</span>
+                            <div class="position-relative mb-3 text-center">
+                                <hr class="text-muted opacity-25 my-2">
+                                <span class="position-absolute top-50 start-50 translate-middle bg-white px-3 text-muted text-xs fw-medium">
+                                    <span class="lang-en">Or register with</span><span class="lang-es">O registrarse con</span>
+                                </span>
                             </div>
 
-                            <a href="{{ route('google.redirect') }}" class="btn btn-outline-dark btn-lg w-100 fw-semibold mb-4 d-flex align-items-center justify-content-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/></svg>
+                            <a href="{{ route('google.redirect') }}" class="btn btn-light rounded-pill border w-100 fw-semibold mb-3 d-flex align-items-center justify-content-center gap-2 py-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/></svg>
                                 Google
                             </a>
-                        </div>
-                        <div class="text-center">
-                            <p class="text-muted text-sm mb-0">¿Ya tienes cuenta? <a href="{{ route('login') }}" class="text-primary fw-semibold text-decoration-none">Inicia sesión</a></p>
                         </div>
                     </div>
 
                     <!-- Step 2: Business Fields Container -->
                     <div id="step-2" style="display: none;">
-                        <div class="d-flex align-items-center mb-4">
+                        <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
                             <button type="button" id="btn-prev-step" class="btn btn-light rounded-circle p-2 me-3 shadow-sm border" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;"><i class="bi bi-arrow-left"></i></button>
-                            <h4 class="fw-bold text-dark mb-0 fs-5">Información de tu Negocio</h4>
+                            <h4 class="fw-bold text-dark mb-0 fs-4">
+                                <span class="lang-en">Business Information</span><span class="lang-es">Información de tu Negocio</span>
+                            </h4>
                         </div>
                         <div id="business-registration-fields" class="mb-4">
                             @include('business.partials.register-form')
                         </div>
-                        <button type="submit" id="btn-submit-business" class="btn btn-primary btn-lg w-100 fw-semibold shadow-sm mb-4">Finalizar y Crear cuenta</button>
+                        <button type="submit" id="btn-submit-business" class="btn btn-spotlight btn-lg w-100 fw-semibold shadow-sm mb-4 py-3">
+                            <span class="lang-en">Register as Entrepreneur</span><span class="lang-es">Finalizar y Crear cuenta</span>
+                        </button>
                     </div>
                 </form>
             </div>
@@ -154,9 +354,23 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // --- GSAP Animation ---
-    const tl = gsap.timeline();
+    // --- LANGUAGE TOGGLE SCRIPT ---
+    const btn = document.getElementById("btnSwitchLang");
+    const html = document.documentElement;
 
+    const savedLang = localStorage.getItem('spotlight-lang') || 'es';
+    html.setAttribute("lang", savedLang);
+
+    if (btn) {
+        btn.addEventListener("click", () => {
+            const current = html.getAttribute("lang");
+            const nextLang = current === 'en' ? 'es' : 'en';
+            html.setAttribute("lang", nextLang);
+            localStorage.setItem('spotlight-lang', nextLang);
+        });
+    }
+
+    // --- GSAP Animation for Background SVG ---
     const Line = ($el) => {
       const $paths = $el.querySelectorAll(".path");
       const tl = gsap.timeline();
@@ -211,69 +425,12 @@ document.addEventListener('DOMContentLoaded', () => {
       tl.seek(gsap.utils.random(10, 20));
     };
 
-    gsap.utils.toArray(".login-bg-svg .g").forEach(($el) => Line($el));
-    gsap.to(".login-bg-svg", { opacity: 1, duration: 1 });
-
-    // --- Dynamic Password Terms Validator (Brand styled) ---
-    const pwdInput = document.getElementById('reg_password');
-    const pwdConfInput = document.getElementById('reg_password_conf');
-    const badge = document.getElementById('pwd-strength-badge');
-
-    function updateRule(liId, iconId, isValid) {
-        const li = document.getElementById(liId);
-        const icon = document.getElementById(iconId);
-        if (!li || !icon) return;
-        if (isValid) {
-            li.style.color = 'var(--vs-secondary)';
-            li.style.fontWeight = '600';
-            icon.className = 'bi bi-check-circle-fill';
-            icon.style.color = 'var(--vs-secondary)';
-        } else {
-            li.style.color = '';
-            li.className = 'd-flex align-items-center gap-2 text-muted';
-            icon.className = 'bi bi-circle text-muted';
-            icon.style.color = '';
-        }
+    if (typeof gsap !== 'undefined') {
+        gsap.utils.toArray(".login-bg-svg .g").forEach(($el) => Line($el));
+        gsap.to(".login-bg-svg", { opacity: 1, duration: 1 });
     }
 
-    function checkPasswordSecurity() {
-        const val = pwdInput.value || '';
-        const confVal = pwdConfInput.value || '';
-
-        const hasMin8 = val.length >= 8;
-        const hasCasing = /[a-z]/.test(val) && /[A-Z]/.test(val);
-        const hasNumber = /[0-9\W]/.test(val);
-        const hasMatch = val.length > 0 && confVal.length > 0 && val === confVal;
-
-        updateRule('rule-min8', 'rule-icon-min8', hasMin8);
-        updateRule('rule-casing', 'rule-icon-casing', hasCasing);
-        updateRule('rule-number', 'rule-icon-number', hasNumber);
-        updateRule('rule-match', 'rule-icon-match', hasMatch);
-
-        const score = [hasMin8, hasCasing, hasNumber, hasMatch].filter(Boolean).length;
-        if (!badge) return;
-
-        if (val.length === 0) {
-            badge.textContent = 'Pendiente';
-            badge.style.backgroundColor = 'var(--vs-primary)';
-        } else if (score === 4) {
-            badge.textContent = 'Segura ✓';
-            badge.style.backgroundColor = 'var(--vs-secondary)';
-        } else if (score >= 2) {
-            badge.textContent = 'Media';
-            badge.style.backgroundColor = '#f59e0b';
-        } else {
-            badge.textContent = 'Débil';
-            badge.style.backgroundColor = '#ef4444';
-        }
-    }
-
-    if (pwdInput && pwdConfInput) {
-        pwdInput.addEventListener('input', checkPasswordSecurity);
-        pwdConfInput.addEventListener('input', checkPasswordSecurity);
-    }
-
-    // --- Stepper Logic ---
+    // --- Stepper & Country Logic ---
     const roleInput = document.getElementById('role_input');
     const btnNextStep = document.getElementById('btn-next-step');
     const btnSubmitUser = document.getElementById('btn-submit-user');
@@ -283,9 +440,37 @@ document.addEventListener('DOMContentLoaded', () => {
     const step2 = document.getElementById('step-2');
     const businessFieldsContainer = document.getElementById('business-registration-fields');
 
+    // Country & Buyer References
+    const countryRadios = document.querySelectorAll('.country-radio');
+    const phoneBadge = document.getElementById('step1_phone_badge');
+    const phonePrefixInput = document.getElementById('step1_phone_prefix');
+    const phoneInput = document.getElementById('step1_phone_input');
+    function getSelectedCountry() {
+        const checked = document.querySelector('.country-radio:checked');
+        return checked ? checked.value : 'CO';
+    }
+
+    function handleCountryChange(country) {
+        const isMX = (country === 'MX');
+        if (phoneBadge) phoneBadge.textContent = isMX ? '+52' : '+57';
+        if (phonePrefixInput) phonePrefixInput.value = isMX ? '+52' : '+57';
+        if (phoneInput) phoneInput.placeholder = isMX ? '222 123 4567' : '300 123 4567';
+
+        // Inform Step 2 partial about country switch
+        if (typeof window.switchRegistrationCountry === 'function') {
+            window.switchRegistrationCountry(country);
+        }
+    }
+
+    countryRadios.forEach(r => {
+        r.addEventListener('change', () => handleCountryChange(r.value));
+    });
+
     function goToStep2() {
         const nameInput = document.querySelector('#step-1 input[name="name"]');
         const emailInput = document.querySelector('#step-1 input[name="email"]');
+        const pwdInput = document.querySelector('#step-1 input[name="password"]');
+        const pwdConfInput = document.querySelector('#step-1 input[name="password_confirmation"]');
         
         // Validation before proceeding
         if (!nameInput.value || !emailInput.value || !pwdInput.value || !pwdConfInput.value) {
@@ -303,45 +488,44 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Remove required attributes so browser doesn't block submission when these are hidden
+        const selectedCountry = getSelectedCountry();
+
+        // Remove required attributes from step 1 so browser doesn't block hidden inputs
         nameInput.removeAttribute('required');
         emailInput.removeAttribute('required');
         pwdInput.removeAttribute('required');
         pwdConfInput.removeAttribute('required');
 
         roleInput.value = 'business';
+
         // Hide Step 1, Show Step 2
         gsap.to(step1, { opacity: 0, x: -20, duration: 0.3, onComplete: () => {
             step1.style.display = 'none';
             step2.style.display = 'block';
             gsap.fromTo(step2, { opacity: 0, x: 20 }, { opacity: 1, x: 0, duration: 0.3, ease: "power2.out" });
-            
-            // Inicializar mapa interactivo de empresa
-            if (window.initCompanyRegMap) {
-                setTimeout(window.initCompanyRegMap, 300);
+
+            // Activate business fields for the selected country
+            if (typeof window.switchRegistrationCountry === 'function') {
+                window.switchRegistrationCountry(selectedCountry);
+            }
+
+            // Initialize / recalculate map size once step-2 is visible (if Colombia)
+            if (selectedCountry === 'CO') {
+                setTimeout(() => {
+                    if (typeof window.initCompanyRegMap === 'function') {
+                        window.initCompanyRegMap();
+                    } else if (window._regMapInstance) {
+                        window._regMapInstance.invalidateSize();
+                    }
+                }, 300);
             }
         }});
-
-        // Enable business fields
-        const allInputs = businessFieldsContainer.querySelectorAll('input');
-        allInputs.forEach(input => {
-            if (input.hasAttribute('data-globally-disabled')) {
-                input.removeAttribute('disabled');
-                input.removeAttribute('data-globally-disabled');
-            }
-        });
-        
-        // Trigger formal/informal logic
-        const formalRadio = document.getElementById('tipo_formal');
-        if (formalRadio) {
-            formalRadio.dispatchEvent(new Event('change'));
-        }
     }
 
     function goToStep1() {
         roleInput.value = 'user';
         
-        // Add required attributes back
+        // Add required attributes back for Step 1
         document.querySelector('#step-1 input[name="name"]').setAttribute('required', 'required');
         document.querySelector('#step-1 input[name="email"]').setAttribute('required', 'required');
         document.querySelector('#step-1 input[name="password"]').setAttribute('required', 'required');
@@ -354,43 +538,62 @@ document.addEventListener('DOMContentLoaded', () => {
             gsap.fromTo(step1, { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.3, ease: "power2.out" });
         }});
 
-        // Disable business fields
-        const allInputs = businessFieldsContainer.querySelectorAll('input');
-        allInputs.forEach(input => {
-            if (!input.disabled) {
+        // Disable all business fields in Step 2 so browser does not validate them
+        if (businessFieldsContainer) {
+            const allInputs = businessFieldsContainer.querySelectorAll('input, select, textarea');
+            allInputs.forEach(input => {
                 input.disabled = true;
-                input.setAttribute('data-globally-disabled', 'true');
-            }
-        });
+            });
+        }
     }
 
+    // UI Radio logic to update the hidden input and buttons
+    const roleUIRadios = document.querySelectorAll('.role-radio');
+
+    roleUIRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            roleInput.value = this.value;
+            if (this.value === 'user') {
+                btnSubmitUser.style.display = 'block';
+                btnNextStep.style.display = 'none';
+            } else {
+                btnSubmitUser.style.display = 'none';
+                btnNextStep.style.display = 'block';
+            }
+        });
+    });
+
     // Initialize state
+    handleCountryChange(getSelectedCountry());
+
     if (roleInput.value === 'business') {
         step1.style.display = 'none';
         step2.style.display = 'block';
-        const allInputs = businessFieldsContainer.querySelectorAll('input');
-        allInputs.forEach(input => {
-            if (input.hasAttribute('data-globally-disabled')) {
-                input.removeAttribute('disabled');
-                input.removeAttribute('data-globally-disabled');
-            }
-        });
-        if (window.initCompanyRegMap) {
-            setTimeout(window.initCompanyRegMap, 300);
+        if (typeof window.switchRegistrationCountry === 'function') {
+            window.switchRegistrationCountry(getSelectedCountry());
+        }
+        if (getSelectedCountry() === 'CO') {
+            setTimeout(() => {
+                if (typeof window.initCompanyRegMap === 'function') {
+                    window.initCompanyRegMap();
+                } else if (window._regMapInstance) {
+                    window._regMapInstance.invalidateSize();
+                }
+            }, 300);
         }
     } else {
-        const allInputs = businessFieldsContainer.querySelectorAll('input');
-        allInputs.forEach(input => {
-            if (!input.disabled) {
+        // Disable business fields initially
+        if (businessFieldsContainer) {
+            const allInputs = businessFieldsContainer.querySelectorAll('input, select, textarea');
+            allInputs.forEach(input => {
                 input.disabled = true;
-                input.setAttribute('data-globally-disabled', 'true');
-            }
-        });
+            });
+        }
     }
 
     // Listeners
-    btnNextStep.addEventListener('click', goToStep2);
-    btnPrevStep.addEventListener('click', goToStep1);
+    if (btnNextStep) btnNextStep.addEventListener('click', goToStep2);
+    if (btnPrevStep) btnPrevStep.addEventListener('click', goToStep1);
 });
 </script>
 @endpush

@@ -33,7 +33,7 @@ class AuthController extends Controller
             $request->session()->regenerate();
             return match($user->role) {
                 'admin'    => redirect()->route('admin.dashboard'),
-                'business' => redirect()->route('business.dashboard'),
+                'business' => $user->company ? redirect()->route('business.dashboard') : redirect()->route('business.company.edit'),
                 default    => redirect()->route('user.dashboard'),
             };
         }
@@ -52,45 +52,93 @@ class AuthController extends Controller
             'role'     => 'required|in:user,business',
         ];
 
-        // Reglas condicionales si es Empresario
+        $country = strtoupper((string) $request->input('country', 'CO'));
+        if (!in_array($country, ['CO', 'MX'])) {
+            $country = 'CO';
+        }
+
+        // Reglas condicionales si es Empresario o Comprador
         if ($request->role === 'business') {
-            $businessRules = (new \App\Http\Requests\BusinessRegisterRequest())->rules();
-            // Remove the rules that are for edit/general company info and keep only the registration ones
+            $businessFormRequest = \App\Http\Requests\BusinessRegisterRequest::createFrom($request);
+            $businessRules = $businessFormRequest->rules();
+            $customMessages = array_merge($businessFormRequest->messages(), [
+                'name.regex' => 'El nombre completo solo puede contener caracteres alfabéticos (A-Z, a-z).',
+            ]);
             $businessRulesToMerge = array_intersect_key($businessRules, array_flip([
+                'country', 'state', 'city', 'postal_code', 'tax_id', 'currency', 'phone_prefix', 'phone',
                 'tipo_negocio', 'habeas_data_accepted', 'address',
                 'razon_social', 'nit', 'camara_comercio_file', 'rut_file',
                 'nombre_comercial', 'cedula_propietario', 'rut_personal_file',
                 'nombre_representante', 'email_representante',
-                'latitude', 'longitude'
+                'latitude', 'longitude', 'category', 'description', 'logo'
             ]));
             $rules = array_merge($rules, $businessRulesToMerge);
+        } else {
+            // Comprador (role: user) - No requiere ningún documento tributario ni requisitos complejos
+            $rules['phone'] = ['nullable', 'string', 'max:20'];
+            $rules['phone_prefix'] = ['nullable', 'string', 'max:10'];
+            $rules['city'] = ['nullable', 'string', 'max:100'];
+            $rules['state'] = ['nullable', 'string', 'max:100'];
+            $rules['postal_code'] = ['nullable', 'string', 'max:20'];
+            $rules['address'] = ['nullable', 'string', 'max:255'];
+            $customMessages = [
+                'name.regex' => 'El nombre completo solo puede contener caracteres alfabéticos (A-Z, a-z).',
+            ];
         }
-
-        $customMessages = array_merge((new \App\Http\Requests\BusinessRegisterRequest())->messages(), [
-            'name.regex' => 'El nombre completo solo puede contener caracteres alfabéticos (A-Z, a-z).',
-        ]);
 
         $request->validate($rules, $customMessages);
 
+        $phonePrefix = $request->input('phone_prefix');
+        if (!$phonePrefix) {
+            $phonePrefix = ($country === 'MX') ? '+52' : '+57';
+        }
+
         $user = User::create([
-            'name'     => $request->name,
-            'email'    => $request->email,
-            'password' => Hash::make($request->password),
-            'role'     => $request->role,
+            'name'         => $request->name,
+            'email'        => $request->email,
+            'password'     => Hash::make($request->password),
+            'role'         => $request->role,
+            'country'      => $country,
+            'state'        => $request->input('state', $country === 'MX' ? 'Puebla' : 'Cundinamarca'),
+            'city'         => $request->input('city', $country === 'MX' ? 'Puebla' : 'Ubaté'),
+            'postal_code'  => $request->input('postal_code'),
+            'address'      => $request->input('address', ''),
+            'phone'        => $request->input('phone', ''),
+            'phone_prefix' => $phonePrefix,
         ]);
 
         if ($user->role === 'business') {
             $companyData = $request->only([
-                'tipo_negocio', 'razon_social', 'nit', 'nombre_comercial', 'cedula_propietario', 'habeas_data_accepted', 'address', 'nombre_representante', 'email_representante', 'latitude', 'longitude'
+                'country', 'state', 'city', 'postal_code', 'tax_id', 'currency', 'phone_prefix', 'phone',
+                'tipo_negocio', 'razon_social', 'nit', 'nombre_comercial', 'cedula_propietario',
+                'habeas_data_accepted', 'address', 'nombre_representante', 'email_representante',
+                'latitude', 'longitude', 'category', 'description'
             ]);
+            $companyData['country'] = $country;
+            $companyData['currency'] = $country === 'MX' ? 'MXN' : 'COP';
+            $companyData['phone_prefix'] = $phonePrefix;
             $companyData['status'] = 'active';
             $companyData['user_id'] = $user->id;
-            
-            // Si el name general fue insertado, lo mapeamos si faltó el de la empresa
-            if ($companyData['tipo_negocio'] === 'formal') {
-                $companyData['name'] = $companyData['razon_social'] ?? $user->name;
+
+            if ($country === 'MX') {
+                $companyData['state'] = $request->input('state', 'Puebla');
+                $companyData['city'] = $request->input('city', 'Puebla');
+                $companyData['name'] = $request->input('nombre_comercial') ?: ($request->input('company_name') ?: ($request->input('razon_social') ?: $user->name));
+                // RFC Opcional: Si viene vacío o con dummy, almacenar null sin inventar datos
+                $rawTaxId = trim((string) $request->input('tax_id'));
+                $companyData['tax_id'] = ($rawTaxId !== '' && $rawTaxId !== '000000' && strtoupper($rawTaxId) !== 'N/A') ? $rawTaxId : null;
+                $companyData['category'] = $request->input('category', 'General');
+                $companyData['description'] = $request->input('description', '');
+                $companyData['tipo_negocio'] = $request->input('tipo_negocio', 'informal');
+                $companyData['formalization'] = $request->input('tipo_negocio', 'informal');
             } else {
-                $companyData['name'] = $companyData['nombre_comercial'] ?? $user->name;
+                $companyData['state'] = $request->input('state') ?: 'Cundinamarca';
+                $companyData['city'] = $request->input('city') ?: 'Ubaté';
+                if (($companyData['tipo_negocio'] ?? '') === 'formal') {
+                    $companyData['name'] = $companyData['razon_social'] ?? $user->name;
+                } else {
+                    $companyData['name'] = $companyData['nombre_comercial'] ?? $user->name;
+                }
             }
 
             if ($request->hasFile('camara_comercio_file')) {
@@ -101,6 +149,9 @@ class AuthController extends Controller
             }
             if ($request->hasFile('rut_personal_file')) {
                 $companyData['rut_personal_file'] = $request->file('rut_personal_file')->store('documents', 'public');
+            }
+            if ($request->hasFile('logo')) {
+                $companyData['logo'] = $request->file('logo')->store('logos', 'public');
             }
 
             \App\Models\Company::create($companyData);

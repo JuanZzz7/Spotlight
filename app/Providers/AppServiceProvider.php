@@ -22,6 +22,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        \Illuminate\Pagination\Paginator::useBootstrapFive();
+
         if (config('app.env') === 'production') {
             URL::forceScheme('https');
         }
@@ -29,5 +31,8 @@ class AppServiceProvider extends ServiceProvider
         if ($alwaysTo = env('MAIL_ALWAYS_TO')) {
             Mail::alwaysTo($alwaysTo);
         }
+
+        \Illuminate\Support\Facades\Gate::policy(\App\Models\ElectronicDocument::class, \App\Policies\ElectronicDocumentPolicy::class);
+        \Illuminate\Support\Facades\Gate::policy(\App\Models\CompanyFiscalProfile::class, \App\Policies\CompanyFiscalProfilePolicy::class);
     }
 }

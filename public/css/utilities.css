@@ -1,23 +1,80 @@
-/* ============================================
-   UTILITIES.CSS - Helper Classes
-   Text sizes, spacing, z-index, misc helpers
-   ============================================ */
+/* ==========================================================================
+   UTILITIES.CSS - Utilidades Oficiales Spotlight
+   Paleta: Borgoña (#7F1D3F), Rosa Empolvado (#D98C9A), Rosa Suave (#F6E7EB),
+           Blanco Marfil (#FFFCF7), Carbón Oscuro (#29252A)
+   ========================================================================== */
 
-/* Text sizes */
-.text-xs { font-size: 0.75rem; }
-.text-sm { font-size: 0.875rem; }
+/* Fondos Oficiales */
+.bg-sl-primary      { background-color: var(--sl-primary) !important; }
+.bg-sl-primary-soft { background-color: var(--sl-primary-soft) !important; }
+.bg-sl-accent       { background-color: var(--sl-accent) !important; }
+.bg-sl-accent-soft  { background-color: var(--sl-accent-soft) !important; }
+.bg-sl-success-soft { background-color: var(--sl-success-soft) !important; }
+.bg-sl-danger-soft  { background-color: var(--sl-danger-soft) !important; }
+.bg-sl-surface      { background-color: var(--sl-surface) !important; }
+.bg-sl-bg           { background-color: var(--sl-bg) !important; }
+.bg-sl-navy         { background-color: var(--sl-navy) !important; }
 
-/* Font weights */
-.font-medium { font-weight: 500; }
-.font-semibold { font-weight: 600; }
+/* Textos Oficiales */
+.text-sl-primary     { color: var(--sl-primary) !important; }
+.text-sl-primary-dark{ color: var(--sl-primary-dark) !important; }
+.text-sl-accent      { color: var(--sl-accent) !important; }
+.text-sl-navy        { color: var(--sl-navy) !important; }
+.text-sl-heading     { color: var(--sl-text-heading) !important; }
+.text-sl-body        { color: var(--sl-text-body) !important; }
+.text-sl-muted       { color: var(--sl-text-muted) !important; }
 
-/* Letter spacing */
-.tracking-wide { letter-spacing: 0.05em; }
+/* Bordes Oficiales */
+.border-sl { border: 1px solid var(--sl-border) !important; }
+.border-sl-subtle { border: 1px solid var(--sl-border-subtle) !important; }
+.border-sl-primary { border: 1px solid var(--sl-primary) !important; }
+.border-sl-accent { border: 1px solid var(--sl-accent) !important; }
 
-/* Z-index */
-.z-1 { z-index: 1; }
-
-/* Hover effects */
-.hover-opacity-100:hover {
-    opacity: 1 !important;
+/* Gradientes Oficiales Spotlight */
+.text-gradient-primary,
+.text-gradient-spotlight {
+    background: linear-gradient(135deg, var(--sl-primary) 0%, var(--sl-accent) 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
 }
+
+.bg-gradient-spotlight {
+    background: linear-gradient(135deg, var(--sl-primary) 0%, var(--sl-accent) 100%) !important;
+}
+
+/* Efectos de elevación e interacción */
+.hover-lift {
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.hover-lift:hover {
+    transform: translateY(-3px) !important;
+    box-shadow: var(--sl-shadow-hover) !important;
+}
+
+/* Compatibilidad de alias antiguos */
+.text-gradient-violet {
+    background: linear-gradient(135deg, var(--sl-primary) 0%, var(--sl-accent) 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+}
+
+.bg-sl-purple-soft { background-color: var(--sl-primary-soft) !important; }
+.bg-sl-coral-soft  { background-color: var(--sl-accent-soft) !important; }
+.bg-sl-cyan-soft   { background-color: var(--sl-primary-soft) !important; }
+.bg-sl-amber-soft  { background-color: var(--sl-accent-soft) !important; }
+.border-sl-purple  { border: 1px solid rgba(127, 29, 63, 0.25) !important; }
+
+/* Animaciones de Entrada Suaves */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.3s ease forwards;
+}
+
+/* Control de Visibilidad de Idiomas */
+html[lang="es"] .lang-en { display: none !important; }
+html[lang="en"] .lang-es { display: none !important; }

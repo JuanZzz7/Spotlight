@@ -21,6 +21,10 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
+        if ($product->orderDetails()->exists()) {
+            return back()->with('error', 'No es posible eliminar el producto porque tiene ventas asociadas en la plataforma. Puede desactivarlo para ocultarlo del catálogo.');
+        }
+
         $product->delete();
         return redirect()->route('admin.products.index')->with('success', 'Producto eliminado.');
     }

@@ -21,13 +21,20 @@
                 <textarea name="description" class="form-control" rows="3">{{ old('description', $product->description) }}</textarea>
             </div>
             <div class="row g-3 mb-3">
-                <div class="col-6">
-                    <label class="form-label text-sm fw-semibold text-dark">Precio (COP) *</label>
-                    <input type="number" name="price" class="form-control" value="{{ old('price', $product->price) }}" min="0" step="100" required>
+                <div class="col-md-4">
+                    <label class="form-label text-sm fw-semibold text-dark">Precio de venta (COP) *</label>
+                    <input type="number" name="price" id="prod_price" class="form-control" value="{{ old('price', $product->price) }}" min="0" step="100" required>
+                    <small class="text-muted" style="font-size: 0.7rem;">A lo que lo vendes al público</small>
                 </div>
-                <div class="col-6">
-                    <label class="form-label text-sm fw-semibold text-dark">Stock *</label>
+                <div class="col-md-4">
+                    <label class="form-label text-sm fw-semibold text-dark">Costo del producto (COP)</label>
+                    <input type="number" name="cost_price" id="prod_cost_price" class="form-control" value="{{ old('cost_price', $product->cost_price ?: 0) }}" min="0" step="100">
+                    <small class="text-muted" style="font-size: 0.7rem;">Lo que te cuesta fabricarlo/comprarlo</small>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label text-sm fw-semibold text-dark">Stock disponible *</label>
                     <input type="number" name="stock" class="form-control" value="{{ old('stock', $product->stock) }}" min="0" required>
+                    <small class="text-muted" style="font-size: 0.7rem;">Unidades en inventario</small>
                 </div>
             </div>
             <div class="mb-3">
