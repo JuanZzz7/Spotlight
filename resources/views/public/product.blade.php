@@ -136,7 +136,7 @@
                 <a href="{{ route('home') }}" class="d-flex align-items-center text-decoration-none">
                     <img src="{{ asset('images/logo.png') }}" alt="Spotlight" style="height: 38px; object-fit: contain;" class="me-2">
                     <span class="fw-bold fs-4" style="color: var(--sl-primary); font-family: 'Outfit', sans-serif;">SPOTLIGHT</span>
-                    <span class="badge badge-purple ms-2 d-none d-sm-inline-block" style="font-size: 0.65rem;">LA ALDEA DIGITAL</span>
+                    <span class="badge badge-purple ms-2 d-none d-sm-inline-block" style="font-size: 0.65rem;">ALDEA DIGITAL</span>
                 </a>
             </div>
 
@@ -383,7 +383,7 @@
                                 <span class="lang-en">About this product</span><span class="lang-es">Descripción del producto</span>
                             </h6>
                             <p class="text-muted lh-base" style="font-size: 0.95rem;">
-                                {{ $product->description ?: 'Producto auténtico ofrecido por la comunidad creativa de la Aldea Digital. Hecho con altos estándares de calidad, pasión y compromiso con el comercio local.' }}
+                                {{ $product->description ?: 'Producto auténtico ofrecido por la comunidad creativa de Aldea Digital. Hecho con altos estándares de calidad, pasión y compromiso con el comercio local.' }}
                             </p>
                         </div>
 

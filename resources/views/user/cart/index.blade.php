@@ -4,7 +4,7 @@
 @section('page-title')
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center w-100">
     <div>
-        <div class="text-uppercase text-muted fw-bold mb-1" style="font-size: 0.65rem; letter-spacing: 0.5px;">PORTAL COMPRADOR / LA ALDEA DIGITAL / CARRITO DE COMPRAS</div>
+        <div class="text-uppercase text-muted fw-bold mb-1" style="font-size: 0.65rem; letter-spacing: 0.5px;">PORTAL COMPRADOR / ALDEA DIGITAL / CARRITO DE COMPRAS</div>
         <div class="mb-2"><span class="badge badge-coral" style="font-size: 0.65rem; font-weight: 800; letter-spacing: 0.5px;"><i class="bi bi-bag-check-fill me-1"></i> {{ count($items ?? []) }} ARTÍCULOS RESERVADOS</span></div>
         <h2 class="fw-bold text-dark mb-2" style="font-family: 'Outfit', sans-serif; letter-spacing: -0.5px; font-size: 2.2rem;">Tu Carrito de <span class="text-gradient-purple">Compras</span></h2>
         <p class="text-muted mb-0" style="font-size: 0.85rem; max-width: 500px;">Revisa tus productos seleccionados antes de proceder al pago seguro y apoyar a la comunidad de emprendedores.</p>
@@ -131,7 +131,7 @@
                         <i class="bi bi-ticket-perforated" style="color: var(--sl-primary, #7F1D3F);"></i>
                         <h6 class="fw-bold mb-0 text-dark" style="font-size: 0.85rem;">Cupón de Descuento</h6>
                     </div>
-                    <p class="text-muted mb-3" style="font-size: 0.75rem;">Ingresa el código promocional emitido por la Aldea Digital o sus emprendedores.</p>
+                    <p class="text-muted mb-3" style="font-size: 0.75rem;">Ingresa el código promocional emitido por Aldea Digital o sus emprendedores.</p>
                     <div class="input-group bg-white rounded-pill p-1 border shadow-sm">
                         <input type="text" class="form-control border-0 bg-transparent fw-medium ps-3" style="font-size: 0.75rem; box-shadow: none;" placeholder="Código: ej. SPOTLIGHT20">
                         <button class="btn btn-dark rounded-pill fw-bold text-white px-3 py-1" style="font-size: 0.75rem;">Aplicar</button>
@@ -221,7 +221,7 @@
                 </a>
                 
                 <a href="{{ route('user.dashboard') }}" class="btn btn-light w-100 py-3 rounded-pill fw-bold text-muted border shadow-sm d-flex justify-content-center align-items-center gap-2 mb-4 hover-bg" style="font-size: 0.85rem; background: linear-gradient(to bottom, #fff, #f8fafc);">
-                    <i class="bi bi-shop"></i> Seguir explorando la Aldea Digital
+                    <i class="bi bi-shop"></i> Seguir explorando Aldea Digital
                 </a>
                 
                 <div class="bg-light rounded-4 p-3 mb-4 d-flex align-items-center gap-3 border" style="background: linear-gradient(to right, #f8fafc, #f1f5f9);">

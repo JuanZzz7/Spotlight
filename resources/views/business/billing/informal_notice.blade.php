@@ -5,8 +5,8 @@
 @section('dashboard-content')
 <div class="container-fluid px-0">
     <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="vs-card p-4 p-md-5 text-center shadow-sm">
+        <div class="col-lg-10 col-xl-9">
+            <div class="vs-card p-4 p-md-5 text-center shadow-sm mb-4">
                 <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-4" 
                      style="width: 80px; height: 80px; background: var(--sl-primary-soft, #F6E7EB); color: var(--sl-primary, #7F1D3F);">
                     <i class="bi bi-shield-lock-fill fs-1"></i>
@@ -47,6 +47,9 @@
                 </div>
 
                 <div class="d-flex flex-wrap gap-3 justify-content-center">
+                    <a href="{{ route('business.formalization.guide') }}" class="btn btn-warning px-4 py-2 text-dark fw-bold rounded-pill shadow-xs">
+                        <i class="bi bi-mortarboard-fill me-1"></i> Ver Tutoriales de Formalización
+                    </a>
                     <a href="{{ route('business.company.edit') }}" class="btn btn-spotlight px-4 py-2">
                         <i class="bi bi-pencil-square me-2"></i> Actualizar Perfil a Comercio Formal
                     </a>
@@ -54,6 +57,11 @@
                         Volver al Panel Principal
                     </a>
                 </div>
+            </div>
+
+            {{-- Centro de Tutoriales incrustado --}}
+            <div class="mb-4">
+                @include('business.partials.formalization-tutorials')
             </div>
         </div>
     </div>

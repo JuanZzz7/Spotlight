@@ -13,12 +13,6 @@
     <a href="{{ route('admin.companies.index') }}" class="vs-nav-link {{ request()->routeIs('admin.companies*') ? 'active' : '' }}">
         <i class="bi bi-building fs-5"></i> Empresas
     </a>
-    <a href="{{ route('admin.products.index') }}" class="vs-nav-link {{ request()->routeIs('admin.products*') ? 'active' : '' }}">
-        <i class="bi bi-box fs-5"></i> Productos
-    </a>
-    <a href="{{ route('admin.reports.index') }}" class="vs-nav-link {{ request()->routeIs('admin.reports*') ? 'active' : '' }}">
-        <i class="bi bi-bar-chart fs-5"></i> Reportes
-    </a>
     <a href="{{ route('admin.fiscal_verifications.index') }}" class="vs-nav-link {{ request()->routeIs('admin.fiscal_verifications*') ? 'active' : '' }}">
         <i class="bi bi-file-earmark-check fs-5"></i> Verificación DIAN
     </a>
@@ -46,6 +40,11 @@
     @if(auth()->user()->company && auth()->user()->company->isColombian())
     <a href="{{ route('business.billing.index') }}" class="vs-nav-link {{ request()->routeIs('business.billing*') && !request()->routeIs('business.billing.sales*') ? 'active' : '' }}">
         <i class="bi bi-shield-check fs-5"></i> Facturación DIAN
+    </a>
+    @endif
+    @if(auth()->user()->company && auth()->user()->company->isInformal())
+    <a href="{{ route('business.formalization.guide') }}" class="vs-nav-link {{ request()->routeIs('business.formalization*') ? 'active' : '' }}">
+        <i class="bi bi-mortarboard fs-5"></i> Tutoriales Formalización
     </a>
     @endif
     <a href="{{ route('business.shipments.index') }}" class="vs-nav-link {{ request()->routeIs('business.shipments*') ? 'active' : '' }}">

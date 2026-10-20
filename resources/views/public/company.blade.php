@@ -9,7 +9,7 @@
             <div class="rounded-3 d-flex align-items-center justify-content-center text-white fw-bold shadow-sm" style="width: 36px; height: 36px; background: linear-gradient(135deg, #7F1D3F, #D98C9A); font-size: 1.1rem;">S</div>
             <div>
                 <span class="fw-bold fs-5 text-dark" style="font-family: var(--sl-font-display); letter-spacing: -0.5px;">SPOTLIGHT</span>
-                <span class="d-block text-uppercase fw-bold" style="font-size: 0.6rem; letter-spacing: 0.08em; color: var(--sl-primary) !important;">LA ALDEA DIGITAL</span>
+                <span class="d-block text-uppercase fw-bold" style="font-size: 0.6rem; letter-spacing: 0.08em; color: var(--sl-primary) !important;">ALDEA DIGITAL</span>
             </div>
         </a>
         <div class="d-flex gap-2 align-items-center">

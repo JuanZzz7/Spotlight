@@ -110,7 +110,7 @@ Se han diseñado 5 módulos progresivos para garantizar una formación integral:
 *   **Temario:** Poblaciones iniciales, selección natural, mutación, funciones de aptitud y aplicaciones en logística.
 *   **Tecnologías:** Python, NumPy, SciPy.
 *   **Modalidad:** Híbrida (Clases grabadas + Sesiones en vivo).
-*   **Beneficios:** Certificado de la Aldea Digital, acceso de por vida y comunidad de estudio.
+*   **Beneficios:** Certificado de Aldea Digital, acceso de por vida y comunidad de estudio.
 
 ---
 
@@ -143,11 +143,11 @@ Un formulario diseñado para la mejor experiencia de usuario (UX), asegurando qu
 
 # 9. Chatbot Inteligente con Gemini API
 
-El asistente virtual de la Aldea Digital está configurado para ser un experto en el ecosistema educativo de la plataforma.
+El asistente virtual de Aldea Digital está configurado para ser un experto en el ecosistema educativo de la plataforma.
 
 ### Especificaciones Técnicas
 *   **Motor:** Gemini 1.5 Flash (vía Google AI Studio).
-*   **Restricción de Contexto:** El chatbot solo opera dentro del dominio de la educación en IA, información de la Aldea Digital, cursos e instructores.
+*   **Restricción de Contexto:** El chatbot solo opera dentro del dominio de la educación en IA, información de Aldea Digital, cursos e instructores.
 *   **Personalidad:** Profesional, amable, servicial y educativo.
 *   **Rechazo de Consultas:** Si el usuario pregunta sobre temas externos (política, entretenimiento ajeno, etc.), el chatbot declinará cordialmente la respuesta y redirigirá al usuario a los temas de estudio.
 
@@ -193,7 +193,7 @@ Este archivo es el corazón informativo que alimenta al Chatbot.
 
 Para garantizar la seguridad y el enfoque educativo, se utiliza el siguiente **System Prompt**:
 
-> "Eres el Asistente Educativo de la Aldea Digital de Ubaté. Tu única función es ayudar a los estudiantes con dudas sobre los cursos de Inteligencia Artificial, la historia de la IA presentada en este sitio, los perfiles de los instructores y la información institucional de la Aldea Digital. 
+> "Eres el Asistente Educativo de Aldea Digital de Ubaté. Tu única función es ayudar a los estudiantes con dudas sobre los cursos de Inteligencia Artificial, la historia de la IA presentada en este sitio, los perfiles de los instructores y la información institucional de Aldea Digital. 
 > 
 > REGLAS CRÍTICAS:
 > 1. Usa ÚNICAMENTE la base de conocimientos proporcionada.
@@ -220,7 +220,7 @@ const API_CONFIG = {
 };
 
 async function sendMessageToGemini(userPrompt, contextData) {
-    const systemInstruction = "Eres un asistente experto en la Aldea Digital de Ubaté. Responde solo sobre IA y cursos.";
+    const systemInstruction = "Eres un asistente experto en Aldea Digital de Ubaté. Responde solo sobre IA y cursos.";
     
     const requestBody = {
         contents: [{

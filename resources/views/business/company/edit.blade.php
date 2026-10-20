@@ -5,8 +5,7 @@
 @push('styles')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
 <style>
-    #map { z-index: 1; border-radius: 1rem; border: 1px solid #dee2e6; height: 350px; width: 100%; min-height: 350px; }
-    .section-save-bar {
+    #map { z-index: 1; border-radius: 1rem; border: 1px solid #dee2e6; height: 350px; width: 100%; min-height: 350px; }    .section-save-bar {
         background: #f8f9fa;
         border-top: 1px solid #e9ecef;
         padding: 14px 24px;
@@ -16,6 +15,58 @@
         align-items: center;
         gap: 10px;
     }
+    .settings-nav-btn {
+        transition: all 0.25s ease;
+        border-radius: 12px;
+        font-weight: 600;
+        border: 1px solid #e2e8f0;
+        background: #ffffff;
+        color: #475569;
+        padding: 12px 18px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        width: 100%;
+        text-align: left;
+    }
+    .settings-nav-btn:hover {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+        transform: translateY(-1px);
+        color: #0f172a;
+    }
+    .settings-nav-btn.active {
+        background: #0f172a;
+        color: #ffffff;
+        border-color: #0f172a;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+    }
+    .settings-nav-btn.active .btn-icon-box {
+        background: rgba(255, 255, 255, 0.2);
+        color: #ffffff;
+    }
+    .settings-nav-btn.active .badge-status {
+        background: rgba(255, 255, 255, 0.25) !important;
+        color: #ffffff !important;
+    }
+    .settings-nav-btn.active .chevron-icon {
+        transform: rotate(90deg);
+        color: #ffffff;
+    }
+    .btn-icon-box {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        transition: all 0.25s ease;
+    }
+    .chevron-icon {
+        transition: transform 0.25s ease;
+    }
     @@keyframes spin {
         from { transform: rotate(0deg); }
         to   { transform: rotate(360deg); }
@@ -24,23 +75,99 @@
 @endpush
 
 @section('dashboard-content')
-<div style="max-width: 720px; margin: 0 auto;">
+<div style="max-width: 960px; margin: 0 auto;">
+
+    {{-- Encabezado estilizado --}}
+    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+        <div>
+            <h4 class="fw-black mb-1 text-dark d-flex align-items-center gap-2">
+                <i class="bi bi-gear-wide-connected text-primary"></i> Ajustes de la Empresa
+            </h4>
+            <p class="text-muted text-sm mb-0">Gestiona y personaliza la identidad, legalidad, contacto y cobros de tu negocio de forma ordenada.</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-light text-dark border px-3 py-2 rounded-pill text-xs fw-semibold">
+                <i class="bi bi-shop me-1 text-primary"></i> {{ $company->name ?: 'Mi Empresa' }}
+            </span>
+        </div>
+    </div>
+
+    {{-- Barra de Botones Desplegables / Selectores de Sección --}}
+    <div class="row g-2 g-md-3 mb-4" id="settings-button-group">
+        <div class="col-6 col-md-3">
+            <button type="button" class="settings-nav-btn active" data-target="panel-general">
+                <div class="d-flex align-items-center gap-2 min-w-0">
+                    <div class="btn-icon-box bg-primary-subtle text-primary">
+                        <i class="bi bi-palette"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <span class="d-block text-xs text-uppercase opacity-75">Básico</span>
+                        <span class="d-block text-sm text-truncate">General</span>
+                    </div>
+                </div>
+                <i class="bi bi-chevron-right chevron-icon d-none d-md-inline text-xs"></i>
+            </button>
+        </div>
+        <div class="col-6 col-md-3">
+            <button type="button" class="settings-nav-btn" data-target="panel-legal">
+                <div class="d-flex align-items-center gap-2 min-w-0">
+                    <div class="btn-icon-box bg-success-subtle text-success">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <span class="d-block text-xs text-uppercase opacity-75">Documentos</span>
+                        <span class="d-block text-sm text-truncate">Legal</span>
+                    </div>
+                </div>
+                <i class="bi bi-chevron-right chevron-icon d-none d-md-inline text-xs"></i>
+            </button>
+        </div>
+        <div class="col-6 col-md-3">
+            <button type="button" class="settings-nav-btn" data-target="panel-contact">
+                <div class="d-flex align-items-center gap-2 min-w-0">
+                    <div class="btn-icon-box bg-info-subtle text-info">
+                        <i class="bi bi-geo-alt"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <span class="d-block text-xs text-uppercase opacity-75">Ubicación</span>
+                        <span class="d-block text-sm text-truncate">Contacto</span>
+                    </div>
+                </div>
+                <i class="bi bi-chevron-right chevron-icon d-none d-md-inline text-xs"></i>
+            </button>
+        </div>
+        <div class="col-6 col-md-3">
+            <button type="button" class="settings-nav-btn" data-target="panel-banking">
+                <div class="d-flex align-items-center gap-2 min-w-0">
+                    <div class="btn-icon-box bg-warning-subtle text-warning">
+                        <i class="bi bi-bank"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <span class="d-block text-xs text-uppercase opacity-75">Finanzas</span>
+                        <span class="d-block text-sm text-truncate">Bancarios</span>
+                    </div>
+                </div>
+                <i class="bi bi-chevron-right chevron-icon d-none d-md-inline text-xs"></i>
+            </button>
+        </div>
+    </div>
 
     {{-- ═══════════════════════════════════
          SECCIÓN 1: VISTA GENERAL
     ═══════════════════════════════════ --}}
-    <form action="{{ route('business.company.update') }}" method="POST" enctype="multipart/form-data" id="form-general">
-        @csrf
-        <input type="hidden" name="section" value="general">
+    <div id="panel-general" class="settings-panel">
+        <form action="{{ route('business.company.update') }}" method="POST" enctype="multipart/form-data" id="form-general">
+            @csrf
+            <input type="hidden" name="section" value="general">
 
-        <div class="card border-0 shadow-sm rounded-4 mb-4">
-            <div class="card-header bg-primary text-white p-3 rounded-top-4 border-0">
-                <h5 class="mb-0 fw-bold"><i class="bi bi-shop me-2"></i>Vista general</h5>
-            </div>
-            <div class="card-body p-4">
-                <h6 class="fw-bold text-dark border-bottom pb-2 mb-4">
-                    <i class="bi bi-palette me-2 text-primary"></i>Identidad Visual
-                </h6>
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-header bg-primary text-white p-3 rounded-top-4 border-0">
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-shop me-2"></i>Vista general</h5>
+                </div>
+                <div class="card-body p-4">
+                    <h6 class="fw-bold text-dark border-bottom pb-2 mb-4">
+                        <i class="bi bi-palette me-2 text-primary"></i>Identidad Visual
+                    </h6>
 
                 {{-- Branding --}}
                 <div class="position-relative mb-5">
@@ -120,10 +247,12 @@
             </div>
         </div>
     </form>
+    </div>
 
     {{-- ═══════════════════════════════════
          SECCIÓN 2: ASPECTO LEGAL
     ═══════════════════════════════════ --}}
+    <div id="panel-legal" class="settings-panel" style="display: none;">
     <form action="{{ route('business.company.update') }}" method="POST" enctype="multipart/form-data" id="form-legal">
         @csrf
         <input type="hidden" name="section" value="legal">
@@ -150,10 +279,12 @@
             </div>
         </div>
     </form>
+    </div>
 
     {{-- ═══════════════════════════════════
          SECCIÓN 3: REDES Y CONTACTO
     ═══════════════════════════════════ --}}
+    <div id="panel-contact" class="settings-panel" style="display: none;">
     <form action="{{ route('business.company.update') }}" method="POST" enctype="multipart/form-data" id="form-contact">
         @csrf
         <input type="hidden" name="section" value="contact">
@@ -304,10 +435,12 @@
             </div>
         </div>
     </form>
+    </div>
 
     {{-- ═══════════════════════════════════
          SECCIÓN 4: DATOS BANCARIOS Y DISPERSIÓN DE PAGOS (WOMPI)
     ═══════════════════════════════════ --}}
+    <div id="panel-banking" class="settings-panel" style="display: none;">
     <form action="{{ route('business.company.update') }}" method="POST" id="form-banking">
         @csrf
         <input type="hidden" name="section" value="banking">
@@ -392,6 +525,7 @@
             </div>
         </div>
     </form>
+    </div>
 
 </div>
 @endsection
@@ -400,6 +534,57 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+
+    // ─── Control de Pestañas / Paneles Desplegables ─────────────
+    let globalLeafletMap = null;
+    let globalLeafletRegMap = null;
+
+    const navButtons = document.querySelectorAll('.settings-nav-btn');
+    const panels = document.querySelectorAll('.settings-panel');
+
+    function switchSection(targetId) {
+        panels.forEach(p => p.style.display = 'none');
+        navButtons.forEach(b => b.classList.remove('active'));
+
+        const targetPanel = document.getElementById(targetId);
+        const targetBtn   = document.querySelector(`.settings-nav-btn[data-target="${targetId}"]`);
+
+        if (targetPanel) {
+            targetPanel.style.display = 'block';
+        }
+        if (targetBtn) {
+            targetBtn.classList.add('active');
+        }
+
+        // Si se abre contacto o legal, invalidar mapas para que rendericen adecuadamente
+        if (targetId === 'panel-contact' && globalLeafletMap) {
+            setTimeout(() => { globalLeafletMap.invalidateSize(); }, 200);
+        }
+        if (targetId === 'panel-legal' && typeof window.invalidateRegisterMap === 'function') {
+            setTimeout(() => { window.invalidateRegisterMap(); }, 200);
+        }
+
+        // Actualizar URL hash de forma limpia sin salto brusco
+        if (history.replaceState) {
+            history.replaceState(null, null, '#' + targetId.replace('panel-', ''));
+        }
+    }
+
+    navButtons.forEach(btn => {
+        btn.addEventListener('click', function () {
+            const targetId = this.getAttribute('data-target');
+            switchSection(targetId);
+        });
+    });
+
+    // Detectar sección activa por sesión de Laravel tras guardar o hash en la URL
+    const sessionSection = "{{ session('active_section') }}";
+    const initialHash = window.location.hash.replace('#', '');
+    const activeTarget = sessionSection || initialHash;
+
+    if (activeTarget && ['general', 'legal', 'contact', 'banking'].includes(activeTarget)) {
+        switchSection('panel-' + activeTarget);
+    }
 
     // ─── Mapa Leaflet ───────────────────────────────────────
     let safeLat = parseFloat("{{ $company->latitude ?: 5.3086 }}");
@@ -419,6 +604,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         const map = L.map('map').setView([safeLat, safeLng], 13);
+        globalLeafletMap = map;
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors',
             maxZoom: 19

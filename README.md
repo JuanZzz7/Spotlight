@@ -10,8 +10,8 @@ Stack: Laravel 12 · PHP 8.2+ · MySQL · Bootstrap 5
 ### 1. Crear proyecto Laravel e instalar dependencias
 
 ```bash
-composer create-project laravel/laravel visory-shop
-cd visory-shop
+composer create-project laravel/laravel spotlight
+cd spotlight
 ```
 
 ### 2. Copiar los archivos de este ZIP sobre el proyecto

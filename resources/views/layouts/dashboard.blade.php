@@ -136,6 +136,14 @@
                                 </a>
                             </li>
                             @endif
+                            @if(auth()->user()->company && auth()->user()->company->isInformal())
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center gap-2 py-2 fw-semibold {{ request()->routeIs('business.formalization*') ? 'active-dropdown-item' : 'text-dark' }}" href="{{ route('business.formalization.guide') }}">
+                                    <i class="bi bi-mortarboard fs-5"></i>
+                                    <span>Tutoriales de Formalización</span>
+                                </a>
+                            </li>
+                            @endif
                             <li>
                                 <a class="dropdown-item d-flex align-items-center gap-2 py-2 fw-semibold {{ request()->routeIs('business.shipments*') ? 'active-dropdown-item' : 'text-dark' }}" href="{{ route('business.shipments.index') }}">
                                     <i class="bi bi-truck fs-5"></i>

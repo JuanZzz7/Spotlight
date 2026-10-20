@@ -12,11 +12,11 @@
 <a href="{{ route('admin.companies.index') }}" class="vs-nav-link {{ request()->routeIs('admin.companies*') ? 'active' : '' }}">
     <i class="bi bi-building fs-5"></i> Gestión de empresas
 </a>
-<a href="{{ route('admin.products.index') }}" class="vs-nav-link {{ request()->routeIs('admin.products*') ? 'active' : '' }}">
-    <i class="bi bi-box fs-5"></i> Gestión de productos
+<a href="{{ route('admin.fiscal_verifications.index') }}" class="vs-nav-link {{ request()->routeIs('admin.fiscal_verifications*') ? 'active' : '' }}">
+    <i class="bi bi-file-earmark-check fs-5"></i> Verificación DIAN
 </a>
-<a href="{{ route('admin.reports.index') }}" class="vs-nav-link {{ request()->routeIs('admin.reports*') ? 'active' : '' }}">
-    <i class="bi bi-bar-chart fs-5"></i> Reportes generales
+<a href="{{ route('admin.assisted_purchases.index') }}" class="vs-nav-link {{ request()->routeIs('admin.assisted_purchases*') ? 'active' : '' }}">
+    <i class="bi bi-globe-americas fs-5"></i> Solicitudes Int.
 </a>
 <a href="{{ route('chat.index') }}" class="vs-nav-link {{ request()->is('chat*') ? 'active' : '' }}">
     <i class="bi bi-chat-dots fs-5"></i> Mensajes
@@ -28,11 +28,11 @@
     @php
     $cards = [
         ['icon'=>'bi-people','label'=>'Usuarios Registrados','value'=>$stats['users'],'color'=>'#7F1D3F'],
-        ['icon'=>'bi-briefcase','label'=>'Emprendedores','value'=>$stats['businesses'],'color'=>'#D98C9A'],
-        ['icon'=>'bi-building','label'=>'Empresas / Tiendas','value'=>$stats['companies'],'color'=>'#5E122C'],
-        ['icon'=>'bi-box','label'=>'Productos en Catálogo','value'=>$stats['products'],'color'=>'#A32852'],
-        ['icon'=>'bi-cart-check','label'=>'Ventas Realizadas','value'=>$stats['orders'],'color'=>'#29252A'],
-        ['icon'=>'bi-currency-dollar','label'=>'Volumen Transaccional','value'=>'$'.number_format($stats['revenue'],0,',','.'),'color'=>'#7F1D3F'],
+        ['icon'=>'bi-briefcase','label'=>'Emprendedores / Comercios','value'=>$stats['businesses'],'color'=>'#D98C9A'],
+        ['icon'=>'bi-building','label'=>'Empresas en Plataforma','value'=>$stats['companies'],'color'=>'#5E122C'],
+        ['icon'=>'bi-clock-history','label'=>'Empresas Pendientes','value'=>$stats['pending_companies'],'color'=>'#D97706'],
+        ['icon'=>'bi-file-earmark-check','label'=>'Verificaciones DIAN Pendientes','value'=>$stats['pending_verifications'],'color'=>'#2563EB'],
+        ['icon'=>'bi-globe-americas','label'=>'Solicitudes Internacionales','value'=>$stats['assisted_purchases'],'color'=>'#059669'],
     ];
     @endphp
     @foreach($cards as $card)
@@ -51,14 +51,23 @@
     </div>
     @endforeach
 </div>
+
 <div class="vs-card p-3 border-0 shadow-sm" style="border-radius: 18px;">
     <div class="card-body">
-        <h6 class="fw-bold text-dark mb-3" style="font-family: 'Outfit', sans-serif;">Acceso rápido a gestión</h6>
+        <h6 class="fw-bold text-dark mb-3" style="font-family: 'Outfit', sans-serif;">Acceso rápido a gobernanza y administración</h6>
         <div class="d-flex gap-2 flex-wrap">
-            <a href="{{ route('admin.users.index') }}" class="btn btn-outline-primary btn-sm rounded-pill px-3"><i class="bi bi-person-plus me-1"></i>Gestionar usuarios</a>
-            <a href="{{ route('admin.companies.index') }}" class="btn btn-outline-primary btn-sm rounded-pill px-3"><i class="bi bi-building me-1"></i>Ver empresas</a>
-            <a href="{{ route('admin.products.index') }}" class="btn btn-outline-primary btn-sm rounded-pill px-3"><i class="bi bi-box me-1"></i>Ver productos</a>
-            <a href="{{ route('admin.reports.index') }}" class="btn btn-outline-primary btn-sm rounded-pill px-3"><i class="bi bi-bar-chart me-1"></i>Ver reportes</a>
+            <a href="{{ route('admin.users.index') }}" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                <i class="bi bi-people me-1"></i>Gestionar usuarios
+            </a>
+            <a href="{{ route('admin.companies.index') }}" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                <i class="bi bi-building me-1"></i>Aprobación de empresas
+            </a>
+            <a href="{{ route('admin.fiscal_verifications.index') }}" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                <i class="bi bi-file-earmark-check me-1"></i>Verificaciones DIAN
+            </a>
+            <a href="{{ route('admin.assisted_purchases.index') }}" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                <i class="bi bi-globe-americas me-1"></i>Solicitudes Internacionales
+            </a>
         </div>
     </div>
 </div>

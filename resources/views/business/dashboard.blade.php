@@ -87,6 +87,40 @@
     </div>
 @endif
 
+@if(isset($company) && $company && $company->isInformal())
+<div class="card border-0 rounded-4 mb-4 shadow-sm overflow-hidden" style="background: #ffffff; border: 1px solid #fed7aa !important; border-left: 6px solid #f59e0b !important;">
+    <div class="card-body p-4 d-flex flex-wrap align-items-center justify-content-between gap-3">
+        <div class="d-flex align-items-center gap-3">
+            <div class="rounded-circle d-flex align-items-center justify-content-center p-3 flex-shrink-0" style="background: #fef3c7; width: 56px; height: 56px; border: 1px solid #fde68a;">
+                <i class="bi bi-mortarboard-fill fs-3" style="color: #b45309;"></i>
+            </div>
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <span class="badge rounded-pill px-2 py-1 fw-bold text-dark" style="background: #fef3c7; border: 1px solid #fde68a; font-size: 0.72rem; color: #92400e !important;">
+                        <i class="bi bi-stars me-1 text-warning"></i>Guía para Emprendimientos
+                    </span>
+                    <span class="badge rounded-pill px-2 py-1 fw-semibold" style="background: #f1f5f9; color: #475569; font-size: 0.72rem; border: 1px solid #e2e8f0;">
+                        Comercio Informal
+                    </span>
+                </div>
+                <h5 class="fw-bold mb-1" style="color: #0f172a !important;">
+                    ¿Deseas conocer el proceso para formalizar tu negocio?
+                </h5>
+                <p class="mb-0 small" style="max-width: 680px; line-height: 1.5; color: #334155 !important;">
+                    Accede a nuestros tutoriales en video y la ruta paso a paso (Cámara de Comercio y DIAN). 
+                    <strong style="color: #0f172a;">Aviso:</strong> Spotlight no realiza trámites mercantiles ni tributarios; te brindamos los recursos oficiales para que lo gestiones de forma directa y autónoma.
+                </p>
+            </div>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <a href="{{ route('business.formalization.guide') }}" class="btn rounded-pill px-4 py-2 fw-bold shadow-sm d-flex align-items-center gap-2" style="background: #f59e0b; color: #000000; border: none; font-size: 0.9rem;">
+                <i class="bi bi-play-circle-fill fs-5"></i> Ver Tutoriales
+            </a>
+        </div>
+    </div>
+</div>
+@endif
+
 <div class="row g-3 mb-4">
     @php
     $cards = [

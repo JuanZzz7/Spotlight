@@ -9,7 +9,7 @@ use App\Http\Controllers\PublicController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Admin\{DashboardController as AdminDash, UserController as AdminUser, CompanyController as AdminCompany, ProductController as AdminProduct, ReportController, FiscalVerificationController as AdminFiscalVerification, AssistedPurchaseController as AdminAssistedPurchase};
-use App\Http\Controllers\Business\{DashboardController as BizDash, CompanyController as BizCompany, ProductController as BizProduct, ExpenseController, ShipmentController as BizShipment, AssistedPurchaseController as BizAssistedPurchase};
+use App\Http\Controllers\Business\{DashboardController as BizDash, CompanyController as BizCompany, ProductController as BizProduct, ExpenseController, ShipmentController as BizShipment, AssistedPurchaseController as BizAssistedPurchase, FormalizationGuideController as BizFormalizationGuide};
 use App\Http\Controllers\Business\Billing\{BillingDashboardController as BizBillingDash, FiscalProfileController as BizFiscalProfile, BillingConfigurationController as BizBillingConfig, InvoiceController as BizInvoice, DocumentController as BizDocument, BillingReportController as BizBillingReport};
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\Api\{WompiWebhookController, MercadoPagoWebhookController};
@@ -63,11 +63,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::post('fiscal-verifications/{profile}/suspend', [AdminFiscalVerification::class, 'suspend'])->name('fiscal_verifications.suspend');
     Route::get('fiscal-verifications/{profile}/download/{type}', [AdminFiscalVerification::class, 'downloadDocument'])->name('fiscal_verifications.download');
 
-    Route::get('products', [AdminProduct::class, 'index'])->name('products.index');
-    Route::patch('products/{product}/toggle', [AdminProduct::class, 'toggleActive'])->name('products.toggle');
-    Route::delete('products/{product}', [AdminProduct::class, 'destroy'])->name('products.destroy');
-
-    Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
+    // Rutas de productos y reportes financieros restringidas para Administrador (privacidad comercial)
+    Route::redirect('products', '/admin/dashboard')->name('products.index');
+    Route::redirect('reports', '/admin/dashboard')->name('reports.index');
 
     // Solicitudes Internacionales Asistidas (Admin)
     Route::get('assisted-purchases', [AdminAssistedPurchase::class, 'index'])->name('assisted_purchases.index');
@@ -106,6 +104,9 @@ Route::prefix('business')->name('business.')->middleware(['auth', 'role:business
     Route::put('assisted-purchases/{assistedPurchase}', [BizAssistedPurchase::class, 'updateConditions'])->name('assisted_purchases.update');
     Route::post('assisted-purchases/{assistedPurchase}/conditions', [BizAssistedPurchase::class, 'updateConditions'])->name('assisted_purchases.update_conditions');
     Route::post('assisted-purchases/{assistedPurchase}/confirm-payment', [BizAssistedPurchase::class, 'confirmPayment'])->name('assisted_purchases.confirm_payment');
+
+    // Centro de Tutoriales de Formalización (Comercios Informales)
+    Route::get('formalization/guide', [BizFormalizationGuide::class, 'index'])->name('formalization.guide');
 
     // Módulo de Facturación Electrónica DIAN (Exclusivo comercios formalizados Colombia)
     Route::prefix('billing')->name('billing.')->middleware('colombian.billing')->group(function () {

@@ -145,6 +145,92 @@
             <input type="file" name="rut_personal_file" class="form-control text-sm" accept="application/pdf,.pdf" {{ $docsDisabled ? 'disabled data-locked="true"' : '' }}>
             <small class="text-muted" style="font-size: 0.75rem;">Si posees RUT personal, adjúntalo en formato PDF (Máx. 5MB).</small>
         </div>
+
+        {{-- Apartado de Tutoriales de Formalización para Empresas Informales --}}
+        <div class="card border rounded-4 overflow-hidden mb-4 shadow-xs" style="background: linear-gradient(135deg, #fff9fa 0%, #ffffff 100%); border-color: rgba(127, 29, 63, 0.18) !important;">
+            <div class="card-body p-3 p-md-4">
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge rounded-circle p-2" style="background: #F6E7EB; color: #7F1D3F;">
+                            <i class="bi bi-mortarboard-fill fs-5"></i>
+                        </span>
+                        <div>
+                            <h6 class="fw-bold mb-0 text-dark" style="font-size: 0.95rem;">
+                                ¿Cómo es el proceso para volverte formal? (Tutoriales)
+                            </h6>
+                            <span class="text-muted" style="font-size: 0.75rem;">Acompañamiento educativo para emprendedores en crecimiento</span>
+                        </div>
+                    </div>
+                    @if(Route::has('business.formalization.guide'))
+                        <a href="{{ route('business.formalization.guide') }}" class="btn btn-sm btn-outline-spotlight rounded-pill px-3" target="_blank" style="font-size: 0.75rem;">
+                            <i class="bi bi-box-arrow-up-right me-1"></i> Abrir Guía Completa
+                        </a>
+                    @endif
+                </div>
+
+                {{-- Aviso de No Intermediación --}}
+                <div class="alert alert-warning border-0 rounded-3 p-3 mb-3 d-flex align-items-start gap-2 shadow-xs" style="background-color: #fffbeb; color: #92400e;">
+                    <i class="bi bi-shield-exclamation text-warning fs-5 flex-shrink-0 mt-1" style="color: #b45309 !important;"></i>
+                    <div style="font-size: 0.78rem; line-height: 1.45;">
+                        <strong class="d-block mb-1" style="color: #92400e;">Aviso Importante: Spotlight NO realiza este trámite</strong>
+                        Nuestra plataforma es exclusivamente un canal tecnológico de comercio. <strong>Nosotros no tramitamos, no cobramos ni gestionamos registros mercantiles ni tributarios</strong> ante la Cámara de Comercio ni la DIAN. Esta guía reúne los tutoriales oficiales para que lo gestiones de forma directa y autónoma.
+                    </div>
+                </div>
+
+                {{-- Pasos esenciales resumidos --}}
+                <div class="row g-2 mb-3">
+                    <div class="col-sm-6">
+                        <div class="p-2 px-3 bg-white border rounded-3 d-flex align-items-center gap-2">
+                            <span class="badge bg-light text-dark border rounded-circle p-1" style="width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem;">1</span>
+                            <div class="overflow-hidden">
+                                <strong class="d-block text-dark small text-truncate" style="font-size: 0.78rem;">Consultar Homonimia</strong>
+                                <span class="text-muted d-block text-truncate" style="font-size: 0.7rem;">Verificar nombre en rues.org.co</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="p-2 px-3 bg-white border rounded-3 d-flex align-items-center gap-2">
+                            <span class="badge bg-light text-dark border rounded-circle p-1" style="width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem;">2</span>
+                            <div class="overflow-hidden">
+                                <strong class="d-block text-dark small text-truncate" style="font-size: 0.78rem;">Elegir Figura Legal</strong>
+                                <span class="text-muted d-block text-truncate" style="font-size: 0.7rem;">Persona Natural o Empresa S.A.S.</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="p-2 px-3 bg-white border rounded-3 d-flex align-items-center gap-2">
+                            <span class="badge bg-light text-dark border rounded-circle p-1" style="width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem;">3</span>
+                            <div class="overflow-hidden">
+                                <strong class="d-block text-dark small text-truncate" style="font-size: 0.78rem;">Matrícula en Cámara CCB</strong>
+                                <span class="text-muted d-block text-truncate" style="font-size: 0.7rem;">ccb.org.co o sede Ubaté</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="p-2 px-3 bg-white border rounded-3 d-flex align-items-center gap-2">
+                            <span class="badge bg-light text-dark border rounded-circle p-1" style="width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem;">4</span>
+                            <div class="overflow-hidden">
+                                <strong class="d-block text-dark small text-truncate" style="font-size: 0.78rem;">RUT y NIT en la DIAN</strong>
+                                <span class="text-muted d-block text-truncate" style="font-size: 0.7rem;">CIIU y responsabilidades fiscales</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Enlaces a tutoriales en video --}}
+                <div class="d-flex flex-wrap gap-2 pt-2 border-top">
+                    <a href="https://www.youtube.com/results?search_query=como+inscribir+el+rut+por+primera+vez+dian+virtual" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-danger rounded-pill px-3" style="font-size: 0.75rem;">
+                        <i class="bi bi-youtube me-1"></i> Tutorial RUT DIAN
+                    </a>
+                    <a href="https://www.youtube.com/results?search_query=como+matricular+empresa+camara+de+comercio+de+bogota+en+linea" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-primary rounded-pill px-3" style="font-size: 0.75rem;">
+                        <i class="bi bi-youtube me-1"></i> Tutorial Matrícula CCB
+                    </a>
+                    <a href="https://www.ccb.org.co" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary rounded-pill px-3" style="font-size: 0.75rem;">
+                        <i class="bi bi-box-arrow-up-right me-1"></i> Portal CCB Ubaté
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Checkbox Habeas Data Colombia (Ley 1581) -->

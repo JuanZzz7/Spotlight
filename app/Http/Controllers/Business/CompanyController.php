@@ -217,6 +217,7 @@ class CompanyController extends Controller
 
         return redirect()
             ->route('business.company.edit')
-            ->with('success', "Seccion '{$sectionLabel}' guardada correctamente.");
+            ->with('success', "Sección '{$sectionLabel}' guardada correctamente.")
+            ->with('active_section', $section);
     }
 }

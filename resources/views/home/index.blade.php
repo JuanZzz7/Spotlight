@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Spotlight — La Aldea Digital | Descubre Emprendimientos y Productos')
+@section('title', 'Spotlight — Aldea Digital | Descubre Emprendimientos y Productos')
 
 @push('styles')
 <!-- Leaflet Map CSS -->
@@ -7,7 +7,7 @@
 
 <style>
     /* ==========================================================================
-       SPOTLIGHT - LA ALDEA DIGITAL
+       SPOTLIGHT - ALDEA DIGITAL
        Identidad Visual Oficial: Borgoña, Rosa Empolvado, Rosa Suave, Blanco Marfil y Carbón
        ========================================================================== */
 
@@ -420,7 +420,7 @@
             <img src="{{ asset('images/logo-symbol-burgundy.png') }}" alt="Spotlight Logo" class="brand-logo-img">
             <div>
                 <div class="brand-text">SPOTLIGHT</div>
-                <div class="brand-tagline">LA ALDEA DIGITAL</div>
+                <div class="brand-tagline">ALDEA DIGITAL</div>
             </div>
         </a>
 
@@ -466,14 +466,14 @@
     </div>
 </nav>
 
-{{-- Hero Principal: Spotlight, la Aldea Digital --}}
+{{-- Hero Principal: Spotlight, Aldea Digital --}}
 <section class="hero-container">
     <div class="container text-center">
         
         <div class="hero-badge animate-fade-in">
             <span class="pulse-dot"></span>
             <span class="lang-en">SPOTLIGHT · DIGITAL VILLAGE OF ENTREPRENEURS</span>
-            <span class="lang-es">SPOTLIGHT · LA ALDEA DIGITAL DE EMPRENDIMIENTOS</span>
+            <span class="lang-es">SPOTLIGHT · ALDEA DIGITAL DE EMPRENDIMIENTOS</span>
         </div>
 
         <h1 class="hero-title animate-fade-in">
@@ -520,7 +520,7 @@
     </div>
 </section>
 
-{{-- Beneficios / Pilares de la Aldea Digital --}}
+{{-- Beneficios / Pilares de Aldea Digital --}}
 <section class="py-4">
     <div class="container">
         <div class="row g-3">
@@ -716,7 +716,7 @@
 
             <div class="col-lg-6">
                 <span class="badge badge-purple mb-2">
-                    <span class="lang-en">THE DIGITAL VILLAGE</span><span class="lang-es">LA ALDEA DIGITAL</span>
+                    <span class="lang-en">THE DIGITAL VILLAGE</span><span class="lang-es">ALDEA DIGITAL</span>
                 </span>
                 
                 <h2 class="display-5 fw-bold mb-3 text-dark">
@@ -1009,7 +1009,7 @@
                 </div>
                 <p class="text-muted small mb-0" style="max-width: 420px; line-height: 1.5;">
                     <span class="lang-en">The digital village connecting creators, products, and communities.</span>
-                    <span class="lang-es">La aldea digital que conecta creadores, productos y comunidades.</span>
+                    <span class="lang-es">Aldea digital que conecta creadores, productos y comunidades.</span>
                 </p>
             </div>
             <div class="col-md-7 d-flex flex-wrap justify-content-md-end gap-4 text-muted small fw-semibold">
