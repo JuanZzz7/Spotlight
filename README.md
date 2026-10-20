@@ -32,7 +32,7 @@ APP_URL=http://localhost:8000
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=visory_shop
+DB_DATABASE=Spotlight
 DB_USERNAME=root
 DB_PASSWORD=
 ```
@@ -40,7 +40,7 @@ DB_PASSWORD=
 ### 4. Crear base de datos
 
 ```sql
-CREATE DATABASE visory_shop CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE Spotlight CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
 ### 5. Ejecutar migraciones y seeders
