@@ -1,149 +1,393 @@
-/* ============================================
-   COMPONENTS.CSS - Reusable UI Components
-   Cards, Buttons, Forms, Tables, Badges, Alerts
-   ============================================ */
+/* ==========================================================================
+   COMPONENTS.CSS - Spotlight Component System
+   Paleta: Borgoña (#7F1D3F), Rosa Empolvado (#D98C9A), Rosa Suave (#F6E7EB),
+           Blanco Marfil (#FFFCF7), Carbón Oscuro (#29252A)
+   ========================================================================== */
 
-/* ---- Cards ---- */
+/* --------------------------------------------------------------------------
+   1. Tarjetas (Cards)
+   -------------------------------------------------------------------------- */
 .vs-card {
-    background-color: var(--vs-surface-color);
-    border: 1px solid var(--vs-border-color);
-    border-radius: var(--vs-radius-lg);
-    box-shadow: var(--vs-shadow-1);
-    transition: all 0.2s ease-in-out;
+    background-color: var(--sl-surface);
+    border: 1px solid var(--sl-border);
+    border-radius: var(--sl-radius-lg);
+    box-shadow: var(--sl-shadow-sm);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
+
 .vs-card:hover {
-    box-shadow: var(--vs-shadow-2);
-    border-color: var(--vs-secondary);
+    border-color: rgba(127, 29, 63, 0.3);
+    box-shadow: var(--sl-shadow-hover);
 }
+
+.card-product {
+    background-color: var(--sl-surface);
+    border: 1px solid var(--sl-border);
+    border-radius: var(--sl-radius-lg);
+    overflow: hidden;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.card-product:hover {
+    border-color: var(--sl-accent);
+    box-shadow: var(--sl-shadow-hover);
+    transform: translateY(-2px);
+}
+
 .vs-card .card-footer {
-    border-bottom-left-radius: var(--vs-radius-lg);
-    border-bottom-right-radius: var(--vs-radius-lg);
+    background-color: transparent;
+    border-top: 1px solid var(--sl-border-subtle);
+    border-bottom-left-radius: var(--sl-radius-lg);
+    border-bottom-right-radius: var(--sl-radius-lg);
 }
 
-/* ---- Buttons ---- */
-.btn-primary {
-    background-color: var(--vs-primary);
-    border-color: var(--vs-primary);
-    color: #fff;
-    font-weight: 500;
-    padding: 0.5rem 1.25rem;
-    border-radius: var(--vs-radius-md);
-    box-shadow: var(--vs-shadow-1);
-    transition: background-color 0.2s;
-}
-.btn-primary:hover, .btn-primary:focus {
-    background-color: var(--vs-primary-hover);
-    border-color: var(--vs-primary-hover);
-    color: #fff;
-}
-
-.btn-secondary {
-    background-color: var(--vs-secondary);
-    border-color: var(--vs-secondary);
-    color: #fff;
-    font-weight: 500;
-}
-.btn-secondary:hover, .btn-secondary:focus {
-    background-color: var(--vs-secondary-hover);
-    border-color: var(--vs-secondary-hover);
-}
-
-.btn-outline-primary {
-    color: var(--vs-primary);
-    border-color: var(--vs-primary);
-    font-weight: 500;
-}
-.btn-outline-primary:hover {
-    background-color: var(--vs-primary);
-    color: #fff;
-}
-
-.btn-check:checked + .btn-outline-primary {
-    background-color: var(--vs-primary);
-    border-color: var(--vs-primary);
-    color: #fff;
-    box-shadow: 0 2px 8px rgba(0, 35, 111, 0.3);
-}
-
-/* ---- Forms ---- */
-.form-control, .form-select {
-    border: 1px solid var(--vs-border-color);
-    border-radius: var(--vs-radius-md);
-    padding: 0.75rem 1rem;
-    font-size: 0.875rem;
-    color: var(--vs-text-body);
-}
-.form-control:focus, .form-select:focus {
-    border-color: var(--vs-primary);
-    box-shadow: 0 0 0 0.2rem rgba(0, 35, 111, 0.2);
-}
-.form-label {
-    font-weight: 500;
-    font-size: 0.875rem;
-    color: var(--vs-text-header);
-    margin-bottom: 0.5rem;
-}
-
-/* ---- Tables ---- */
-.table {
-    color: var(--vs-text-body);
-    font-size: 0.875rem;
-}
-.table thead th {
-    background-color: #F1F5F9;
-    color: var(--vs-text-header);
+/* --------------------------------------------------------------------------
+   2. Botones (Buttons) - Sistema de Acciones Spotlight
+   -------------------------------------------------------------------------- */
+.btn {
+    font-family: var(--sl-font-body);
     font-weight: 600;
-    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: -0.01em;
+    border-radius: var(--sl-radius-md);
+    padding: 0.65rem 1.35rem;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease, transform 0.15s ease;
+    text-decoration: none;
+}
+
+.btn-sm {
+    min-height: 36px;
+    padding: 0.38rem 0.95rem;
+    font-size: 0.825rem;
+    border-radius: var(--sl-radius-sm);
+}
+
+.btn-lg {
+    min-height: 50px;
+    padding: 0.85rem 1.85rem;
+    font-size: 1rem;
+    border-radius: var(--sl-radius-md);
+}
+
+/* Botón Principal: Borgoña #7F1D3F con texto Blanco Marfil */
+.btn-primary,
+.btn-spotlight,
+.btn-coral {
+    background-color: var(--sl-primary) !important;
+    border: 1px solid var(--sl-primary) !important;
+    color: var(--sl-text-on-dark) !important;
+    box-shadow: 0 2px 6px rgba(127, 29, 63, 0.2) !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-spotlight:hover,
+.btn-spotlight:focus,
+.btn-coral:hover,
+.btn-coral:focus {
+    background-color: var(--sl-primary-dark) !important;
+    border-color: var(--sl-primary-dark) !important;
+    color: var(--sl-text-on-dark) !important;
+    box-shadow: 0 4px 12px rgba(127, 29, 63, 0.28) !important;
+    transform: translateY(-1px);
+}
+
+.btn-primary:active,
+.btn-spotlight:active,
+.btn-coral:active {
+    background-color: #4A0E23 !important;
+    border-color: #4A0E23 !important;
+    transform: translateY(0);
+}
+
+/* Botón Secundario: Rosa Suave #F6E7EB con texto Borgoña o Carbón */
+.btn-secondary,
+.btn-soft {
+    background-color: var(--sl-primary-soft) !important;
+    border: 1px solid rgba(217, 140, 154, 0.35) !important;
+    color: var(--sl-primary) !important;
+    box-shadow: none !important;
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus,
+.btn-soft:hover,
+.btn-soft:focus {
+    background-color: #ECD3DA !important;
+    border-color: var(--sl-accent) !important;
+    color: var(--sl-primary-dark) !important;
+}
+
+/* Botón Outline: Borde Borgoña elegante */
+.btn-outline-primary,
+.btn-outline-spotlight,
+.btn-outline-coral {
+    color: var(--sl-primary) !important;
+    background-color: transparent !important;
+    border: 1.5px solid var(--sl-primary) !important;
+    box-shadow: none !important;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus,
+.btn-outline-spotlight:hover,
+.btn-outline-coral:hover {
+    background-color: var(--sl-primary-soft) !important;
+    border-color: var(--sl-primary) !important;
+    color: var(--sl-primary-dark) !important;
+}
+
+/* Botón Neutral / Superficie Clara */
+.btn-light,
+.btn-white {
+    background-color: var(--sl-surface) !important;
+    border: 1px solid var(--sl-border) !important;
+    color: var(--sl-text-heading) !important;
+    box-shadow: var(--sl-shadow-xs) !important;
+}
+
+.btn-light:hover,
+.btn-white:hover {
+    background-color: var(--sl-primary-soft) !important;
+    border-color: var(--sl-accent) !important;
+    color: var(--sl-primary) !important;
+}
+
+.btn-pill-light {
+    background-color: var(--sl-surface);
+    color: var(--sl-text-heading) !important;
+    border: 1px solid var(--sl-border);
+    border-radius: var(--sl-radius-pill);
+    min-height: 40px;
+    padding: 0.45rem 1.15rem;
+}
+
+.btn-pill-light:hover {
+    background-color: var(--sl-primary-soft);
+    border-color: var(--sl-accent);
+    color: var(--sl-primary) !important;
+}
+
+/* Botón Deshabilitado */
+.btn:disabled,
+.btn.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+    box-shadow: none !important;
+}
+
+/* --------------------------------------------------------------------------
+   3. Formularios, Búsquedas y Filtros
+   -------------------------------------------------------------------------- */
+.form-control, 
+.form-select {
+    border: 1px solid var(--sl-border);
+    border-radius: var(--sl-radius-md);
+    padding: 0.7rem 1rem;
+    font-size: 0.925rem;
+    color: var(--sl-text-heading);
+    background-color: var(--sl-surface);
+    min-height: 46px;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.form-control:focus, 
+.form-select:focus {
+    border-color: var(--sl-primary);
+    box-shadow: 0 0 0 3px rgba(127, 29, 63, 0.15);
+    outline: none;
+    background-color: var(--sl-surface);
+}
+
+.form-control::placeholder {
+    color: var(--sl-text-dim);
+}
+
+.form-label {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--sl-text-heading);
+    margin-bottom: 0.4rem;
+}
+
+.input-group-text {
+    border-color: var(--sl-border);
+    background-color: var(--sl-primary-soft);
+    color: var(--sl-text-muted);
+}
+
+/* --------------------------------------------------------------------------
+   4. Badges (Sistema de Estados Oficial)
+   -------------------------------------------------------------------------- */
+.badge {
+    font-family: var(--sl-font-body);
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    border-radius: var(--sl-radius-pill);
+    padding: 0.35rem 0.75rem;
     font-size: 0.75rem;
-    letter-spacing: 0.05em;
-    border-bottom: 1px solid var(--vs-border-color);
-    padding: 1rem;
-}
-.table tbody td {
-    padding: 1rem;
-    vertical-align: middle;
-    border-bottom: 1px solid var(--vs-border-color);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
 }
 
-/* ---- Badges ---- */
-.badge-soft-success {
-    background-color: rgba(13, 148, 136, 0.1);
-    color: #0d9488;
+/* Informativo / Principal: Rosa suave con acento Borgoña */
+.badge-info,
+.badge-purple,
+.badge-cyan,
+.badge-primary {
+    background-color: var(--sl-primary-soft) !important;
+    color: var(--sl-primary) !important;
+    border: 1px solid rgba(127, 29, 63, 0.18) !important;
 }
-.badge-soft-danger {
-    background-color: rgba(220, 38, 38, 0.1);
-    color: #dc2626;
-}
+
+/* Destacado / Oferta / Rosa Empolvado */
+.badge-warning,
+.badge-amber,
+.badge-spotlight-yellow,
+.badge-accent,
 .badge-soft-warning {
-    background-color: rgba(217, 119, 6, 0.1);
-    color: #d97706;
-}
-.badge-soft-primary {
-    background-color: rgba(0, 35, 111, 0.1);
-    color: var(--vs-primary);
+    background-color: var(--sl-accent-soft) !important;
+    color: var(--sl-primary) !important;
+    border: 1px solid rgba(217, 140, 154, 0.4) !important;
 }
 
-/* ---- Alerts ---- */
+/* Confirmado / Verificado / Éxito */
+.badge-success,
+.badge-soft-success {
+    background-color: var(--sl-success-soft) !important;
+    color: var(--sl-success-ink) !important;
+    border: 1px solid rgba(42, 135, 93, 0.22) !important;
+}
+
+/* Alerta / Peligro */
+.badge-danger,
+.badge-coral,
+.badge-soft-danger {
+    background-color: var(--sl-danger-soft) !important;
+    color: var(--sl-danger-ink) !important;
+    border: 1px solid rgba(186, 45, 66, 0.22) !important;
+}
+
+/* --------------------------------------------------------------------------
+   5. Tablas Limpias y Elegantes
+   -------------------------------------------------------------------------- */
+.table {
+    color: var(--sl-text-body);
+    font-size: 0.88rem;
+    margin-bottom: 0;
+}
+
+.table thead th {
+    background-color: var(--sl-bg);
+    color: var(--sl-text-muted);
+    font-weight: 600;
+    font-size: 0.78rem;
+    text-transform: none;
+    letter-spacing: 0.02em;
+    border-bottom: 1px solid var(--sl-border);
+    padding: 0.85rem 1rem;
+}
+
+.table tbody td {
+    padding: 0.95rem 1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--sl-border-subtle);
+    background-color: var(--sl-surface);
+}
+
+.table-hover tbody tr:hover td {
+    background-color: var(--sl-primary-soft);
+}
+
+/* --------------------------------------------------------------------------
+   6. Alertas
+   -------------------------------------------------------------------------- */
 .alert {
-    border-radius: var(--vs-radius-md);
-    font-size: 0.875rem;
+    border-radius: var(--sl-radius-md);
+    padding: 0.85rem 1.15rem;
+    font-size: 0.9rem;
+    border: 1px solid transparent;
 }
 
-/* ---- Pagination ---- */
-.pagination .page-link {
-    color: var(--vs-primary);
-    border-color: var(--vs-border-color);
-    border-radius: var(--vs-radius-md);
-    margin: 0 2px;
-    font-weight: 500;
+.alert-primary,
+.alert-info {
+    background-color: var(--sl-primary-soft);
+    border-color: rgba(127, 29, 63, 0.2);
+    color: var(--sl-primary);
+}
+
+.alert-success {
+    background-color: var(--sl-success-soft);
+    border-color: rgba(42, 135, 93, 0.25);
+    color: var(--sl-success-ink);
+}
+
+.alert-warning {
+    background-color: var(--sl-warning-soft);
+    border-color: rgba(199, 121, 26, 0.3);
+    color: var(--sl-warning-ink);
+}
+
+.alert-danger {
+    background-color: var(--sl-danger-soft);
+    border-color: rgba(186, 45, 66, 0.25);
+    color: var(--sl-danger-ink);
+}
+
+/* --------------------------------------------------------------------------
+   7. Modales y Dropdowns
+   -------------------------------------------------------------------------- */
+.modal-content {
+    background-color: var(--sl-surface);
+    border: 1px solid var(--sl-border);
+    border-radius: var(--sl-radius-xl);
+    box-shadow: var(--sl-shadow-lg);
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--sl-border-subtle);
+    padding: 1.25rem 1.5rem;
+}
+
+.modal-footer {
+    border-top: 1px solid var(--sl-border-subtle);
+    padding: 1rem 1.5rem;
+}
+
+.dropdown-menu {
+    background-color: var(--sl-surface);
+    border: 1px solid var(--sl-border);
+    border-radius: var(--sl-radius-md);
+    box-shadow: var(--sl-shadow-md);
+    padding: 0.5rem;
+}
+
+.dropdown-item {
     font-size: 0.875rem;
+    color: var(--sl-text-body);
+    border-radius: var(--sl-radius-sm);
+    padding: 0.5rem 0.85rem;
+    transition: background-color 0.15s ease, color 0.15s ease;
 }
-.pagination .page-item.active .page-link {
-    background-color: var(--vs-primary);
-    border-color: var(--vs-primary);
-    color: #fff;
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+    background-color: var(--sl-primary-soft);
+    color: var(--sl-primary);
 }
-.pagination .page-link:hover {
-    background-color: var(--vs-bg-color);
-    color: var(--vs-primary);
+
+.dropdown-item.active,
+.dropdown-item:active {
+    background-color: var(--sl-primary);
+    color: var(--sl-text-on-dark);
 }

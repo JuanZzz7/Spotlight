@@ -3,29 +3,33 @@
 @section('content')
 
 {{-- Navbar --}}
-<nav class="navbar navbar-expand-lg navbar-dark border-bottom border-light" style="background: var(--vs-primary)">
-    <div class="container py-2">
-        <a class="navbar-brand fw-bold fs-4 d-flex align-items-center gap-2" href="{{ route('home') }}">
-            <img src="{{ asset('images/logo.png') }}" alt="Spotlight" class="vs-brand-logo">
+<nav class="navbar navbar-expand-lg bg-white border-bottom border-sl py-2">
+    <div class="container py-1 d-flex align-items-center justify-content-between">
+        <a class="d-flex align-items-center gap-2 text-decoration-none" href="{{ route('home') }}">
+            <div class="rounded-3 d-flex align-items-center justify-content-center text-white fw-bold shadow-sm" style="width: 36px; height: 36px; background: linear-gradient(135deg, #7F1D3F, #D98C9A); font-size: 1.1rem;">S</div>
+            <div>
+                <span class="fw-bold fs-5 text-dark" style="font-family: var(--sl-font-display); letter-spacing: -0.5px;">SPOTLIGHT</span>
+                <span class="d-block text-uppercase fw-bold" style="font-size: 0.6rem; letter-spacing: 0.08em; color: var(--sl-primary) !important;">LA ALDEA DIGITAL</span>
+            </div>
         </a>
-        <div class="d-flex gap-3">
+        <div class="d-flex gap-2 align-items-center">
             @auth
                 @php $dash = match(auth()->user()->role) { 'admin'=>'admin.dashboard','business'=>'business.dashboard',default=>'user.dashboard'}; @endphp
-                <a href="{{ route($dash) }}" class="btn btn-outline-light px-4 rounded-pill">Mi Panel</a>
+                <a href="{{ route($dash) }}" class="btn btn-sm btn-outline-primary px-3 rounded-pill">Mi Panel</a>
             @else
-                <a href="{{ route('login') }}" class="btn text-white opacity-75 fw-medium">Iniciar sesión</a>
-                <a href="{{ route('register') }}" class="btn btn-secondary px-4 rounded-pill shadow-sm">Registrarse</a>
+                <a href="{{ route('login') }}" class="btn btn-sm btn-pill-light px-3">Iniciar sesión</a>
+                <a href="{{ route('register') }}" class="btn btn-sm btn-primary px-4 rounded-pill shadow-sm">Registrarse</a>
             @endauth
         </div>
     </div>
 </nav>
 
 {{-- Hero de la empresa --}}
-<div style="position: relative; height: 260px; background: linear-gradient(135deg, var(--vs-primary), var(--vs-secondary)); overflow: hidden;">
+<div style="position: relative; height: 260px; background: linear-gradient(135deg, #7F1D3F 0%, #D98C9A 100%); overflow: hidden;">
     @if($company->banner)
-        <img src="{{ asset('storage/'.$company->banner) }}" class="w-100 h-100" style="object-fit:cover; opacity:0.5;">
+        <img src="{{ asset('storage/'.$company->banner) }}" class="w-100 h-100" style="object-fit:cover; opacity:0.4;">
     @endif
-    <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 60%);"></div>
+    <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(24, 18, 38, 0.75) 0%, transparent 60%);"></div>
 
     <div class="container h-100 d-flex align-items-end pb-4" style="position: relative; z-index: 2;">
         <div class="d-flex align-items-center gap-4">
@@ -88,7 +92,7 @@
             {{-- Botón ver en mapa --}}
             @if($company->latitude && $company->longitude)
                 <button onclick="scrollToMap()" class="btn btn-sm rounded-pill px-3 fw-semibold d-flex align-items-center gap-2"
-                        style="background:linear-gradient(135deg,#00236f,#0d9488); color:#fff; border:none;">
+                        style="background: var(--sl-primary); color:#fff; border:none; box-shadow: 0 4px 12px rgba(127, 29, 63, 0.25);">
                     <i class="bi bi-map-fill"></i> Ver en el mapa
                 </button>
             @endif
@@ -109,7 +113,7 @@
 </div>
 
 {{-- Productos --}}
-<section class="py-5" style="background: var(--vs-bg-color);">
+<section class="py-5" style="background: var(--sl-bg);">
     <div class="container">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
@@ -127,15 +131,25 @@
                 <div class="col-sm-6 col-md-4 col-lg-3">
                     <div class="vs-card h-100 d-flex flex-column overflow-hidden"
                          style="transition: transform 0.2s, box-shadow 0.2s;"
-                         onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 16px 40px rgba(0,35,111,0.12)'"
+                         onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='var(--sl-shadow-hover)'"
                          onmouseout="this.style.transform='';this.style.boxShadow=''">
-                        <img src="{{ $product->image_url }}" class="card-img-top" style="height:200px;object-fit:cover;" alt="{{ $product->name }}">
+                        <a href="{{ route('public.product', $product) }}">
+                            <img src="{{ $product->image_url }}" class="card-img-top" style="height:200px;object-fit:cover;" alt="{{ $product->name }}">
+                        </a>
                         <div class="card-body d-flex flex-column p-4 flex-fill">
-                            <h6 class="fw-bold text-dark mb-1 text-truncate" title="{{ $product->name }}">{{ $product->name }}</h6>
+                            <h6 class="fw-bold mb-1 text-truncate" title="{{ $product->name }}">
+                                <a href="{{ route('public.product', $product) }}" class="text-dark text-decoration-none">{{ $product->name }}</a>
+                            </h6>
+                            <div class="d-flex align-items-center gap-1 mb-2">
+                                <i class="bi bi-star-fill text-warning" style="font-size: 0.75rem;"></i>
+                                <span class="fw-bold text-dark text-xs">{{ $product->average_rating > 0 ? number_format($product->average_rating, 1) : '5.0' }}</span>
+                                <span class="text-muted text-xs">({{ $product->reviews_count }})</span>
+                                <a href="{{ route('public.product', $product) }}#reviews-section" class="text-xs text-primary text-decoration-none ms-1">Reseñas</a>
+                            </div>
                             @if($product->description)
                                 <p class="text-muted text-sm mb-3" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">{{ $product->description }}</p>
                             @endif
-                            <div class="fw-bold fs-4 mt-auto mb-3" style="color:var(--vs-primary);">
+                            <div class="fw-bold fs-4 mt-auto mb-3" style="color:var(--sl-primary);">
                                 ${{ number_format($product->price, 0, ',', '.') }}
                             </div>
                             @if($product->stock > 0)
@@ -160,7 +174,7 @@
                                 @endif
                             @else
                                 <a href="{{ route('login') }}" class="btn w-100 rounded-pill py-2 fw-medium shadow-sm text-white"
-                                   style="background: linear-gradient(135deg, var(--vs-primary), var(--vs-secondary));">
+                                   style="background: var(--sl-primary); border: none;">
                                     <i class="bi bi-person-lock me-1"></i>Inicia sesión para comprar
                                 </a>
                             @endauth
@@ -188,11 +202,11 @@
     <div class="container">
         <div class="d-flex align-items-start justify-content-between mb-4 flex-wrap gap-3">
             <div>
-                <h3 class="fw-bold mb-1" style="color:var(--vs-primary);">
-                    <i class="bi bi-geo-alt-fill me-2" style="color:#0d9488;"></i>Ubicación de {{ $company->name }}
+                <h3 class="fw-bold mb-1" style="color:var(--sl-text-heading);">
+                    <i class="bi bi-geo-alt-fill me-2" style="color:var(--sl-primary);"></i>Ubicación de {{ $company->name }}
                 </h3>
                 <p class="text-muted small mb-0">
-                    <i class="bi bi-geo-alt-fill me-1" style="color:#0d9488;"></i>
+                    <i class="bi bi-geo-alt-fill me-1" style="color:var(--sl-primary);"></i>
                     <span id="map-section-address">
                         @if($company->address)
                             {{ $company->address }}
@@ -205,13 +219,13 @@
             <a href="https://www.google.com/maps?q={{ $company->latitude }},{{ $company->longitude }}"
                target="_blank"
                class="btn btn-sm rounded-pill px-4 d-flex align-items-center gap-2 fw-medium"
-               style="background:#00236f; color:#fff; border:none;">
+               style="background:var(--sl-navy); color:#fff; border:none;">
                 <i class="bi bi-box-arrow-up-right"></i> Abrir en Google Maps
             </a>
         </div>
 
         {{-- Wrapper del mapa --}}
-        <div style="position:relative; border-radius:20px; box-shadow:0 16px 48px rgba(0,35,111,0.15); height:420px;">
+        <div style="position:relative; border-radius:20px; box-shadow:0 16px 48px rgba(41,37,42,0.15); height:420px;">
 
             {{-- Mapa Leaflet: siempre visible para que pueda calcular dimensiones --}}
             <div id="company-map" style="height:420px; width:100%; border-radius:20px;"></div>
@@ -219,7 +233,7 @@
             {{-- Skeleton: overlay absoluto encima del mapa --}}
             <div id="map-skeleton" style="
                 position:absolute; inset:0; border-radius:20px;
-                background: linear-gradient(135deg, #00236f 0%, #00369e 40%, #0d9488 100%);
+                background: linear-gradient(135deg, #7F1D3F 0%, #5E122C 40%, #29252A 100%);
                 display:flex; flex-direction:column;
                 align-items:center; justify-content:center; gap:12px;
                 color:rgba(255,255,255,0.9);
@@ -246,7 +260,7 @@
 
             {{-- Badge dirección (visible tras cargar el mapa) --}}
             <div id="map-coords-badge" style="display:none; position:absolute; bottom:12px; left:12px; z-index:1000;
-                        background:rgba(0,35,111,0.85); color:#fff; padding:8px 14px;
+                        background:rgba(41,37,42,0.88); color:#fff; padding:8px 14px;
                         border-radius:10px; font-size:0.75rem; backdrop-filter:blur(4px); max-width:280px;">
                 <i class="bi bi-geo-alt-fill me-1"></i>
                 <span id="badge-address">
@@ -263,7 +277,7 @@
 @endif
 
 {{-- Footer --}}
-<footer class="text-white py-4" style="background-color: #0f172a;">
+<footer class="text-white py-4" style="background-color: var(--sl-navy);">
     <div class="container text-center">
         <img src="{{ asset('images/logo.png') }}" alt="Spotlight" class="vs-brand-logo mb-2">
         <p class="text-white-50 mb-0 small">© {{ date('Y') }} Spotlight. Todos los derechos reservados.</p>

@@ -91,5 +91,8 @@ class DatabaseSeeder extends Seeder
             'amount' => 50000, 'date' => now()->subDays(5), 'description' => 'Pauta pagada']);
         Expense::create(['company_id' => $c2->id, 'concept' => 'Arriendo local',
             'amount' => 800000, 'date' => now()->subDays(10), 'description' => 'Pago mensual']);
+
+        // Seeder especializado para Facturación Electrónica DIAN y usuario de empresa formal
+        $this->call(FormalBusinessBillingSeeder::class);
     }
 }

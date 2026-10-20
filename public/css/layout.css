@@ -1,28 +1,37 @@
-/* ============================================
-   LAYOUT.CSS - Sidebar, Topbar & Navigation
-   Dashboard layout structure
-   ============================================ */
+/* ==========================================================================
+   LAYOUT.CSS - Sidebar, Topbar & Navigation Structure
+   Spotlight — Menú Lateral Carbón Oscuro & Topbar Blanco Marfil
+   ========================================================================== */
 
-/* ---- Sidebar ---- */
+/* --------------------------------------------------------------------------
+   Sidebar (Menú Lateral en Carbón Oscuro)
+   -------------------------------------------------------------------------- */
 .vs-sidebar {
-    background-color: var(--vs-surface-color);
-    border-right: 1px solid var(--vs-border-color);
+    background-color: var(--sl-navy);
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
     min-height: 100vh;
-    width: 260px;
-    min-width: 260px;
-    transition: all 0.3s ease;
+    width: 270px;
+    min-width: 270px;
+    transition: left 0.25s ease;
+    z-index: 1045;
+    color: var(--sl-text-on-dark);
+}
+
+.vs-sidebar-dark {
+    background-color: var(--sl-navy) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
 
 @media (max-width: 991.98px) {
     .vs-sidebar {
         position: fixed;
-        left: -260px;
+        left: -270px;
         top: 0;
         bottom: 0;
-        z-index: 1050;
     }
     .vs-sidebar.show {
         left: 0;
+        box-shadow: 0 10px 30px rgba(41, 37, 42, 0.45);
     }
     .vs-sidebar-overlay {
         display: none;
@@ -31,83 +40,93 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(0, 0, 0, 0.4);
+        background: rgba(41, 37, 42, 0.6);
         z-index: 1040;
-        backdrop-filter: blur(2px);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
     }
     .vs-sidebar-overlay.show {
         display: block;
     }
 }
-.vs-sidebar-dark {
-    background-color: var(--vs-primary);
-    color: rgba(255, 255, 255, 0.8);
-}
 
-/* ---- Sidebar Navigation Links ---- */
+/* --------------------------------------------------------------------------
+   Sidebar Navigation Links
+   -------------------------------------------------------------------------- */
 .vs-nav-link {
-    color: var(--vs-text-body);
+    color: var(--sl-text-on-dark-muted) !important;
     font-weight: 500;
-    padding: 0.75rem 1rem;
-    border-radius: var(--vs-radius-md);
+    font-size: 0.88rem;
+    padding: 0.65rem 0.95rem;
+    border-radius: var(--sl-radius-md);
     margin-bottom: 0.25rem;
-    transition: all 0.2s;
     display: flex;
     align-items: center;
     gap: 0.75rem;
+    text-decoration: none;
+    position: relative;
+    transition: background-color 0.18s ease, color 0.18s ease;
 }
+
+.vs-nav-link i {
+    font-size: 1.15rem;
+    color: var(--sl-text-on-dark-muted);
+    transition: color 0.18s ease;
+}
+
 .vs-nav-link:hover {
-    background-color: rgba(0,0,0,0.03);
-    color: var(--vs-text-header);
+    background-color: rgba(246, 231, 235, 0.08);
+    color: #ffffff !important;
 }
+
+.vs-nav-link:hover i {
+    color: var(--sl-accent);
+}
+
+/* Ítem Activo: fondo borgoña translúcido con punto en rosa empolvado */
 .vs-nav-link.active {
-    background-color: rgba(0, 35, 111, 0.05);
-    color: var(--vs-primary);
-    border-left: 4px solid var(--vs-primary);
-    border-radius: 0 var(--vs-radius-md) var(--vs-radius-md) 0;
+    background: linear-gradient(90deg, rgba(127, 29, 63, 0.45) 0%, rgba(217, 140, 154, 0.15) 100%) !important;
+    color: #ffffff !important;
+    font-weight: 600;
+    border-left: 3px solid var(--sl-accent);
 }
 
-/* ---- Sidebar Dark Variant ---- */
-.vs-sidebar-dark .vs-nav-link {
-    color: rgba(255,255,255,0.7);
-}
-.vs-sidebar-dark .vs-nav-link:hover {
-    background-color: rgba(255,255,255,0.1);
-    color: #fff;
-}
-.vs-sidebar-dark .vs-nav-link.active {
-    background-color: rgba(255,255,255,0.15);
-    color: #fff;
-    border-left: 4px solid #fff;
+.vs-nav-link.active i {
+    color: var(--sl-accent) !important;
 }
 
-/* ---- Topbar ---- */
+.vs-nav-link.active::after {
+    content: '';
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--sl-accent);
+    box-shadow: 0 0 6px rgba(217, 140, 154, 0.6);
+}
+
+/* --------------------------------------------------------------------------
+   Topbar (Superficie Blanco Marfil, Limpia y Refinada)
+   -------------------------------------------------------------------------- */
 .vs-topbar {
-    background-color: var(--vs-surface-color);
-    border-bottom: 1px solid var(--vs-border-color);
-    padding: 1rem 1.5rem;
+    background-color: var(--sl-surface) !important;
+    border-bottom: 1px solid var(--sl-border);
+    padding: 0.85rem 1.75rem;
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 
-/* ---- Brand Logo ---- */
+/* --------------------------------------------------------------------------
+   Brand Logo
+   -------------------------------------------------------------------------- */
 .vs-brand-logo {
-    height: auto;
-    max-height: 56px;
-    width: auto;
-    max-width: 100%;
-    transition: transform 0.3s ease;
-}
-.vs-brand-logo:hover {
-    transform: translateY(-2px) scale(1.02);
-}
-.vs-brand-logo-sm {
-    height: auto;
     max-height: 40px;
     width: auto;
-    max-width: 100%;
-}
-.vs-brand-logo-lg {
-    height: auto;
-    max-height: 140px;
-    width: auto;
-    max-width: 100%;
+    object-fit: contain;
 }

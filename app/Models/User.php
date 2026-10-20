@@ -12,13 +12,26 @@ class User extends Authenticatable
 
     protected $fillable = [
         'name', 'email', 'password', 'role',
-        'phone', 'address', 'document', 'avatar', 'active', 'google_id',
+        'phone', 'phone_prefix', 'address', 'city', 'state', 'postal_code', 'country', 'birthdate',
+        'document', 'avatar', 'active', 'google_id',
         'email_verified_at',
     ];
 
     protected $hidden = ['password', 'remember_token'];
 
-    protected $casts = ['password' => 'hashed', 'active' => 'boolean'];
+    protected $casts = [
+        'password' => 'hashed',
+        'active' => 'boolean',
+        'birthdate' => 'date',
+    ];
+
+    public function getAvatarUrlAttribute()
+    {
+        if ($this->avatar) {
+            return asset('storage/' . $this->avatar);
+        }
+        return null;
+    }
 
     public function company()
     {
@@ -28,6 +41,16 @@ class User extends Authenticatable
     public function orders()
     {
         return $this->hasMany(Order::class);
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    public function assistedPurchases()
+    {
+        return $this->hasMany(AssistedPurchase::class);
     }
 
     public function isAdmin(): bool { return $this->role === 'admin'; }

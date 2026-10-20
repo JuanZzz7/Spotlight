@@ -7,13 +7,22 @@ use Illuminate\Foundation\Configuration\Middleware;
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
+        api: __DIR__.'/../routes/api.php',
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
+        $middleware->validateCsrfTokens(except: [
+            'api/payments/wompi/webhook',
+            'payments/wompi/webhook',
+            'api/payments/mercadopago/webhook',
+            'payments/mercadopago/webhook',
+            'api/v1/shipments/*/simulate-advance',
+        ]);
         $middleware->alias([
-            'role' => \App\Http\Middleware\RoleMiddleware::class,
+            'role'              => \App\Http\Middleware\RoleMiddleware::class,
+            'colombian.billing' => \App\Http\Middleware\EnsureColombianBilling::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

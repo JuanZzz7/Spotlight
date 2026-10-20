@@ -1,74 +1,182 @@
-/* ============================================
-   TOKENS.CSS - Design Tokens & Variables
-   Spotlight — Aldea Digital Design System
-   ============================================ */
+/* ==========================================================================
+   TOKENS.CSS - Spotlight Official Design System
+   Paleta Oficial: Borgoña, Rosa Empolvado, Rosa Suave, Blanco Marfil y Carbón
+   Limpio, Sofisticado, Dinámico, Comercial y Accesible
+   ========================================================================== */
 
 :root {
-    /* Brand Colors */
-    --vs-primary: #00236f;
-    --vs-primary-hover: #1e3a8a;
-    --vs-secondary: #0d9488;
-    --vs-secondary-hover: #0f766e;
+    /* --- Paleta Principal Oficial --- */
+    --sl-primary: #7F1D3F;              /* Borgoña principal: botones principales, enlaces, activo, foco */
+    --sl-primary-dark: #5E122C;         /* Borgoña profundo: estados hover y active */
+    --sl-primary-light: #9E2D53;        /* Borgoña luminoso: detalles y acentos */
+    --sl-primary-soft: #F6E7EB;         /* Rosa suave: superficies secundarias, fondos de cards, badges */
+    --sl-primary-tint: rgba(127, 29, 63, 0.08);
+    --sl-primary-subtle: rgba(127, 29, 63, 0.04);
 
-    /* Surface & Background */
-    --vs-bg-color: #F8FAFC;
-    --vs-surface-color: #FFFFFF;
-    --vs-border-color: #E2E8F0;
+    /* --- Acentos Rosa Empolvado y Detalles --- */
+    --sl-accent: #D98C9A;               /* Rosa empolvado: bordes secundarios, chips, detalles sutiles */
+    --sl-accent-dark: #B86B7B;          /* Rosa empolvado oscuro: interacción y contraste */
+    --sl-accent-soft: #FAF0F2;          /* Rosa empolvado muy suave: avisos e indicadores */
+    --sl-accent-ink: #7F1D3F;           /* Texto sobre fondos rosados */
+    --sl-accent-tint: rgba(217, 140, 154, 0.16);
 
-    /* Text */
-    --vs-text-header: #1a1b21;
-    --vs-text-body: #444651;
-    --vs-text-muted: #757682;
+    /* --- Carbón Oscuro (Textos, Iconos, Sidebar y Contraste) --- */
+    --sl-navy: #29252A;                 /* Carbón oscuro principal: menú lateral, títulos de máximo contraste */
+    --sl-navy-dark: #1F1B20;            /* Carbón ultra profundo */
+    --sl-navy-soft: rgba(41, 37, 42, 0.05);
 
-    /* Shadows */
-    --vs-shadow-1: 0px 1px 3px rgba(0,0,0,0.05), 0px 1px 2px rgba(0,0,0,0.02);
-    --vs-shadow-2: 0px 10px 15px -3px rgba(0,0,0,0.08);
-    --vs-shadow-3: 0px 20px 25px -5px rgba(0,0,0,0.1);
+    /* --- Fondos y Superficies Claras (65% Blanco Marfil) --- */
+    --sl-bg: #FFFCF7;                   /* Fondo general: Blanco marfil cálido y elegante */
+    --sl-surface: #FFFFFF;              /* Superficie: tarjetas principales, navbar, modales */
+    --sl-surface-ivory: #FFFCF7;        /* Superficie alternativa en blanco marfil */
+    --sl-border: #EEDDDC;               /* Bordes neutros delicados con sutil matiz cálido */
+    --sl-border-subtle: #F7EFF1;        /* Separadores sutiles */
+    --sl-border-focus: #7F1D3F;         /* Indicador de foco visible en borgoña */
 
-    /* Border Radius */
-    --vs-radius-sm: 0.25rem;
-    --vs-radius-md: 0.5rem;
-    --vs-radius-lg: 1rem;
-    --vs-radius-xl: 1.5rem;
+    /* --- Tipografía Moderna y Legible --- */
+    --sl-font-display: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --sl-font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    
+    --sl-text-heading: #29252A;         /* Encabezados y títulos en carbón oscuro */
+    --sl-text-body: #484249;            /* Texto de lectura con alto contraste */
+    --sl-text-muted: #736B75;           /* Metadatos, etiquetas secundarias */
+    --sl-text-dim: #9E96A0;             /* Placeholders y deshabilitados */
+    --sl-text-on-dark: #FFFCF7;         /* Texto sobre carbón oscuro (marfil) */
+    --sl-text-on-dark-muted: #D8CBD0;   /* Texto secundario sobre carbón oscuro */
 
-    /* Bootstrap Overrides */
-    --bs-primary: var(--vs-primary);
-    --bs-secondary: var(--vs-secondary);
-    --bs-body-bg: var(--vs-bg-color);
-    --bs-body-color: var(--vs-text-body);
-    --bs-font-sans-serif: 'Inter', sans-serif;
-    --bs-border-radius: var(--vs-radius-md);
-    --bs-border-radius-lg: var(--vs-radius-lg);
-    --bs-border-radius-sm: var(--vs-radius-sm);
-    --bs-border-color: var(--vs-border-color);
+    /* --- Estados del Sistema --- */
+    --sl-success: #2A875D;
+    --sl-success-soft: #EBF7F1;
+    --sl-success-ink: #1A6342;
+
+    --sl-warning: #C7791A;
+    --sl-warning-soft: #FDF5E8;
+    --sl-warning-ink: #874D09;
+
+    --sl-danger: #BA2D42;
+    --sl-danger-soft: #FDECEF;
+    --sl-danger-ink: #821526;
+
+    --sl-info: #7F1D3F;
+    --sl-info-soft: #F6E7EB;
+    --sl-info-ink: #5E122C;
+
+    /* --- Sombras Suaves y Elegantes (Tono Carbón Neutro) --- */
+    --sl-shadow-xs: 0 1px 3px rgba(41, 37, 42, 0.04);
+    --sl-shadow-sm: 0 2px 8px rgba(41, 37, 42, 0.05);
+    --sl-shadow-md: 0 6px 20px rgba(41, 37, 42, 0.07);
+    --sl-shadow-lg: 0 14px 34px rgba(41, 37, 42, 0.09);
+    --sl-shadow-hover: 0 8px 24px rgba(127, 29, 63, 0.12);
+
+    /* --- Radios de Borde Consistentes --- */
+    --sl-radius-xs: 6px;
+    --sl-radius-sm: 8px;
+    --sl-radius-md: 12px;              /* Botones y campos de formulario */
+    --sl-radius-lg: 16px;              /* Tarjetas estándar */
+    --sl-radius-xl: 22px;              /* Modales, héroes y contenedores principales */
+    --sl-radius-pill: 9999px;          /* Badges, chips y botones redondeados */
+
+    /* --- Alias de Compatibilidad Retroactiva --- */
+    --sl-purple: var(--sl-primary);
+    --sl-purple-hover: var(--sl-primary-dark);
+    --sl-purple-deep: var(--sl-navy);
+    --sl-purple-light: var(--sl-primary-light);
+    --sl-purple-soft: var(--sl-primary-soft);
+    --sl-purple-tint: var(--sl-primary-tint);
+
+    --sl-coral: var(--sl-accent);
+    --sl-coral-hover: var(--sl-accent-dark);
+    --sl-coral-soft: var(--sl-primary-soft);
+    --sl-coral-tint: var(--sl-accent-tint);
+
+    --sl-cyan: var(--sl-primary);
+    --sl-cyan-hover: var(--sl-primary-dark);
+    --sl-cyan-soft: var(--sl-primary-soft);
+    --sl-amber: var(--sl-accent);
+    --sl-amber-soft: var(--sl-primary-soft);
+
+    --vs-primary: var(--sl-primary);
+    --vs-primary-hover: var(--sl-primary-dark);
+    --vs-secondary: var(--sl-primary-soft);
+    --vs-accent: var(--sl-accent);
+    --vs-bg-color: var(--sl-bg);
+    --vs-surface-color: var(--sl-surface);
+    --vs-border-color: var(--sl-border);
+    --vs-text-header: var(--sl-text-heading);
+    --vs-text-body: var(--sl-text-body);
+    --vs-text-muted: var(--sl-text-muted);
+
+    --color-spotlight-purple: var(--sl-primary);
+    --color-spotlight-magenta: var(--sl-accent);
+    --color-spotlight-yellow: var(--sl-accent);
+    --color-spotlight-cyan: var(--sl-primary);
+    --color-spotlight-bg: var(--sl-bg);
+
+    /* --- Overrides Bootstrap 5 --- */
+    --bs-primary: var(--sl-primary);
+    --bs-primary-rgb: 127, 29, 63;
+    --bs-secondary: var(--sl-primary-soft);
+    --bs-secondary-rgb: 246, 231, 235;
+    --bs-success: var(--sl-success);
+    --bs-success-rgb: 42, 135, 93;
+    --bs-danger: var(--sl-danger);
+    --bs-danger-rgb: 186, 45, 66;
+    --bs-warning: var(--sl-warning);
+    --bs-warning-rgb: 199, 121, 26;
+    --bs-info: var(--sl-primary);
+    --bs-info-rgb: 127, 29, 63;
+    --bs-body-bg: var(--sl-bg);
+    --bs-body-color: var(--sl-text-body);
+    --bs-body-font-family: var(--sl-font-body);
+    --bs-border-radius: var(--sl-radius-md);
+    --bs-border-radius-lg: var(--sl-radius-lg);
+    --bs-border-radius-sm: var(--sl-radius-sm);
+    --bs-border-color: var(--sl-border);
 }
 
 /* Base Resets */
-html { scroll-behavior: smooth; }
+html {
+    scroll-behavior: smooth;
+}
 
 body {
-    font-family: 'Inter', sans-serif;
-    background-color: var(--vs-bg-color);
-    color: var(--vs-text-body);
+    font-family: var(--sl-font-body);
+    background-color: var(--sl-bg);
+    color: var(--sl-text-body);
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+    line-height: 1.55;
 }
 
-/* Typography */
+/* Tipografía de Encabezados */
 h1, h2, h3, h4, h5, h6,
 .h1, .h2, .h3, .h4, .h5, .h6 {
-    color: var(--vs-text-header);
-    font-weight: 600;
+    font-family: var(--sl-font-display);
+    color: var(--sl-text-heading);
+    font-weight: 700;
+    letter-spacing: -0.02em;
 }
 
-h1, .h1 { letter-spacing: -0.02em; }
-h2, .h2 { letter-spacing: -0.01em; }
-h3, .h3 { letter-spacing: -0.01em; }
+h1, .h1 { letter-spacing: -0.03em; }
+h2, .h2 { letter-spacing: -0.025em; }
 
-/* Links */
+/* Enlaces */
 a {
-    color: var(--vs-primary);
+    color: var(--sl-primary);
     text-decoration: none;
+    transition: color 0.15s ease;
 }
 a:hover {
-    color: var(--vs-primary-hover);
+    color: var(--sl-primary-dark);
+}
+
+/* Reducción de Movimiento */
+@media (prefers-reduced-motion: reduce) {
+    *, ::before, ::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
 }

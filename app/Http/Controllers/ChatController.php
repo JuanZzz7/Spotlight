@@ -40,7 +40,13 @@ class ChatController extends Controller
         // Marcar como leídos
         Message::where('sender_id', $receiver->id)->where('receiver_id', $sender->id)->update(['is_read' => true]);
 
-        return view('chat.show', compact('receiver', 'messages'));
+        // Get chats for sidebar
+        $sentTo = Message::where('sender_id', $sender->id)->pluck('receiver_id')->toArray();
+        $receivedFrom = Message::where('receiver_id', $sender->id)->pluck('sender_id')->toArray();
+        $userIds = array_unique(array_merge($sentTo, $receivedFrom));
+        $chats = User::whereIn('id', $userIds)->get();
+
+        return view('chat.show', compact('receiver', 'messages', 'chats'));
     }
 
     public function send(Request $request, User $receiver)
