@@ -160,8 +160,15 @@
                     </p>
                 </div>
 
+                @if (session('status'))
+                    <div class="alert alert-success border-0 d-flex align-items-center rounded-4 mb-4" style="background-color: rgba(16, 185, 129, 0.12); color: #047857;">
+                        <i class="bi bi-check-circle-fill me-2 fs-5"></i>
+                        <div>{{ session('status') }}</div>
+                    </div>
+                @endif
+
                 @if($errors->any())
-                    <div class="alert alert-danger border-0 d-flex align-items-center rounded-4" style="background-color: rgba(220, 38, 38, 0.1); color: #dc2626;">
+                    <div class="alert alert-danger border-0 d-flex align-items-center rounded-4 mb-4" style="background-color: rgba(220, 38, 38, 0.1); color: #dc2626;">
                         <i class="bi bi-exclamation-circle-fill me-2 fs-5"></i>
                         <div>{{ $errors->first() }}</div>
                     </div>
@@ -181,7 +188,7 @@
                             <label class="form-label text-sm fw-semibold text-dark mb-0">
                                 <span class="lang-en">Password</span><span class="lang-es">Contraseña</span>
                             </label>
-                            <a href="#" class="text-decoration-none text-sm fw-semibold" style="color: var(--sl-primary);">
+                            <a href="{{ route('password.request') }}" class="text-decoration-none text-sm fw-semibold" style="color: var(--sl-primary);">
                                 <span class="lang-en">Forgot password?</span><span class="lang-es">¿Olvidaste tu contraseña?</span>
                             </a>
                         </div>

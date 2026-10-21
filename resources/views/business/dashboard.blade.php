@@ -61,12 +61,26 @@
         <div class="p-4 pt-5 pb-3">
             <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 ms-2">
                 <div>
-                    <div class="d-flex align-items-center gap-2 mb-1">
+                    <div class="d-flex align-items-center flex-wrap gap-2 mb-1">
                         <h4 class="fw-bold text-dark mb-0" style="font-family: 'Outfit', sans-serif; letter-spacing: -0.5px;">{{ $company->name }}</h4>
                         <i class="bi bi-patch-check-fill fs-5" style="color: var(--sl-primary, #7F1D3F);"></i>
                         <span class="badge badge-purple ms-1 fw-bold" style="font-size: 0.65rem;">
                             {{ mb_strtoupper($company->category) }}
                         </span>
+                        @if($company->isFormal())
+                            <span class="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-2 py-1 fw-bold" style="font-size: 0.68rem;">
+                                <i class="bi bi-shield-check me-1"></i>Empresa Formal • NIT {{ $company->nit }}
+                            </span>
+                            @if($company->canIssueElectronicInvoices())
+                                <span class="badge rounded-pill px-2 py-1 fw-bold" style="background: rgba(127, 29, 63, 0.1); color: var(--sl-primary, #7F1D3F); border: 1px solid rgba(127, 29, 63, 0.2); font-size: 0.68rem;">
+                                    <i class="bi bi-receipt me-1"></i>Facturación DIAN Activa
+                                </span>
+                            @endif
+                        @else
+                            <span class="badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning-subtle px-2 py-1 fw-semibold" style="font-size: 0.68rem;">
+                                <i class="bi bi-shop me-1"></i>Emprendimiento Local
+                            </span>
+                        @endif
                     </div>
                     <div class="d-flex align-items-center text-muted gap-3 mt-2 fw-medium" style="font-size: 0.8rem;">
                         <span><i class="bi bi-geo-alt me-1" style="color: #94a3b8;"></i>Aldea Digital</span>
@@ -85,6 +99,42 @@
             </div>
         </div>
     </div>
+@endif
+
+@if(isset($company) && $company && $company->isFormal() && $company->canIssueElectronicInvoices())
+<div class="card border-0 rounded-4 mb-4 shadow-sm overflow-hidden" style="background: #ffffff; border: 1px solid #bbf7d0 !important; border-left: 6px solid #10b981 !important;">
+    <div class="card-body p-4 d-flex flex-wrap align-items-center justify-content-between gap-3">
+        <div class="d-flex align-items-center gap-3">
+            <div class="rounded-circle d-flex align-items-center justify-content-center p-3 flex-shrink-0" style="background: #dcfce7; width: 56px; height: 56px; border: 1px solid #bbf7d0;">
+                <i class="bi bi-shield-check fs-3" style="color: #15803d;"></i>
+            </div>
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <span class="badge rounded-pill px-2 py-1 fw-bold text-dark" style="background: #dcfce7; border: 1px solid #bbf7d0; font-size: 0.72rem; color: #15803d !important;">
+                        <i class="bi bi-patch-check-fill me-1 text-success"></i>Empresa Formal Certificada DIAN
+                    </span>
+                    <span class="badge rounded-pill px-2 py-1 fw-semibold" style="background: #f1f5f9; color: #475569; font-size: 0.72rem; border: 1px solid #e2e8f0;">
+                        NIT: {{ $company->nit }}
+                    </span>
+                </div>
+                <h5 class="fw-bold mb-1" style="color: #0f172a !important;">
+                    Facturación Electrónica DIAN Operativa
+                </h5>
+                <p class="mb-0 small" style="max-width: 680px; line-height: 1.5; color: #334155 !important;">
+                    Tu empresa formal tiene habilitada la emisión de facturas y notas crédito con resolución DIAN, generación UBL 2.1 y firma digital CUFE/CUDE. Puedes emitir facturas legales en 1 clic para tus ventas.
+                </p>
+            </div>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <a href="{{ route('business.billing.index') }}" class="btn rounded-pill px-3 py-2 fw-bold shadow-sm d-flex align-items-center gap-2 text-white" style="background: var(--sl-primary, #7F1D3F); border: none; font-size: 0.85rem;">
+                <i class="bi bi-receipt-cutoff"></i> Módulo DIAN
+            </a>
+            <a href="{{ route('business.billing.sales') }}" class="btn btn-outline-secondary rounded-pill px-3 py-2 fw-semibold" style="font-size: 0.85rem;">
+                Panel de Ventas
+            </a>
+        </div>
+    </div>
+</div>
 @endif
 
 @if(isset($company) && $company && $company->isInformal())

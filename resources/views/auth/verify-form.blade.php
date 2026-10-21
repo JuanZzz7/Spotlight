@@ -7,119 +7,136 @@
     <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="{{ asset('css/tokens.css') }}" rel="stylesheet">
     <style>
         * { box-sizing: border-box; }
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
             min-height: 100vh;
             margin: 0;
-            background: linear-gradient(135deg, #00236f 0%, #00369e 40%, #0d9488 100%);
+            background: radial-gradient(circle at 15% 20%, rgba(127, 29, 63, 0.05) 0%, transparent 45%),
+                        radial-gradient(circle at 85% 80%, rgba(217, 140, 154, 0.09) 0%, transparent 45%),
+                        #FFFCF7;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 24px;
+            color: #29252A;
         }
         body::before {
             content: '';
             position: fixed;
             top: -100px; right: -100px;
-            width: 350px; height: 350px;
+            width: 380px; height: 380px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.05);
+            background: radial-gradient(circle, rgba(127, 29, 63, 0.04) 0%, transparent 70%);
             pointer-events: none;
         }
         body::after {
             content: '';
             position: fixed;
-            bottom: -60px; left: -60px;
-            width: 280px; height: 280px;
+            bottom: -70px; left: -70px;
+            width: 300px; height: 300px;
             border-radius: 50%;
-            background: rgba(13,148,136,0.12);
+            background: radial-gradient(circle, rgba(217, 140, 154, 0.08) 0%, transparent 70%);
             pointer-events: none;
         }
 
         .card-verify {
-            background: #fff;
-            border-radius: 24px;
-            padding: 48px 44px;
-            max-width: 480px;
+            background: #ffffff;
+            border: 1px solid #EEDDDC;
+            border-radius: 28px;
+            padding: 48px 42px;
+            max-width: 490px;
             width: 100%;
-            box-shadow: 0 32px 80px rgba(0,0,0,0.25);
+            box-shadow: 0 24px 60px rgba(127, 29, 63, 0.08), 0 4px 14px rgba(0,0,0,0.03);
             text-align: center;
             position: relative;
             z-index: 1;
         }
 
         /* Logo */
-        .logo-wrap { margin-bottom: 24px; }
-        .logo-wrap img { height: 52px; width: auto; }
+        .logo-wrap { margin-bottom: 22px; }
+        .logo-wrap img { 
+            height: 50px; 
+            width: auto; 
+            object-fit: contain;
+        }
 
         /* Badge de paso */
         .step-badge {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            background: linear-gradient(135deg, rgba(0,35,111,0.08), rgba(13,148,136,0.08));
-            border: 1px solid rgba(0,35,111,0.12);
-            border-radius: 20px;
+            background: rgba(127, 29, 63, 0.08);
+            border: 1px solid rgba(127, 29, 63, 0.15);
+            border-radius: 9999px;
             padding: 6px 14px;
             font-size: 0.75rem;
             font-weight: 600;
-            color: #00236f;
+            color: #7F1D3F;
             margin-bottom: 20px;
         }
 
         .title {
-            font-size: 1.45rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.55rem;
             font-weight: 800;
-            color: #00236f;
+            color: #29252A;
             letter-spacing: -0.02em;
             margin-bottom: 8px;
         }
         .subtitle {
             font-size: 0.88rem;
-            color: #64748b;
+            color: #736B75;
             line-height: 1.6;
-            margin-bottom: 30px;
+            margin-bottom: 28px;
         }
-        .subtitle strong { color: #0d9488; }
+        .subtitle strong { 
+            color: #7F1D3F; 
+            font-weight: 700;
+        }
 
         /* ── 6 inputs OTP ── */
         .otp-container {
             display: flex;
             gap: 10px;
             justify-content: center;
-            margin-bottom: 10px;
+            align-items: center;
+            margin-bottom: 12px;
         }
         .otp-input {
-            width: 56px;
-            height: 66px;
-            border: 2px solid #e2e8f0;
+            width: 54px;
+            height: 64px;
+            border: 2px solid #EEDDDC;
             border-radius: 14px;
             text-align: center;
             font-size: 1.6rem;
             font-weight: 800;
-            color: #00236f;
-            background: #f8fafc;
-            transition: border-color 0.2s, background 0.2s, transform 0.15s, box-shadow 0.2s;
+            color: #29252A;
+            background: #FFFCF7;
+            transition: all 0.2s ease;
             outline: none;
-            caret-color: #0d9488;
+            caret-color: #7F1D3F;
         }
         .otp-input:focus {
-            border-color: #00236f;
-            background: #fff;
-            box-shadow: 0 0 0 4px rgba(0,35,111,0.1);
+            border-color: #7F1D3F;
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(127, 29, 63, 0.12);
             transform: translateY(-2px);
         }
         .otp-input.filled {
-            border-color: #0d9488;
-            background: linear-gradient(135deg, #f0fdf9, #e8fdf7);
-            color: #0d9488;
+            border-color: #7F1D3F;
+            background: #FAF0F2;
+            color: #7F1D3F;
         }
         .otp-input.error {
-            border-color: #ef4444;
-            background: #fef2f2;
+            border-color: #BA2D42;
+            background: #FDECEF;
+            color: #BA2D42;
             animation: shake 0.4s ease;
         }
         @keyframes shake {
@@ -134,106 +151,119 @@
         .otp-sep {
             display: flex;
             align-items: center;
-            color: #cbd5e1;
+            color: #D98C9A;
             font-size: 1.2rem;
             font-weight: 300;
             user-select: none;
         }
 
-        /* Mensajes de error */
-        .error-msg {
-            font-size: 0.82rem;
-            color: #ef4444;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
         /* Hint de email */
         .email-hint {
-            font-size: 0.78rem;
-            color: #94a3b8;
-            margin-bottom: 28px;
+            font-size: 0.8rem;
+            color: #736B75;
+            margin-bottom: 26px;
         }
-        .email-hint strong { color: #00236f; }
+        .email-hint strong { 
+            color: #7F1D3F; 
+            font-weight: 600;
+        }
 
         /* Botón verificar */
-        .btn-verify {
-            background: linear-gradient(135deg, #00236f, #0d4fc4);
-            color: #fff;
+        .btn-spotlight-verify {
+            background: #7F1D3F;
+            color: #ffffff !important;
             border: none;
-            border-radius: 12px;
-            padding: 15px 28px;
+            border-radius: 9999px;
+            padding: 14px 28px;
             font-size: 0.95rem;
             font-weight: 700;
             width: 100%;
             cursor: pointer;
-            transition: transform 0.15s, box-shadow 0.15s, opacity 0.2s;
-            margin-bottom: 14px;
+            transition: all 0.2s ease;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 14px rgba(127, 29, 63, 0.25);
             letter-spacing: 0.01em;
+            display: block;
+            text-decoration: none;
         }
-        .btn-verify:hover {
+        .btn-spotlight-verify:hover {
+            background: #5E122C;
             transform: translateY(-2px);
-            box-shadow: 0 10px 28px rgba(0,35,111,0.3);
+            box-shadow: 0 8px 22px rgba(127, 29, 63, 0.35);
+            color: #ffffff !important;
         }
-        .btn-verify:disabled {
+        .btn-spotlight-verify:disabled {
             opacity: 0.5;
             cursor: not-allowed;
             transform: none;
+            box-shadow: none;
         }
 
-        .btn-back {
+        .btn-spotlight-back {
             background: transparent;
-            color: #94a3b8;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 12px;
+            color: #7F1D3F;
+            border: 1.5px solid #EEDDDC;
+            border-radius: 9999px;
             padding: 13px 28px;
             font-size: 0.88rem;
-            font-weight: 500;
+            font-weight: 600;
             width: 100%;
             cursor: pointer;
-            transition: all 0.15s;
+            transition: all 0.2s ease;
             text-decoration: none;
             display: block;
         }
-        .btn-back:hover { border-color: #0d9488; color: #0d9488; }
+        .btn-spotlight-back:hover { 
+            background: #FAF0F2; 
+            border-color: #7F1D3F; 
+            color: #5E122C; 
+        }
 
         /* Progress dots */
         .progress-dots {
             display: flex;
             justify-content: center;
             gap: 8px;
-            margin-bottom: 28px;
+            margin-bottom: 24px;
         }
         .progress-dots .dot {
             width: 8px; height: 8px;
             border-radius: 50%;
-            background: #e2e8f0;
+            background: #EEDDDC;
+            transition: all 0.3s ease;
         }
         .progress-dots .dot.active {
-            background: linear-gradient(135deg, #00236f, #0d9488);
+            background: linear-gradient(135deg, #7F1D3F, #9E2D53);
             width: 24px;
-            border-radius: 4px;
+            border-radius: 9999px;
         }
 
         /* Alert error global */
         .alert-vs {
-            border-radius: 10px;
-            padding: 12px 16px;
-            font-size: 0.85rem;
-            margin-bottom: 20px;
+            border-radius: 14px;
+            padding: 12px 18px;
+            font-size: 0.86rem;
+            margin-bottom: 22px;
             text-align: left;
+            border: none;
+        }
+        .alert-vs.alert-danger {
+            background: #FDECEF;
+            color: #BA2D42;
+            border: 1px solid rgba(186, 45, 66, 0.2);
         }
 
         /* Countdown */
         .countdown {
-            font-size: 0.78rem;
-            color: #94a3b8;
-            margin-top: 16px;
+            font-size: 0.8rem;
+            color: #9E96A0;
+            margin-top: 18px;
+            margin-bottom: 0;
         }
-        .countdown span { color: #00236f; font-weight: 700; }
+        .countdown span { 
+            color: #7F1D3F; 
+            font-weight: 700; 
+        }
     </style>
 </head>
 <body>
@@ -263,8 +293,9 @@
 
     {{-- Error global --}}
     @if($errors->has('code'))
-        <div class="alert-vs alert alert-danger">
-            <i class="bi bi-x-circle-fill me-2"></i>{{ $errors->first('code') }}
+        <div class="alert-vs alert alert-danger d-flex align-items-center">
+            <i class="bi bi-exclamation-circle-fill me-2 fs-5"></i>
+            <div>{{ $errors->first('code') }}</div>
         </div>
     @endif
 
@@ -286,12 +317,12 @@
             Código enviado a: <strong>{{ $email }}</strong>
         </p>
 
-        <button type="submit" class="btn-verify" id="btn-verify" disabled>
+        <button type="submit" class="btn-spotlight-verify" id="btn-verify" disabled>
             <i class="bi bi-patch-check-fill me-2"></i>Verificar y continuar
         </button>
     </form>
 
-    <a href="{{ route('verify.notice') }}" class="btn-back">
+    <a href="{{ route('verify.notice') }}" class="btn-spotlight-back">
         <i class="bi bi-arrow-left me-2"></i>Volver · Reenviar código
     </a>
 
@@ -327,7 +358,7 @@
                 inputs[idx - 1].focus();
                 checkAllFilled();
             }
-            // Permitir pegar
+            // Permitir flechas
             if (e.key === 'ArrowLeft' && idx > 0) inputs[idx - 1].focus();
             if (e.key === 'ArrowRight' && idx < inputs.length - 1) inputs[idx + 1].focus();
         });
@@ -364,7 +395,7 @@
         if (totalSeconds <= 0) {
             clearInterval(ticker);
             timerEl.textContent = '00:00';
-            timerEl.style.color = '#ef4444';
+            timerEl.style.color = '#BA2D42';
             inputs.forEach(i => {
                 i.disabled = true;
                 i.classList.add('error');
@@ -376,7 +407,7 @@
         const m = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
         const s = (totalSeconds % 60).toString().padStart(2, '0');
         timerEl.textContent = `${m}:${s}`;
-        if (totalSeconds < 60) timerEl.style.color = '#ef4444';
+        if (totalSeconds < 60) timerEl.style.color = '#BA2D42';
     }, 1000);
 
     // Submit con loading

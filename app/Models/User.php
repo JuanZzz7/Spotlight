@@ -56,4 +56,10 @@ class User extends Authenticatable
     public function isAdmin(): bool { return $this->role === 'admin'; }
     public function isBusiness(): bool { return $this->role === 'business'; }
     public function isUser(): bool { return $this->role === 'user'; }
+
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new \App\Notifications\CustomResetPasswordNotification($token));
+    }
 }
+

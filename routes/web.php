@@ -8,6 +8,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PublicController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\Auth\EmailVerificationController;
+use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Admin\{DashboardController as AdminDash, UserController as AdminUser, CompanyController as AdminCompany, ProductController as AdminProduct, ReportController, FiscalVerificationController as AdminFiscalVerification, AssistedPurchaseController as AdminAssistedPurchase};
 use App\Http\Controllers\Business\{DashboardController as BizDash, CompanyController as BizCompany, ProductController as BizProduct, ExpenseController, ShipmentController as BizShipment, AssistedPurchaseController as BizAssistedPurchase, FormalizationGuideController as BizFormalizationGuide};
 use App\Http\Controllers\Business\Billing\{BillingDashboardController as BizBillingDash, FiscalProfileController as BizFiscalProfile, BillingConfigurationController as BizBillingConfig, InvoiceController as BizInvoice, DocumentController as BizDocument, BillingReportController as BizBillingReport};
@@ -31,6 +32,12 @@ Route::post('/login',   [AuthController::class, 'login']);
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
 Route::post('/register',[AuthController::class, 'register']);
 Route::post('/logout',  [AuthController::class, 'logout'])->name('logout')->middleware('auth');
+
+// Recuperación de Contraseña
+Route::get('/forgot-password',        [PasswordResetController::class, 'showLinkRequestForm'])->name('password.request');
+Route::post('/forgot-password',       [PasswordResetController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::get('/reset-password/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
+Route::post('/reset-password',        [PasswordResetController::class, 'reset'])->name('password.update');
 
 // Google OAuth
 Route::get('/auth/google/redirect', [GoogleController::class, 'redirect'])->name('google.redirect');

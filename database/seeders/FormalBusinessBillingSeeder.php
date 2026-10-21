@@ -196,117 +196,120 @@ class FormalBusinessBillingSeeder extends Seeder
             ['name' => 'Luis Pérez', 'password' => Hash::make('password'), 'role' => 'user']
         );
 
-        // 3. Crear Pedido A: Pendiente por facturar en /business/billing/sales
-        $orderPending = Order::create([
-            'user_id' => $customerAna->id,
-            'company_id' => $companyTech->id,
-            'total' => 279650, // 235.000 + IVA 19% = 279.650
-            'status' => 'paid',
-            'billing_status' => 'not_billed',
-            'payment_method_code' => '48', // Tarjeta crédito
-        ]);
+        // 3. Crear Pedidos y Facturas de demostración (si aún no han sido creados)
+        if (!ElectronicDocument::where('company_id', $companyTech->id)->where('prefix', 'SETP')->where('consecutive', 101)->exists()) {
+            // Pedido A: Pendiente por facturar en /business/billing/sales
+            $orderPending = Order::create([
+                'user_id' => $customerAna->id,
+                'company_id' => $companyTech->id,
+                'total' => 279650, // 235.000 + IVA 19% = 279.650
+                'status' => 'paid',
+                'billing_status' => 'not_billed',
+                'payment_method_code' => '48', // Tarjeta crédito
+            ]);
 
-        OrderDetail::create([
-            'order_id' => $orderPending->id,
-            'product_id' => $createdProducts[0]->id,
-            'company_id' => $companyTech->id,
-            'product_name' => $createdProducts[0]->name,
-            'product_sku' => $createdProducts[0]->sku,
-            'quantity' => 1,
-            'unit_price' => 150000,
-            'subtotal' => 150000,
-            'tax_type' => '01',
-            'tax_rate' => 19.00,
-            'tax_amount' => 28500,
-        ]);
+            OrderDetail::create([
+                'order_id' => $orderPending->id,
+                'product_id' => $createdProducts[0]->id,
+                'company_id' => $companyTech->id,
+                'product_name' => $createdProducts[0]->name,
+                'product_sku' => $createdProducts[0]->sku,
+                'quantity' => 1,
+                'unit_price' => 150000,
+                'subtotal' => 150000,
+                'tax_type' => '01',
+                'tax_rate' => 19.00,
+                'tax_amount' => 28500,
+            ]);
 
-        OrderDetail::create([
-            'order_id' => $orderPending->id,
-            'product_id' => $createdProducts[1]->id,
-            'company_id' => $companyTech->id,
-            'product_name' => $createdProducts[1]->name,
-            'product_sku' => $createdProducts[1]->sku,
-            'quantity' => 1,
-            'unit_price' => 85000,
-            'subtotal' => 85000,
-            'tax_type' => '01',
-            'tax_rate' => 19.00,
-            'tax_amount' => 16150,
-        ]);
+            OrderDetail::create([
+                'order_id' => $orderPending->id,
+                'product_id' => $createdProducts[1]->id,
+                'company_id' => $companyTech->id,
+                'product_name' => $createdProducts[1]->name,
+                'product_sku' => $createdProducts[1]->sku,
+                'quantity' => 1,
+                'unit_price' => 85000,
+                'subtotal' => 85000,
+                'tax_type' => '01',
+                'tax_rate' => 19.00,
+                'tax_amount' => 16150,
+            ]);
 
-        // 4. Crear Pedido B: Facturado previamente con factura electrónica DIAN emitida
-        $orderBilled = Order::create([
-            'user_id' => $customerLuis->id,
-            'company_id' => $companyTech->id,
-            'total' => 261800, // 220.000 + IVA = 261.800
-            'status' => 'paid',
-            'billing_status' => 'not_billed', // Servicio lo marcará como billed
-            'payment_method_code' => '10', // Efectivo
-        ]);
+            // Pedido B: Facturado previamente con factura electrónica DIAN emitida
+            $orderBilled = Order::create([
+                'user_id' => $customerLuis->id,
+                'company_id' => $companyTech->id,
+                'total' => 261800, // 220.000 + IVA = 261.800
+                'status' => 'paid',
+                'billing_status' => 'not_billed', // Servicio lo marcará como billed
+                'payment_method_code' => '10', // Efectivo
+            ]);
 
-        OrderDetail::create([
-            'order_id' => $orderBilled->id,
-            'product_id' => $createdProducts[2]->id,
-            'company_id' => $companyTech->id,
-            'product_name' => $createdProducts[2]->name,
-            'product_sku' => $createdProducts[2]->sku,
-            'quantity' => 1,
-            'unit_price' => 220000,
-            'subtotal' => 220000,
-            'tax_type' => '01',
-            'tax_rate' => 19.00,
-            'tax_amount' => 41800,
-        ]);
+            OrderDetail::create([
+                'order_id' => $orderBilled->id,
+                'product_id' => $createdProducts[2]->id,
+                'company_id' => $companyTech->id,
+                'product_name' => $createdProducts[2]->name,
+                'product_sku' => $createdProducts[2]->sku,
+                'quantity' => 1,
+                'unit_price' => 220000,
+                'subtotal' => 220000,
+                'tax_type' => '01',
+                'tax_rate' => 19.00,
+                'tax_amount' => 41800,
+            ]);
 
-        // Emitir factura electrónica SETP-101 mediante el servicio oficial
-        /** @var ElectronicDocumentService $billingService */
-        $billingService = app(ElectronicDocumentService::class);
+            // Emitir factura electrónica SETP-101 mediante el servicio oficial
+            /** @var ElectronicDocumentService $billingService */
+            $billingService = app(ElectronicDocumentService::class);
 
-        $invoice = $billingService->createInvoiceFromOrder(
-            $companyTech,
-            $orderBilled,
-            [
-                'name' => 'Luis Fernando Pérez Gómez',
-                'id_type' => '13', // Cédula de Ciudadanía
-                'id_number' => '1018234567',
-                'email' => 'luis@spotlight.com',
-                'phone' => '3128901234',
-                'address' => 'Barrio Santa Bárbara, Carrera 5 # 10-12, Ubaté',
-                'municipality_code' => '25843',
-            ],
-            '10'
-        );
-
-        // 5. Emitir una segunda factura directa y su Nota Crédito correspondiente para ver ciclo completo
-        $directInvoice = $billingService->createDirectInvoice(
-            $companyTech,
-            [
-                'name' => 'Empresas Unidas de Ubaté S.A.S.',
-                'id_type' => '31', // NIT
-                'id_number' => '900987654',
-                'dv' => '8',
-                'email' => 'contabilidad@empresasunidas.com',
-                'phone' => '3205557788',
-                'address' => 'Zona Industrial Ubaté Km 2',
-            ],
-            [
+            $invoice = $billingService->createInvoiceFromOrder(
+                $companyTech,
+                $orderBilled,
                 [
-                    'description' => 'Mantenimiento y configuración de red empresarial',
-                    'quantity' => 1,
-                    'price_amount' => 180000,
-                    'tax_rate' => 19.00,
-                    'standard_code' => '81111800',
-                ]
-            ],
-            '30' // Transferencia bancaria
-        );
+                    'name' => 'Luis Fernando Pérez Gómez',
+                    'id_type' => '13', // Cédula de Ciudadanía
+                    'id_number' => '1018234567',
+                    'email' => 'luis@spotlight.com',
+                    'phone' => '3128901234',
+                    'address' => 'Barrio Santa Bárbara, Carrera 5 # 10-12, Ubaté',
+                    'municipality_code' => '25843',
+                ],
+                '10'
+            );
 
-        // Emitir Nota Crédito de anulación por concepto 2 (Anulación de factura electrónica)
-        $creditNote = $billingService->createCreditNote(
-            $directInvoice,
-            '2',
-            'Anulación solicitada por el cliente debido a cambio en los términos del contrato de mantenimiento.'
-        );
+            // 5. Emitir una segunda factura directa y su Nota Crédito correspondiente para ver ciclo completo
+            $directInvoice = $billingService->createDirectInvoice(
+                $companyTech,
+                [
+                    'name' => 'Empresas Unidas de Ubaté S.A.S.',
+                    'id_type' => '31', // NIT
+                    'id_number' => '900987654',
+                    'dv' => '8',
+                    'email' => 'contabilidad@empresasunidas.com',
+                    'phone' => '3205557788',
+                    'address' => 'Zona Industrial Ubaté Km 2',
+                ],
+                [
+                    [
+                        'description' => 'Mantenimiento y configuración de red empresarial',
+                        'quantity' => 1,
+                        'price_amount' => 180000,
+                        'tax_rate' => 19.00,
+                        'standard_code' => '81111800',
+                    ]
+                ],
+                '30' // Transferencia bancaria
+            );
+
+            // Emitir Nota Crédito de anulación por concepto 2 (Anulación de factura electrónica)
+            $creditNote = $billingService->createCreditNote(
+                $directInvoice,
+                '2',
+                'Anulación solicitada por el cliente debido a cambio en los términos del contrato de mantenimiento.'
+            );
+        }
 
         // 6. CREAR EMPRESA FORMAL EN PROCESO DE VERIFICACIÓN (Para prueba de Administrador en /admin/fiscal-verifications)
         $userLacteos = User::firstOrCreate(

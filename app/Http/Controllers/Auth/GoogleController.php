@@ -13,6 +13,15 @@ class GoogleController extends Controller
 {
     public function redirect()
     {
+        $clientId = config('services.google.client_id');
+        $clientSecret = config('services.google.client_secret');
+
+        if (empty($clientId) || empty($clientSecret)) {
+            return redirect()->route('login')->withErrors([
+                'email' => 'El inicio con Google no está activo porque faltan GOOGLE_CLIENT_ID y GOOGLE_CLIENT_SECRET en el archivo .env. Consulta la guía de configuración de Google Cloud Console.'
+            ]);
+        }
+
         return Socialite::driver('google')->redirect();
     }
 
