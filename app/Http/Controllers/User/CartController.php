@@ -60,7 +60,11 @@ class CartController extends Controller
             }
         }
 
-        $qty  = (int) $request->get('quantity', 1);
+        $validated = $request->validate([
+            'quantity' => 'nullable|integer|min:1|max:100'
+        ]);
+
+        $qty  = (int) ($validated['quantity'] ?? 1);
         $cart[$product->id] = ($cart[$product->id] ?? 0) + $qty;
         session(['cart' => $cart]);
 
@@ -86,8 +90,12 @@ class CartController extends Controller
 
     public function update(Request $request, Product $product)
     {
+        $validated = $request->validate([
+            'quantity' => 'required|integer|min:0|max:100'
+        ]);
+
         $cart = $this->getCart();
-        $qty  = (int) $request->get('quantity', 1);
+        $qty  = (int) $validated['quantity'];
         if ($qty <= 0) {
             unset($cart[$product->id]);
         } else {

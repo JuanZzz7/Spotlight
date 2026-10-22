@@ -51,7 +51,7 @@ class ChatController extends Controller
 
     public function send(Request $request, User $receiver)
     {
-        $request->validate(['message' => 'required|string']);
+        $request->validate(['message' => 'required|string|max:5000']);
 
         $message = Message::create([
             'sender_id' => Auth::id(),
