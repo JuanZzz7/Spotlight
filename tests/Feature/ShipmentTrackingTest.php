@@ -10,6 +10,7 @@ use App\Models\Shipment;
 use App\Models\ShipmentEvent;
 use App\Models\User;
 use App\Services\Shipping\ShipmentTrackingService;
+use Database\Seeders\TestShipmentSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -57,6 +58,7 @@ class ShipmentTrackingTest extends TestCase
             'company_id' => $this->company->id,
             'total' => 180000,
             'status' => 'paid',
+            'payment_status' => Order::PAYMENT_APPROVED,
             'payment_method_code' => '48',
         ]);
 
@@ -242,5 +244,89 @@ class ShipmentTrackingTest extends TestCase
 
         $response->assertSessionHas('error');
         $this->assertEquals('preparing', $this->shipment->fresh()->status);
+    }
+
+    public function test_public_tracking_portal_shows_not_found_for_invalid_guide(): void
+    {
+        $response = $this->get(route('public.tracking', ['guia' => 'GUIA-INEXISTENTE-999']));
+
+        $response->assertStatus(200);
+        $response->assertSee('Guía no encontrada');
+        $response->assertSee('GUIA-INEXISTENTE-999');
+    }
+
+    public function test_public_tracking_portal_renders_without_parameters(): void
+    {
+        $response = $this->get(route('public.tracking'));
+
+        $response->assertStatus(200);
+        $response->assertSee('Rastrea tu Paquete en Tiempo Real');
+        $response->assertDontSee('Guía no encontrada');
+    }
+
+    public function test_simulation_advances_through_all_lifecycle_stages_until_delivered(): void
+    {
+        // Estado inicial: preparing -> avanzar a dispatched
+        $this->postJson("/api/v1/shipments/{$this->shipment->id}/simulate-advance")
+            ->assertStatus(200)
+            ->assertJsonPath('status.code', 'dispatched');
+
+        // dispatched -> in_transit
+        $this->postJson("/api/v1/shipments/{$this->shipment->id}/simulate-advance")
+            ->assertStatus(200)
+            ->assertJsonPath('status.code', 'in_transit');
+
+        // in_transit -> out_for_delivery
+        $this->postJson("/api/v1/shipments/{$this->shipment->id}/simulate-advance")
+            ->assertStatus(200)
+            ->assertJsonPath('status.code', 'out_for_delivery');
+
+        // out_for_delivery -> delivered
+        $this->postJson("/api/v1/shipments/{$this->shipment->id}/simulate-advance")
+            ->assertStatus(200)
+            ->assertJsonPath('status.code', 'delivered')
+            ->assertJsonPath('status.is_delivered', true);
+
+        $freshShipment = $this->shipment->fresh();
+        $this->assertEquals('delivered', $freshShipment->status);
+        $this->assertNotNull($freshShipment->delivered_at);
+        $this->assertEquals('delivered', $this->order->fresh()->status);
+    }
+
+    public function test_test_shipment_seeder_creates_official_ubate_guide_and_can_be_tracked(): void
+    {
+        $seeder = new TestShipmentSeeder();
+        $seeder->run();
+
+        $this->assertDatabaseHas('shipments', [
+            'tracking_number' => 'CRD-261022-UBATE',
+            'carrier' => 'coordinadora',
+            'status' => Shipment::STATUS_IN_TRANSIT,
+        ]);
+
+        // Consulta mediante API pública
+        $apiResponse = $this->getJson('/api/v1/tracking/CRD-261022-UBATE');
+        $apiResponse->assertStatus(200);
+        $apiResponse->assertJson([
+            'success' => true,
+            'tracking_number' => 'CRD-261022-UBATE',
+            'carrier' => [
+                'code' => 'coordinadora',
+                'name' => 'Coordinadora Mercantil',
+            ],
+            'status' => [
+                'code' => 'in_transit',
+            ],
+            'origin_city' => 'Ubaté, Cundinamarca',
+            'destination_city' => 'Bogotá D.C.',
+        ]);
+
+        // Consulta en portal público web
+        $webResponse = $this->get(route('public.tracking', ['guia' => 'CRD-261022-UBATE']));
+        $webResponse->assertStatus(200);
+        $webResponse->assertSee('CRD-261022-UBATE');
+        $webResponse->assertSee('Coordinadora Mercantil');
+        $webResponse->assertSee('Ubaté, Cundinamarca');
+        $webResponse->assertSee('Bogotá D.C.');
     }
 }

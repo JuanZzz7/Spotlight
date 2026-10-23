@@ -18,7 +18,7 @@ class StoreCheckoutRequest extends FormRequest
             'first_name'                 => 'required|string|max:100',
             'last_name'                  => 'required|string|max:100',
             'email'                      => 'required|email|max:150',
-            'phone'                      => 'required|string|min:7|max:25',
+            'phone'                      => ['required', 'string', 'regex:/^[0-9]{10}$/'],
             'doc_type'                   => 'required|string|in:CC,NIT,CE,PP,TI,RFC,CURP,INE',
             'doc_number'                 => 'required|string|min:4|max:30',
 
@@ -65,6 +65,7 @@ class StoreCheckoutRequest extends FormRequest
             'email.required'            => 'El correo electrónico es obligatorio para recibir el comprobante.',
             'email.email'               => 'Ingresa un correo electrónico válido.',
             'phone.required'            => 'El teléfono celular es requerido para la coordinación del envío.',
+            'phone.regex'               => 'El número de celular debe contener exactamente 10 dígitos numéricos (ni más ni menos).',
             'doc_type.required'         => 'Selecciona el tipo de documento.',
             'doc_number.required'       => 'El número de documento es obligatorio para facturación y despacho.',
             'country.required'          => 'El país es obligatorio.',

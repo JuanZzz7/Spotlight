@@ -119,7 +119,8 @@ class Order extends Model
 
     public function isPaid(): bool
     {
-        return $this->payment_status === self::PAYMENT_APPROVED || $this->status === 'paid';
+        return $this->payment_status === self::PAYMENT_APPROVED 
+            || in_array($this->status, ['paid', 'shipped', 'delivered']);
     }
 
     public function scopeByPaymentReference($query, string $ref)

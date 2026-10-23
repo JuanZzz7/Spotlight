@@ -107,5 +107,11 @@ class DatabaseSeeder extends Seeder
 
         // Seeder especializado para Facturación Electrónica DIAN y usuario de empresa formal
         $this->call(FormalBusinessBillingSeeder::class);
+
+        // Seeder con orden y guía de prueba para rastreo logístico en tiempo real
+        $this->call(TestShipmentSeeder::class);
+
+        // Seeder con empresa y productos de México (Marketplace Multinacional CO/MX)
+        $this->call(MexicanBusinessSeeder::class);
     }
 }

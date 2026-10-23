@@ -64,8 +64,44 @@ class CartController extends Controller
             'quantity' => 'nullable|integer|min:1|max:100'
         ]);
 
-        $qty  = (int) ($validated['quantity'] ?? 1);
-        $cart[$product->id] = ($cart[$product->id] ?? 0) + $qty;
+        $qty = (int) ($validated['quantity'] ?? 1);
+        $currentInCart = $cart[$product->id] ?? 0;
+        $totalRequested = $currentInCart + $qty;
+
+        // Validación de Stock
+        if ($product->stock <= 0) {
+            $errorMsg = "El producto '{$product->name}' se encuentra agotado (sin existencias disponibles).";
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success'      => false,
+                    'error'        => $errorMsg,
+                    'out_of_stock' => true,
+                ], 422);
+            }
+            return back()->with('error', $errorMsg);
+        }
+
+        if ($totalRequested > $product->stock) {
+            $availableToAdd = max(0, $product->stock - $currentInCart);
+            if ($availableToAdd <= 0) {
+                $errorMsg = "Ya alcanzaste el stock máximo disponible ({$product->stock} unidades) de '{$product->name}' en tu carrito. No es posible agregar más.";
+            } else {
+                $errorMsg = "Stock insuficiente para '{$product->name}'. Solo hay {$product->stock} unidad(es) disponible(s) y ya tienes {$currentInCart} en tu carrito. Solo puedes agregar {$availableToAdd} más.";
+            }
+
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success'            => false,
+                    'error'              => $errorMsg,
+                    'insufficient_stock' => true,
+                    'stock'              => $product->stock,
+                    'in_cart'            => $currentInCart,
+                ], 422);
+            }
+            return back()->with('error', $errorMsg);
+        }
+
+        $cart[$product->id] = $totalRequested;
         session(['cart' => $cart]);
 
         if ($request->wantsJson() || $request->ajax()) {
@@ -98,11 +134,18 @@ class CartController extends Controller
         $qty  = (int) $validated['quantity'];
         if ($qty <= 0) {
             unset($cart[$product->id]);
-        } else {
-            $cart[$product->id] = $qty;
+            session(['cart' => $cart]);
+            return back()->with('success', 'Producto eliminado del carrito.');
         }
+
+        if ($qty > $product->stock) {
+            $errorMsg = "Stock insuficiente para '{$product->name}'. Solo hay {$product->stock} unidad(es) disponibles en inventario.";
+            return back()->with('error', $errorMsg);
+        }
+
+        $cart[$product->id] = $qty;
         session(['cart' => $cart]);
-        return back();
+        return back()->with('success', 'Cantidad actualizada correctamente.');
     }
 
     public function checkout()

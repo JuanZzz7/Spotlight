@@ -38,7 +38,13 @@ class DashboardController extends Controller
 
     public function panel(Request $request)
     {
-        return view('user.panel');
+        $orders = \Illuminate\Support\Facades\Auth::user()
+            ->orders()
+            ->with(['company', 'shipment.events', 'details.product'])
+            ->latest()
+            ->get();
+
+        return view('user.panel', compact('orders'));
     }
 
     public function map(Request $request)

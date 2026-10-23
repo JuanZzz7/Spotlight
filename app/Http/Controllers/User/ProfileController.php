@@ -16,7 +16,7 @@ class ProfileController extends Controller
         $validated = $request->validate([
             'name'      => 'required|string|max:255',
             'email'     => 'required|email|unique:users,email,'.$user->id,
-            'phone'     => 'nullable|string|max:30',
+            'phone'     => ['nullable', 'string', 'regex:/^[0-9]{10}$/'],
             'city'      => 'nullable|string|max:100',
             'country'   => 'nullable|string|max:100',
             'address'   => 'nullable|string|max:255',
@@ -28,6 +28,7 @@ class ProfileController extends Controller
             'email.required' => 'El correo electrónico es obligatorio.',
             'email.email'   => 'Ingresa un formato de correo electrónico válido.',
             'email.unique'  => 'Este correo electrónico ya está registrado por otro usuario.',
+            'phone.regex'   => 'El número de celular debe tener exactamente 10 dígitos numéricos (ni más ni menos).',
             'avatar.image'  => 'El archivo debe ser una imagen válida.',
             'avatar.mimes'  => 'Solo se permiten imágenes en formato JPG, PNG o WebP.',
             'avatar.max'    => 'La imagen no debe pesar más de 2 MB.',

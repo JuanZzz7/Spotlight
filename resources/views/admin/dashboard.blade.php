@@ -52,6 +52,96 @@
     @endforeach
 </div>
 
+<div class="row g-4 mb-4">
+    <!-- Últimos Usuarios Registrados -->
+    <div class="col-lg-6">
+        <div class="vs-card border-0 shadow-sm h-100 p-3" style="border-radius: 18px;">
+            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                <h6 class="fw-bold text-dark mb-0 font-outfit">
+                    <i class="bi bi-people text-primary me-2"></i>Últimos Usuarios Registrados
+                </h6>
+                <a href="{{ route('admin.users.index') }}" class="btn btn-sm btn-light border rounded-pill px-3 text-xs fw-semibold">Ver todos</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-sm align-middle mb-0">
+                    <thead>
+                        <tr class="text-muted text-xs">
+                            <th>Nombre</th>
+                            <th>Correo</th>
+                            <th>Rol</th>
+                            <th>Verificado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($recentUsers as $ru)
+                        <tr>
+                            <td class="fw-semibold text-dark text-sm">{{ $ru->name }}</td>
+                            <td class="text-muted text-xs">{{ $ru->email }}</td>
+                            <td>
+                                <span class="badge badge-soft-primary rounded-pill px-2 py-1 text-xs">{{ ucfirst($ru->role) }}</span>
+                            </td>
+                            <td>
+                                @if($ru->email_verified_at)
+                                    <span class="badge bg-success-subtle text-success rounded-pill px-2 py-0 text-xs"><i class="bi bi-check"></i> Sí</span>
+                                @else
+                                    <span class="badge bg-warning-subtle text-warning rounded-pill px-2 py-0 text-xs">Pendiente</span>
+                                @endif
+                            </td>
+                        </tr>
+                        @empty
+                        <tr><td colspan="4" class="text-center text-muted py-3">No hay registros aún.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Últimas Empresas Registradas -->
+    <div class="col-lg-6">
+        <div class="vs-card border-0 shadow-sm h-100 p-3" style="border-radius: 18px;">
+            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                <h6 class="fw-bold text-dark mb-0 font-outfit">
+                    <i class="bi bi-building text-primary me-2"></i>Últimas Empresas Registradas
+                </h6>
+                <a href="{{ route('admin.companies.index') }}" class="btn btn-sm btn-light border rounded-pill px-3 text-xs fw-semibold">Ver todas</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-sm align-middle mb-0">
+                    <thead>
+                        <tr class="text-muted text-xs">
+                            <th>Empresa</th>
+                            <th>País</th>
+                            <th>Categoría</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($recentCompanies as $rc)
+                        <tr>
+                            <td class="fw-semibold text-dark text-sm">{{ $rc->name }}</td>
+                            <td>
+                                <span class="badge bg-light border text-dark rounded-pill px-2 py-0 text-xs">
+                                    {{ $rc->country === 'MX' ? '🇲🇽 México' : '🇨🇴 Colombia' }}
+                                </span>
+                            </td>
+                            <td class="text-muted text-xs">{{ $rc->category ?: 'General' }}</td>
+                            <td>
+                                <span class="badge {{ $rc->status === 'active' ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning' }} rounded-pill px-2 py-0 text-xs">
+                                    {{ ucfirst($rc->status) }}
+                                </span>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr><td colspan="4" class="text-center text-muted py-3">No hay empresas registradas aún.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="vs-card p-3 border-0 shadow-sm" style="border-radius: 18px;">
     <div class="card-body">
         <h6 class="fw-bold text-dark mb-3" style="font-family: 'Outfit', sans-serif;">Acceso rápido a gobernanza y administración</h6>

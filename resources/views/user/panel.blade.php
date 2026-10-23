@@ -406,9 +406,9 @@
             </p>
         </div>
         <div class="d-flex align-items-center gap-2 flex-wrap">
-            <button type="button" class="btn btn-sl-outlined" data-bs-toggle="modal" data-bs-target="#orderDetailsModal">
-                <i class="bi bi-geo-alt"></i> Rastrear envío
-            </button>
+            <a href="{{ route('user.orders.index') }}" class="btn btn-sl-outlined">
+                <i class="bi bi-truck me-1"></i> Mis Compras y Rastreo
+            </a>
             <a href="{{ route('user.dashboard') }}" class="btn btn-sl-primary">
                 <i class="bi bi-shop"></i> Explorar Marketplace
             </a>
@@ -453,104 +453,112 @@
         </div>
     </div>
 
-    {{-- 3. Pedido en Camino (Foco Principal Destacado) --}}
-    <div class="sl-card p-4 p-md-4 mb-4" id="recentOrderCard">
-        <!-- Encabezado del pedido -->
-        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3 pb-2 border-bottom" style="border-color: #F0EDF2 !important;">
-            <div class="d-flex align-items-center gap-2">
-                <span class="sl-badge-subtle" style="background: #FDF2F4;">
-                    <i class="bi bi-broadcast" style="color: var(--sl-primary);"></i> Seguimiento en vivo
-                </span>
-                <span class="fw-bold" style="font-size: 13px; color: var(--sl-text-secondary);">Orden #SP-8421</span>
+    {{-- 3. Pedidos y Rastreo de Guía en Vivo --}}
+    @php
+        $latestOrder = $orders->first();
+    @endphp
+
+    @if($latestOrder)
+        <div class="sl-card p-4 p-md-4 mb-4" id="recentOrderCard">
+            <!-- Encabezado del pedido -->
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3 pb-2 border-bottom" style="border-color: #F0EDF2 !important;">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="sl-badge-subtle" style="background: #FDF2F4;">
+                        <i class="bi bi-broadcast text-danger pulse-live"></i> Seguimiento en vivo
+                    </span>
+                    <span class="fw-bold" style="font-size: 13px; color: var(--sl-text-secondary);">Orden #{{ $latestOrder->id }}</span>
+                    <span class="text-muted text-xs">• Realizada el {{ $latestOrder->created_at->format('d/m/Y H:i') }}</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge {{ $latestOrder->shipment ? $latestOrder->shipment->status_badge_class : 'bg-secondary' }} rounded-pill px-3 py-1">
+                        {{ $latestOrder->shipment ? $latestOrder->shipment->status_label : 'En preparación' }}
+                    </span>
+                </div>
             </div>
-            <span class="text-muted" style="font-size: 12px;">Despacho directo aliado</span>
+
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+                <h3 class="font-outfit fw-bold mb-1" style="font-size: 1.5rem; color: var(--sl-neutral); letter-spacing: -0.3px;">
+                    Rastreo de tu Compra: <span class="text-primary font-monospace">{{ $latestOrder->shipment?->tracking_number ?: 'En asignación de guía' }}</span>
+                </h3>
+                <div class="text-muted text-sm">
+                    Transportadora: <strong>{{ $latestOrder->shipment?->carrier_name ?: 'Transportadora aliada' }}</strong>
+                </div>
+            </div>
+
+            <!-- Ficha compacta de producto y comercio -->
+            <div class="p-3 rounded-4 mb-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3" style="background: #FAF8FA; border: 1px solid #EFEBF2;">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-3 bg-white d-flex align-items-center justify-content-center shadow-xs text-primary" style="width: 52px; height: 52px; border: 1px solid #ECE7EE;">
+                        <i class="bi bi-box-seam fs-3"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-1 text-dark" style="font-size: 14px;">
+                            {{ $latestOrder->details->first()?->effective_product_name ?: 'Compra en Spotlight' }}
+                            @if($latestOrder->details->count() > 1)
+                                <span class="badge bg-light text-muted border text-xs">+{{ $latestOrder->details->count() - 1 }} producto(s)</span>
+                            @endif
+                        </h6>
+                        <div class="d-flex align-items-center gap-2" style="font-size: 13px; color: var(--sl-text-secondary);">
+                            <span class="fw-bold text-primary">${{ number_format($latestOrder->total, 0, ',', '.') }} {{ $latestOrder->currency ?: 'COP' }}</span>
+                            <span>•</span>
+                            <span class="fw-semibold"><i class="bi bi-shop me-1"></i>{{ $latestOrder->company->name ?? 'Comercio Local' }}</span>
+                            @if($latestOrder->shipment?->current_location)
+                                <span>•</span>
+                                <span class="text-muted"><i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ $latestOrder->shipment->current_location }}</span>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones de acción del pedido -->
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <a href="{{ route('user.orders.tracking', $latestOrder) }}" class="btn btn-sl-primary btn-sm">
+                        <i class="bi bi-truck me-1"></i> Rastrear en tiempo real
+                    </a>
+                    <a href="{{ route('user.orders.index') }}" class="btn btn-sl-outlined btn-sm">
+                        <i class="bi bi-receipt me-1"></i> Todas mis compras ({{ $orders->count() }})
+                    </a>
+                </div>
+            </div>
+
+            <!-- Barra de progreso en vivo del envío -->
+            <div class="mb-3">
+                <div class="d-flex justify-content-between text-xs fw-bold text-muted mb-2">
+                    <span><i class="bi bi-box-seam me-1"></i>Preparación</span>
+                    <span><i class="bi bi-truck me-1"></i>Despacho</span>
+                    <span><i class="bi bi-arrow-left-right me-1"></i>En Tránsito</span>
+                    <span><i class="bi bi-bicycle me-1"></i>En Reparto</span>
+                    <span><i class="bi bi-check-circle-fill me-1"></i>Entregado</span>
+                </div>
+                <div class="progress" style="height: 8px; border-radius: 8px; background-color: #f1f5f9;">
+                    <div class="progress-bar" style="width: {{ $latestOrder->shipment?->progress_percentage ?? 20 }}%; background: linear-gradient(90deg, var(--sl-primary), var(--sl-secondary)); border-radius: 8px;"></div>
+                </div>
+            </div>
+
+            <!-- Aviso informativo de rastreo -->
+            <div class="d-flex justify-content-between align-items-center pt-2 flex-wrap gap-2" style="font-size: 12px; color: var(--sl-text-muted);">
+                <span><i class="bi bi-shield-check text-success me-1"></i> Envío asegurado y verificado por la plataforma Spotlight.</span>
+                @if($latestOrder->shipment?->tracking_number)
+                    <a href="{{ route('public.tracking', ['guia' => $latestOrder->shipment->tracking_number]) }}" target="_blank" class="text-decoration-none fw-semibold text-primary">
+                        <i class="bi bi-box-arrow-up-right me-1"></i>Ver en portal público de rastreo
+                    </a>
+                @endif
+            </div>
         </div>
-
-        <h3 class="font-outfit fw-bold mb-3" style="font-size: 1.65rem; color: var(--sl-neutral); letter-spacing: -0.3px;">
-            Tu pedido más reciente está en camino
-        </h3>
-
-        <!-- Ficha compacta de producto y comercio -->
-        <div class="p-3 rounded-4 mb-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3" style="background: #FAF8FA; border: 1px solid #EFEBF2;">
-            <div class="d-flex align-items-center gap-3">
-                <div class="rounded-3 bg-white d-flex align-items-center justify-content-center shadow-xs" style="width: 52px; height: 52px; color: var(--sl-primary); border: 1px solid #ECE7EE;">
-                    <i class="bi bi-headphones fs-4"></i>
-                </div>
-                <div>
-                    <h6 class="fw-bold mb-1" style="color: var(--sl-neutral); font-size: 14px;">
-                        Audífonos Bluetooth Pro Bass (Edición Aldea)
-                    </h6>
-                    <div class="d-flex align-items-center gap-2" style="font-size: 13px; color: var(--sl-text-secondary);">
-                        <span class="fw-bold" style="color: var(--sl-primary);">$149.900 COP</span>
-                        <span>•</span>
-                        <span>1 unidad</span>
-                        <span>•</span>
-                        <span class="fw-semibold">TechStore Pro</span>
-                    </div>
-                </div>
+    @else
+        <div class="sl-card p-4 p-md-5 mb-4 text-center">
+            <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px; background: #F6E7EB;">
+                <i class="bi bi-bag text-primary fs-2"></i>
             </div>
-
-            <!-- Botones de acción del pedido: 'Ver detalles de orden' abre la ventana modal sin salir del panel -->
-            <div class="d-flex align-items-center gap-2 flex-wrap">
-                <button type="button" class="btn btn-sl-outlined btn-sm" data-bs-toggle="modal" data-bs-target="#orderDetailsModal">
-                    <i class="bi bi-eye"></i> Ver detalles de orden
-                </button>
-                <a href="{{ route('chat.index') }}" class="btn btn-sl-primary btn-sm">
-                    <i class="bi bi-chat-dots"></i> Mensaje a tienda
-                </a>
-            </div>
+            <h4 class="font-outfit fw-bold text-dark mb-1">Aún no tienes pedidos registrados</h4>
+            <p class="text-muted text-sm mb-3 mx-auto" style="max-width: 460px;">
+                Cuando compres en Spotlight, aquí podrás ver en tiempo real la guía de transporte, el estado de preparación y la ubicación de tus productos.
+            </p>
+            <a href="{{ route('user.dashboard') }}" class="btn btn-sl-primary btn-sm px-4">
+                <i class="bi bi-shop me-1"></i> Explorar comercios y productos
+            </a>
         </div>
-
-        <!-- Barra de progreso simple de 4 pasos -->
-        <div class="position-relative pt-2 pb-2 mb-3">
-            <div class="order-stepper-track">
-                <div class="order-stepper-progress"></div>
-            </div>
-
-            <div class="d-flex justify-content-between position-relative z-1">
-                <!-- Paso 1 -->
-                <div class="stepper-node">
-                    <div class="stepper-circle completed">
-                        <i class="bi bi-check-lg fs-5"></i>
-                    </div>
-                    <div class="fw-bold" style="font-size: 13px; color: var(--sl-neutral);">Confirmado</div>
-                    <div class="text-muted" style="font-size: 11px;">10:15 AM</div>
-                </div>
-
-                <!-- Paso 2 -->
-                <div class="stepper-node">
-                    <div class="stepper-circle completed">
-                        <i class="bi bi-check-lg fs-5"></i>
-                    </div>
-                    <div class="fw-bold" style="font-size: 13px; color: var(--sl-neutral);">Preparando</div>
-                    <div class="text-muted" style="font-size: 11px;">11:45 AM</div>
-                </div>
-
-                <!-- Paso 3 (Actual) -->
-                <div class="stepper-node">
-                    <div class="stepper-circle active">
-                        <i class="bi bi-truck fs-5"></i>
-                    </div>
-                    <div class="fw-bold" style="font-size: 13px; color: var(--sl-primary);">En ruta</div>
-                    <span class="sl-badge-subtle py-0 px-2" style="font-size: 10px;">Ahora</span>
-                </div>
-
-                <!-- Paso 4 -->
-                <div class="stepper-node">
-                    <div class="stepper-circle pending">
-                        <i class="bi bi-box-seam fs-6"></i>
-                    </div>
-                    <div class="fw-semibold text-muted" style="font-size: 13px;">Entrega hoy</div>
-                    <div class="text-muted" style="font-size: 11px;">Estimada: 3:00 - 5:00 PM</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Aviso discreto de una sola línea sin caja punteada -->
-        <div class="pt-2 text-center text-md-start" style="font-size: 12px; color: var(--sl-text-muted);">
-            <i class="bi bi-info-circle me-1" style="color: var(--sl-secondary);"></i> Servicio de mensajería directa aliado con contacto activo vía SMS y WhatsApp.
-        </div>
-    </div>
+    @endif
 
     {{-- 4. Fila de Métricas (4 tarjetas unificadas) --}}
     <div class="row g-3 mb-4">
@@ -976,18 +984,18 @@
                     <div class="text-muted mt-1" style="font-size: 11px;">Se utiliza para acceder a tu cuenta y notificaciones de compras.</div>
                 </div>
 
-                <!-- Teléfono / WhatsApp -->
+                <!-- Teléfono / WhatsApp (10 dígitos exactos) -->
                 <div>
                     <label class="form-label fw-bold mb-1" for="inputPhone" style="font-size: 13px; color: var(--sl-neutral);">
-                        Teléfono / WhatsApp
+                        Teléfono / WhatsApp <span class="text-muted fw-normal" style="font-size: 11px;">(Exactamente 10 dígitos)</span>
                     </label>
                     <div class="input-group">
                         <span class="input-group-text bg-white border-end-0 drawer-form-control" style="border-radius: 12px 0 0 12px !important; color: var(--sl-text-muted);">
                             <i class="bi bi-telephone"></i>
                         </span>
-                        <input type="tel" class="form-control drawer-form-control border-start-0" id="inputPhone" name="phone" value="{{ $user->phone }}" placeholder="Ej: +57 310 123 4567" style="border-radius: 0 12px 12px 0 !important;" oninput="handleFormInputChange()">
+                        <input type="tel" class="form-control drawer-form-control border-start-0" id="inputPhone" name="phone" value="{{ $user->phone }}" placeholder="3001234567" maxlength="10" minlength="10" pattern="[0-9]{10}" style="border-radius: 0 12px 12px 0 !important;" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10); handleFormInputChange()">
                     </div>
-                    <div class="invalid-feedback" id="valErrorPhone" style="font-size: 11px;">Ingresa un número de teléfono válido.</div>
+                    <div class="invalid-feedback" id="valErrorPhone" style="font-size: 11px;">El número celular debe tener exactamente 10 dígitos numéricos.</div>
                 </div>
 
                 <!-- País y Ciudad -->

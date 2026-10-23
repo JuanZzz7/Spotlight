@@ -56,6 +56,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
 
     Route::resource('users', AdminUser::class);
     Route::patch('users/{user}/toggle', [AdminUser::class, 'toggleActive'])->name('users.toggle');
+    Route::patch('users/{user}/verify', [AdminUser::class, 'verifyAccount'])->name('users.verify');
 
     Route::get('companies', [AdminCompany::class, 'index'])->name('companies.index');
     Route::patch('companies/{company}/toggle', [AdminCompany::class, 'toggleStatus'])->name('companies.toggle');
