@@ -165,10 +165,10 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label fw-semibold small text-dark">Celular / Teléfono <span class="text-danger">*</span></label>
+                                <label class="form-label fw-semibold small text-dark">Celular / Teléfono (10 dígitos exactos) <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-white border-end-0 fw-semibold text-muted">+57</span>
-                                    <input type="tel" name="phone" id="phone" class="form-control rounded-end-3 py-2 border-start-0" value="{{ old('phone', $preloadedUser['phone'] ?? '') }}" placeholder="300 123 4567" required>
+                                    <input type="tel" name="phone" id="phone" class="form-control rounded-end-3 py-2 border-start-0" value="{{ old('phone', $preloadedUser['phone'] ?? '') }}" placeholder="3001234567" maxlength="10" minlength="10" pattern="[0-9]{10}" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);" required>
                                 </div>
                             </div>
                             <div class="col-md-4">

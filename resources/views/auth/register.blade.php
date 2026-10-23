@@ -247,38 +247,40 @@
                             <label class="form-label text-sm fw-semibold text-dark mb-1">
                                 <span class="lang-en">Email Address</span><span class="lang-es">Correo electrónico</span>
                             </label>
-                            <input type="email" name="email" class="form-control text-sm rounded-pill px-3 py-2" style="background-color: #f8fafc; border: 1px solid #e2e8f0;" placeholder="ejemplo@correo.com" value="{{ old('email') }}" required>
-                        </div>
-                        
-                        <!-- Teléfono con Indicativo Dinámico -->
-                        <div class="mb-3">
-                            <label class="form-label text-sm fw-semibold text-dark mb-1">
-                                <span class="lang-en">Phone Number</span><span class="lang-es">Número de teléfono</span>
-                            </label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light text-sm fw-bold border-end-0 rounded-start-pill px-3" id="step1_phone_badge">{{ old('country', 'CO') === 'MX' ? '+52' : '+57' }}</span>
-                                <input type="hidden" name="phone_prefix" id="step1_phone_prefix" value="{{ old('phone_prefix', old('country', 'CO') === 'MX' ? '+52' : '+57') }}">
-                                <input type="tel" name="phone" id="step1_phone_input" class="form-control text-sm border-start-0 rounded-end-pill px-3 py-2" style="background-color: #f8fafc; border: 1px solid #e2e8f0;" placeholder="{{ old('country', 'CO') === 'MX' ? '222 123 4567' : '300 123 4567' }}" value="{{ old('phone') }}">
-                            </div>
-                            <small class="text-muted" style="font-size: 0.72rem;">
-                                <span class="lang-en">For notifications and purchase tracking</span><span class="lang-es">Para notificaciones y seguimiento de compras</span>
-                            </small>
+                            <input type="email" name="email" class="form-control text-sm rounded-pill px-3 py-2 @error('email') is-invalid @enderror" style="background-color: #f8fafc; border: 1px solid #e2e8f0;" placeholder="ejemplo@correo.com" value="{{ old('email') }}" required>
+                            @error('email')
+                                <div class="text-danger small mt-1 fw-semibold"><i class="bi bi-exclamation-circle me-1"></i>{{ $message }}</div>
+                            @enderror
                         </div>
 
-                        <div class="row g-2 mb-3">
+                        <div class="row g-2 mb-2">
                             <div class="col-6">
                                 <label class="form-label text-sm fw-semibold text-dark mb-1">
                                     <span class="lang-en">Password</span><span class="lang-es">Contraseña</span>
                                 </label>
-                                <input type="password" name="password" class="form-control text-sm rounded-pill px-3 py-2" style="background-color: #f8fafc; border: 1px solid #e2e8f0;" placeholder="••••••••" required>
+                                <input type="password" name="password" id="register_password" class="form-control text-sm rounded-pill px-3 py-2 @error('password') is-invalid @enderror" style="background-color: #f8fafc; border: 1px solid #e2e8f0;" placeholder="••••••••" required>
                             </div>
                             <div class="col-6">
                                 <label class="form-label text-sm fw-semibold text-dark mb-1">
                                     <span class="lang-en">Confirm Password</span><span class="lang-es">Confirmar contraseña</span>
                                 </label>
-                                <input type="password" name="password_confirmation" class="form-control text-sm rounded-pill px-3 py-2" style="background-color: #f8fafc; border: 1px solid #e2e8f0;" placeholder="••••••••" required>
+                                <input type="password" name="password_confirmation" id="register_password_confirmation" class="form-control text-sm rounded-pill px-3 py-2" style="background-color: #f8fafc; border: 1px solid #e2e8f0;" placeholder="••••••••" required>
                             </div>
                         </div>
+
+                        <!-- Indicador en tiempo real de seguridad de contraseña -->
+                        <div id="password-requirements-box" class="p-2 mb-3 rounded-3 bg-light border" style="font-size: 0.72rem;">
+                            <div class="text-muted fw-bold mb-1"><i class="bi bi-shield-lock me-1"></i>Requisitos de contraseña:</div>
+                            <div class="row g-1">
+                                <div class="col-6" id="req-length"><i class="bi bi-circle text-muted me-1"></i>Mínimo 8 caracteres</div>
+                                <div class="col-6" id="req-uppercase"><i class="bi bi-circle text-muted me-1"></i>Una mayúscula (A-Z)</div>
+                                <div class="col-6" id="req-number"><i class="bi bi-circle text-muted me-1"></i>Al menos un número (0-9)</div>
+                                <div class="col-6" id="req-symbol"><i class="bi bi-circle text-muted me-1"></i>Un signo/símbolo (!@#$...)</div>
+                            </div>
+                        </div>
+                        @error('password')
+                            <div class="text-danger small mb-3 fw-semibold"><i class="bi bi-exclamation-circle me-1"></i>{{ $message }}</div>
+                        @enderror
 
 
 
@@ -466,11 +468,73 @@ document.addEventListener('DOMContentLoaded', () => {
         r.addEventListener('change', () => handleCountryChange(r.value));
     });
 
+    // Validación en tiempo real de contraseña
+    const pwdInput = document.getElementById('register_password');
+    const pwdConfInput = document.getElementById('register_password_confirmation');
+    const reqLength = document.getElementById('req-length');
+    const reqUpper = document.getElementById('req-uppercase');
+    const reqNum = document.getElementById('req-number');
+    const reqSym = document.getElementById('req-symbol');
+
+    function checkPasswordCriteria(val) {
+        return {
+            hasLength: val.length >= 8,
+            hasUpper: /[A-Z]/.test(val),
+            hasNum: /[0-9]/.test(val),
+            hasSym: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(val),
+        };
+    }
+
+    function updateBadge(el, ok, text) {
+        if (!el) return;
+        if (ok) {
+            el.className = 'col-6 text-success fw-bold';
+            el.innerHTML = '<i class="bi bi-check-circle-fill text-success me-1"></i>' + text;
+        } else {
+            el.className = 'col-6 text-muted';
+            el.innerHTML = '<i class="bi bi-circle text-muted me-1"></i>' + text;
+        }
+    }
+
+    function validatePasswordLive(val) {
+        const c = checkPasswordCriteria(val);
+        updateBadge(reqLength, c.hasLength, 'Mínimo 8 caracteres');
+        updateBadge(reqUpper, c.hasUpper, 'Una mayúscula (A-Z)');
+        updateBadge(reqNum, c.hasNum, 'Al menos un número (0-9)');
+        updateBadge(reqSym, c.hasSym, 'Un signo/símbolo (!@#$...)');
+        return c.hasLength && c.hasUpper && c.hasNum && c.hasSym;
+    }
+
+    if (pwdInput) {
+        pwdInput.addEventListener('input', function() {
+            validatePasswordLive(this.value);
+        });
+    }
+
+    // Interceptar envío si es usuario normal para asegurar contraseña válida
+    const registerForm = document.getElementById('register-form');
+    if (registerForm) {
+        registerForm.addEventListener('submit', function(e) {
+            if (roleInput.value === 'user') {
+                const pVal = pwdInput ? pwdInput.value : '';
+                const pConfVal = pwdConfInput ? pwdConfInput.value : '';
+                if (!validatePasswordLive(pVal)) {
+                    e.preventDefault();
+                    alert('La contraseña debe cumplir todos los requisitos de seguridad: mínimo 8 caracteres, al menos una mayúscula (A-Z), un número (0-9) y un signo o símbolo especial (!@#$...).');
+                    return false;
+                }
+                if (pVal !== pConfVal) {
+                    e.preventDefault();
+                    alert('Las contraseñas no coinciden. Por favor verifícalas.');
+                    return false;
+                }
+            }
+        });
+    }
+
     function goToStep2() {
         const nameInput = document.querySelector('#step-1 input[name="name"]');
         const emailInput = document.querySelector('#step-1 input[name="email"]');
-        const pwdInput = document.querySelector('#step-1 input[name="password"]');
-        const pwdConfInput = document.querySelector('#step-1 input[name="password_confirmation"]');
         
         // Validation before proceeding
         if (!nameInput.value || !emailInput.value || !pwdInput.value || !pwdConfInput.value) {
@@ -478,8 +542,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
-        if (pwdInput.value.length < 8) {
-            alert('La contraseña debe tener al menos 8 caracteres.');
+        if (!validatePasswordLive(pwdInput.value)) {
+            alert('La contraseña debe cumplir con todos los requisitos de seguridad: mínimo 8 caracteres, al menos una mayúscula, un número y un signo o símbolo especial.');
             return;
         }
 
