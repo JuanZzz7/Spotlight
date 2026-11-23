@@ -161,6 +161,11 @@ Route::prefix('user')->name('user.')->middleware(['auth', 'role:user'])->group(f
     Route::get('cart/checkout',            [CheckoutController::class, 'index'])->name('cart.checkout');
     Route::post('cart/checkout/process',    [CartController::class, 'processPayment'])->name('cart.payment.process');
 
+    // Proceso oficial Checkout Marketplace Wompi / Mercado Pago
+    Route::get('/checkout',                     [CheckoutController::class, 'index'])->name('checkout.index');
+    Route::post('/checkout/process',            [CheckoutController::class, 'process'])->name('checkout.process');
+    Route::get('/checkout/result/{reference}',  [CheckoutController::class, 'result'])->name('checkout.result');
+
     Route::post('cart/{product}',          [CartController::class, 'add'])->name('cart.add');
     Route::delete('cart/{product}',        [CartController::class, 'remove'])->name('cart.remove');
     Route::patch('cart/{product}',         [CartController::class, 'update'])->name('cart.update');

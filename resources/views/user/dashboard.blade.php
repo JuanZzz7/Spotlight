@@ -555,7 +555,7 @@
 </div>
 
 @push('styles')
-<link href="{{ asset('css/user.css') }}" rel="stylesheet">
+<link href="{{ asset('css/user.css') }}?v=2.5" rel="stylesheet">
 @endpush
 
 @push('scripts')

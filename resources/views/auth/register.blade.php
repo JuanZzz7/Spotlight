@@ -137,6 +137,35 @@
                             @enderror
                         </div>
 
+                        <!-- Teléfono con Indicativo Dinámico y Responsive -->
+                        <div class="mb-3">
+                            <label class="form-label text-sm fw-semibold text-dark mb-1">
+                                <span class="lang-en">Phone Number (10 digits)</span><span class="lang-es">Número de teléfono (10 dígitos)</span>
+                            </label>
+                            <div class="input-group flex-nowrap">
+                                <span class="input-group-text bg-light text-sm fw-bold border-end-0 rounded-start-pill px-3" id="step1_phone_badge">{{ old('country', 'CO') === 'MX' ? '+52' : '+57' }}</span>
+                                <input type="hidden" name="phone_prefix" id="step1_phone_prefix" value="{{ old('phone_prefix', old('country', 'CO') === 'MX' ? '+52' : '+57') }}">
+                                <input type="tel"
+                                       name="phone"
+                                       id="step1_phone_input"
+                                       inputmode="numeric"
+                                       maxlength="10"
+                                       minlength="10"
+                                       pattern="[0-9]{10}"
+                                       oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);"
+                                       class="form-control text-sm border-start-0 rounded-end-pill px-3 py-2 @error('phone') is-invalid @enderror"
+                                       style="background-color: #f8fafc; border: 1px solid #e2e8f0; min-width: 0;"
+                                       placeholder="{{ old('country', 'CO') === 'MX' ? '2221234567' : '3001234567' }}"
+                                       value="{{ old('phone') }}">
+                            </div>
+                            <small class="text-muted" style="font-size: 0.72rem;">
+                                <span class="lang-en">10 numeric digits for notifications and purchase tracking</span><span class="lang-es">10 dígitos numéricos para notificaciones y seguimiento de compras</span>
+                            </small>
+                            @error('phone')
+                                <div class="text-danger small mt-1 fw-semibold"><i class="bi bi-exclamation-circle me-1"></i>{{ $message }}</div>
+                            @enderror
+                        </div>
+
                         <div class="row g-2 mb-2">
                             <div class="col-6">
                                 <label class="form-label text-sm fw-semibold text-dark mb-1">

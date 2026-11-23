@@ -393,6 +393,126 @@
 }
 
 /* --------------------------------------------------------------------------
+   Global Responsive Base & Overflow Protection
+   -------------------------------------------------------------------------- */
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+.vs-topbar-logo-symbol {
+    height: 36px !important;
+    width: 36px !important;
+    max-width: 36px !important;
+    max-height: 36px !important;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.vs-topbar-quicklink {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #4b5563;
+    text-decoration: none;
+    transition: all 0.18s ease;
+    white-space: nowrap;
+}
+
+.vs-topbar-quicklink:hover {
+    background-color: var(--sl-primary-soft, #F6E7EB);
+    color: var(--sl-primary, #7F1D3F);
+}
+
+.vs-topbar-quicklink.active {
+    background-color: var(--sl-primary-soft, #F6E7EB);
+    color: var(--sl-primary, #7F1D3F);
+    font-weight: 700;
+}
+
+/* --------------------------------------------------------------------------
+   Global Phone Input & Multi-Platform Responsive Enhancements
+   -------------------------------------------------------------------------- */
+.input-group {
+    flex-wrap: nowrap;
+}
+
+.input-group > .form-control,
+.input-group > .form-select {
+    min-width: 0;
+}
+
+@media (max-width: 991.98px) {
+    .vs-topbar {
+        padding: 0.65rem 1rem;
+    }
+    .vs-main-content {
+        max-width: 100vw;
+        overflow-x: hidden;
+    }
+}
+
+@media (max-width: 767.98px) {
+    /* Evita el auto-zoom en iOS Safari y Android Chrome al tocar campos de teléfono y formularios */
+    input[type="tel"],
+    input[type="text"],
+    input[type="email"],
+    input[type="number"],
+    input[type="password"],
+    select.form-select,
+    textarea.form-control {
+        font-size: 16px !important;
+    }
+
+    .vs-dropdown-menu,
+    .vs-account-dropdown-menu {
+        max-width: calc(100vw - 1.5rem);
+    }
+
+    .vs-cookie-card {
+        padding: 1rem !important;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .vs-topbar-dropdown {
+        min-height: 58px !important;
+        padding: 0.45rem 0.65rem !important;
+    }
+
+    .vs-topbar-logo-symbol {
+        width: 30px !important;
+        height: 30px !important;
+        max-width: 30px !important;
+        max-height: 30px !important;
+    }
+
+    .vs-dropdown-toggle-btn,
+    .vs-lang-switch-btn,
+    .vs-account-toggle-btn,
+    .vs-cart-topbar-btn {
+        font-size: 0.76rem !important;
+        padding: 0.35rem 0.6rem !important;
+    }
+
+    .vs-lang-switch-btn span {
+        font-size: 0.72rem;
+    }
+
+    .vs-msg-toast {
+        left: 12px;
+        right: 12px;
+        bottom: 14px;
+        min-width: auto;
+        max-width: none;
+    }
+}
+
+/* --------------------------------------------------------------------------
    Global Language Switcher Pill Button (.vs-lang-switch-btn)
    -------------------------------------------------------------------------- */
 .vs-lang-switch-btn {

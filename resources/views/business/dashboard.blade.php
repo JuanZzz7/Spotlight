@@ -3,7 +3,7 @@
 @section('page-title','Panel Empresario')
 
 @push('styles')
-<link href="{{ asset('css/business.css') }}" rel="stylesheet">
+<link href="{{ asset('css/business.css') }}?v=2.5" rel="stylesheet">
 @endpush
 
 @section('dashboard-content')

@@ -76,7 +76,9 @@ class DashboardController extends Controller
             ->latest()
             ->get();
 
-        return view('user.panel', compact('orders'));
+        $latestOrder = $orders->first();
+
+        return view('user.panel', compact('orders', 'latestOrder'));
     }
 
     public function map(Request $request)

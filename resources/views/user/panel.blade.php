@@ -3,13 +3,15 @@
 @section('page-title', 'Mi Perfil')
 
 @push('styles')
-<link href="{{ asset('css/user-panel.css') }}" rel="stylesheet">
+<link href="{{ asset('css/user-panel.css') }}?v=2.5" rel="stylesheet">
 @endpush
 
 @section('dashboard-content')
 @php
     $user = auth()->user();
     $firstName = explode(' ', $user->name)[0];
+    $orders = $orders ?? collect();
+    $latestOrder = $latestOrder ?? $orders->first();
 @endphp
 
 <div class="profile-dashboard-wrapper">
@@ -73,14 +75,16 @@
     </div>
 
     {{-- 3. Pedido en Camino (Foco Principal Destacado) --}}
-    <div class="sl-card p-4 p-md-4 mb-4" id="recentOrderCard">
+    <div class="sl-card p-3 p-sm-4 mb-4" id="recentOrderCard">
         <!-- Encabezado del pedido -->
         <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3 pb-2 border-bottom up-border-soft">
             <div class="d-flex align-items-center gap-2">
                 <span class="sl-badge-subtle up-badge-live">
                     <i class="bi bi-broadcast text-sl-primary"></i> Seguimiento en vivo
                 </span>
-                <span class="fw-bold up-meta-13">Orden #SP-8421</span>
+                <span class="fw-bold up-meta-13">
+                    {{ $latestOrder ? ('Orden #' . ($latestOrder->reference ?? ('SP-' . str_pad($latestOrder->id, 4, '0', STR_PAD_LEFT)))) : 'Orden #SP-8421' }}
+                </span>
             </div>
             <span class="text-muted up-text-12">Despacho directo aliado</span>
         </div>
@@ -90,38 +94,56 @@
         </h3>
 
         <!-- Ficha compacta de producto y comercio -->
+        @php
+            $firstDetail = $latestOrder?->details?->first();
+            $orderProductName = $firstDetail?->product?->name ?? 'Audífonos Bluetooth Pro Bass (Edición Aldea)';
+            $orderPrice = $latestOrder ? ('$' . number_format($latestOrder->total, 0, ',', '.') . ' ' . ($latestOrder->currency ?? 'COP')) : '$149.900 COP';
+            $orderQty = $firstDetail ? ($firstDetail->quantity . ($firstDetail->quantity == 1 ? ' unidad' : ' unidades')) : '1 unidad';
+            $orderCompanyName = $latestOrder?->company?->name ?? 'TechStore Pro';
+        @endphp
         <div class="p-3 rounded-4 mb-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 up-order-summary-box">
             <div class="d-flex align-items-center gap-3">
-                <div class="rounded-3 bg-white d-flex align-items-center justify-content-center shadow-xs up-order-icon-box">
+                <div class="rounded-3 bg-white d-flex align-items-center justify-content-center shadow-xs up-order-icon-box flex-shrink-0">
                     <i class="bi bi-headphones fs-4"></i>
                 </div>
-                <div>
-                    <h6 class="fw-bold mb-1 up-text-14">
-                        Audífonos Bluetooth Pro Bass (Edición Aldea)
+                <div class="min-w-0">
+                    <h6 class="fw-bold mb-1 up-text-14 text-truncate">
+                        {{ $orderProductName }}
                     </h6>
-                    <div class="d-flex align-items-center gap-2 up-meta-13">
-                        <span class="fw-bold text-sl-primary">$149.900 COP</span>
+                    <div class="d-flex flex-wrap align-items-center gap-2 up-meta-13">
+                        <span class="fw-bold text-sl-primary">{{ $orderPrice }}</span>
                         <span>•</span>
-                        <span>1 unidad</span>
+                        <span>{{ $orderQty }}</span>
                         <span>•</span>
-                        <span class="fw-semibold">TechStore Pro</span>
+                        <span class="fw-semibold">{{ $orderCompanyName }}</span>
                     </div>
-                </div>
-
-                <!-- Botones de acción del pedido -->
-                <div class="d-flex align-items-center gap-2 flex-wrap">
-                    <a href="{{ route('user.orders.tracking', $latestOrder) }}" class="btn btn-sl-primary btn-sm">
-                        <i class="bi bi-truck me-1"></i> Rastrear en tiempo real
-                    </a>
-                    <a href="{{ route('user.orders.index') }}" class="btn btn-sl-outlined btn-sm">
-                        <i class="bi bi-receipt me-1"></i> Todas mis compras ({{ $orders->count() }})
-                    </a>
                 </div>
             </div>
 
+            <!-- Botones de acción del pedido -->
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                @if($latestOrder)
+                    <a href="{{ route('user.orders.tracking', $latestOrder) }}" class="btn btn-sl-primary btn-sm">
+                        <i class="bi bi-truck me-1"></i> Rastrear en tiempo real
+                    </a>
+                @else
+                    <button type="button" class="btn btn-sl-outlined btn-sm" data-bs-toggle="modal" data-bs-target="#orderDetailsModal">
+                        <i class="bi bi-eye"></i> Ver detalles de orden
+                    </button>
+                @endif
+                <a href="{{ route('user.orders.index') }}" class="btn btn-sl-outlined btn-sm">
+                    <i class="bi bi-receipt me-1"></i> Mis compras ({{ $orders->count() }})
+                </a>
+                <a href="{{ route('chat.index') }}" class="btn btn-sl-primary btn-sm">
+                    <i class="bi bi-chat-dots"></i> Mensaje a tienda
+                </a>
+            </div>
+        </div>
+
+        @if($latestOrder && $latestOrder->shipment)
             <!-- Barra de progreso en vivo del envío -->
             <div class="mb-3">
-                <div class="d-flex justify-content-between text-xs fw-bold text-muted mb-2">
+                <div class="d-flex justify-content-between flex-wrap gap-1 text-xs fw-bold text-muted mb-2">
                     <span><i class="bi bi-box-seam me-1"></i>Preparación</span>
                     <span><i class="bi bi-truck me-1"></i>Despacho</span>
                     <span><i class="bi bi-arrow-left-right me-1"></i>En Tránsito</span>
@@ -129,20 +151,18 @@
                     <span><i class="bi bi-check-circle-fill me-1"></i>Entregado</span>
                 </div>
                 <div class="progress" style="height: 8px; border-radius: 8px; background-color: #f1f5f9;">
-                    <div class="progress-bar" style="width: {{ $latestOrder->shipment?->progress_percentage ?? 20 }}%; background: linear-gradient(90deg, var(--sl-primary), var(--sl-secondary)); border-radius: 8px;"></div>
+                    <div class="progress-bar" style="width: {{ $latestOrder->shipment->progress_percentage ?? 20 }}%; background: linear-gradient(90deg, var(--sl-primary), var(--sl-secondary)); border-radius: 8px;"></div>
                 </div>
-            </div>
-
-            <!-- Aviso informativo de rastreo -->
-            <div class="d-flex justify-content-between align-items-center pt-2 flex-wrap gap-2" style="font-size: 12px; color: var(--sl-text-muted);">
-                <span><i class="bi bi-shield-check text-success me-1"></i> Envío asegurado y verificado por la plataforma Spotlight.</span>
-                @if($latestOrder->shipment?->tracking_number)
-                    <a href="{{ route('public.tracking', ['guia' => $latestOrder->shipment->tracking_number]) }}" target="_blank" class="text-decoration-none fw-semibold text-primary">
-                        <i class="bi bi-box-arrow-up-right me-1"></i>Ver en portal público de rastreo
-                    </a>
+                @if($latestOrder->shipment->tracking_number)
+                    <div class="d-flex justify-content-between align-items-center pt-2 flex-wrap gap-2" style="font-size: 12px; color: var(--sl-text-muted);">
+                        <span><i class="bi bi-shield-check text-success me-1"></i> Envío asegurado y verificado por Spotlight.</span>
+                        <a href="{{ route('public.tracking', ['guia' => $latestOrder->shipment->tracking_number]) }}" target="_blank" class="text-decoration-none fw-semibold text-primary">
+                            <i class="bi bi-box-arrow-up-right me-1"></i>Ver en portal público de rastreo
+                        </a>
+                    </div>
                 @endif
             </div>
-        </div>
+        @endif
 
         <!-- Barra de progreso simple de 4 pasos -->
         <div class="position-relative pt-2 pb-2 mb-3">
@@ -187,13 +207,6 @@
                     <div class="text-muted up-text-11">Estimada: 3:00 - 5:00 PM</div>
                 </div>
             </div>
-            <h4 class="font-outfit fw-bold text-dark mb-1">Aún no tienes pedidos registrados</h4>
-            <p class="text-muted text-sm mb-3 mx-auto" style="max-width: 460px;">
-                Cuando compres en Spotlight, aquí podrás ver en tiempo real la guía de transporte, el estado de preparación y la ubicación de tus productos.
-            </p>
-            <a href="{{ route('user.dashboard') }}" class="btn btn-sl-primary btn-sm px-4">
-                <i class="bi bi-shop me-1"></i> Explorar comercios y productos
-            </a>
         </div>
 
         <!-- Aviso discreto de una sola línea sin caja punteada -->
@@ -629,15 +642,24 @@
                 <!-- Teléfono / WhatsApp (10 dígitos exactos) -->
                 <div>
                     <label class="form-label fw-bold mb-1 up-label-13" for="inputPhone">
-                        Teléfono / WhatsApp
+                        Teléfono / WhatsApp (10 dígitos)
                     </label>
-                    <div class="input-group">
+                    <div class="input-group flex-nowrap">
                         <span class="input-group-text bg-white border-end-0 drawer-form-control up-phone-prefix">
                             <i class="bi bi-telephone"></i>
                         </span>
-                        <input type="tel" class="form-control drawer-form-control border-start-0 up-phone-input" id="inputPhone" name="phone" value="{{ $user->phone }}" placeholder="Ej: +57 310 123 4567" oninput="handleFormInputChange()">
+                        <input type="tel"
+                               inputmode="numeric"
+                               maxlength="10"
+                               pattern="[0-9]{10}"
+                               class="form-control drawer-form-control border-start-0 up-phone-input"
+                               id="inputPhone"
+                               name="phone"
+                               value="{{ $user->phone }}"
+                               placeholder="Ej: 3101234567"
+                               oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10); handleFormInputChange();">
                     </div>
-                    <div class="invalid-feedback up-text-11" id="valErrorPhone">Ingresa un número de teléfono válido.</div>
+                    <div class="invalid-feedback up-text-11" id="valErrorPhone">Ingresa un número de teléfono válido de 10 dígitos.</div>
                 </div>
 
                 <!-- País y Ciudad -->

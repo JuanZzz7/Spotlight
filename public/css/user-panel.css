@@ -607,12 +607,28 @@ body {
         max-width: 100%;
     }
     .user-avatar-circle {
-        width: 64px;
-        height: 64px;
-        font-size: 1.5rem;
+        width: 56px;
+        height: 56px;
+        font-size: 1.35rem;
     }
     .metric-value-num {
-        font-size: 1.5rem;
+        font-size: 1.45rem;
+    }
+    .stepper-circle {
+        width: 34px;
+        height: 34px;
+        font-size: 12px;
+    }
+    .stepper-node .up-label-13,
+    .stepper-node .up-step-active,
+    .stepper-node .up-text-13 {
+        font-size: 11px !important;
+    }
+    .stepper-node .up-text-11 {
+        font-size: 10px !important;
+    }
+    .up-greeting-title {
+        font-size: 1.45rem !important;
     }
 }
 
