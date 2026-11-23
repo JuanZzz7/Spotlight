@@ -23,7 +23,7 @@
         @if(in_array(auth()->user()->role, ['user', 'business']))
         {{-- El widget de IA se renderiza en el <body>, después de @stack('styles'),
              habilitado exclusivamente para consumidores y emprendedores registrados --}}
-        <link href="{{ asset('css/chatbot.css') }}?v=2.7" rel="stylesheet">
+        <link href="{{ asset('css/chatbot.css') }}?v=2.9" rel="stylesheet">
         @endif
     @endauth
     @stack('styles')

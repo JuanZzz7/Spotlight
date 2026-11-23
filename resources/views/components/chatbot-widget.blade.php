@@ -184,7 +184,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 history.push({ role: 'bot', content: greeting });
             }, 250);
         }
-        if (input) input.focus();
+        if (input && window.innerWidth > 768) input.focus();
     }
 
     function closeChat() {
@@ -271,7 +271,7 @@ document.addEventListener('DOMContentLoaded', function () {
         } finally {
             busy = false;
             if (sendBtn) sendBtn.disabled = false;
-            if (input) input.focus();
+            if (input && window.innerWidth > 768) input.focus();
         }
     }
 
