@@ -211,37 +211,6 @@
                         </li>
                     </ul>
                 </div>
-
-                <!-- Accesos rápidos horizontales en pantallas grandes (evita barra vacía en desktop) -->
-                <div class="d-none d-lg-flex align-items-center gap-1 ms-1">
-                    @if($isBusiness)
-                        <a href="{{ route('business.dashboard') }}" class="vs-topbar-quicklink {{ request()->routeIs('business.dashboard*') ? 'active' : '' }}">
-                            <i class="bi bi-grid"></i> <span>Panel</span>
-                        </a>
-                        <a href="{{ route('business.products.index') }}" class="vs-topbar-quicklink {{ request()->routeIs('business.products*') ? 'active' : '' }}">
-                            <i class="bi bi-box-seam"></i> <span>Productos</span>
-                        </a>
-                        <a href="{{ route('business.expenses.index') }}" class="vs-topbar-quicklink {{ request()->routeIs('business.expenses*') ? 'active' : '' }}">
-                            <i class="bi bi-cash-stack"></i> <span>Ventas</span>
-                        </a>
-                        <a href="{{ route('chat.index') }}" class="vs-topbar-quicklink {{ request()->is('chat*') ? 'active' : '' }}">
-                            <i class="bi bi-chat-dots"></i> <span>Mensajes</span>
-                        </a>
-                    @else
-                        <a href="{{ route('user.dashboard') }}" class="vs-topbar-quicklink {{ request()->routeIs('user.dashboard') ? 'active' : '' }}">
-                            <i class="bi bi-shop"></i> <span>Tienda</span>
-                        </a>
-                        <a href="{{ route('user.map') }}" class="vs-topbar-quicklink {{ request()->routeIs('user.map') ? 'active' : '' }}">
-                            <i class="bi bi-geo-alt"></i> <span>Mapa</span>
-                        </a>
-                        <a href="{{ route('user.orders.index') }}" class="vs-topbar-quicklink {{ request()->routeIs('user.orders*') ? 'active' : '' }}">
-                            <i class="bi bi-truck"></i> <span>Mis Compras</span>
-                        </a>
-                        <a href="{{ route('chat.index') }}" class="vs-topbar-quicklink {{ request()->is('chat*') ? 'active' : '' }}">
-                            <i class="bi bi-chat-dots"></i> <span>Mensajes</span>
-                        </a>
-                    @endif
-                </div>
             </div>
 
             <!-- Derecha: Selector de Idioma, Menú de Cuenta y Carrito si es User -->
