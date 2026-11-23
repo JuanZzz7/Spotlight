@@ -58,7 +58,7 @@ class DashboardController extends Controller
             // Actividad semanal de ventas (últimos 7 días)
             $days = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
             $startOfWeek = Carbon::now()->startOfWeek();
-            $maxAmount = 1;
+            $maxAmount = 0;
             $weekData = [];
 
             for ($i = 0; $i < 7; $i++) {
@@ -78,7 +78,9 @@ class DashboardController extends Controller
             }
 
             foreach ($weekData as &$item) {
-                $item['percentage'] = $maxAmount > 0 ? max(15, min(100, (int)round(($item['amount'] / $maxAmount) * 100))) : 20;
+                $item['percentage'] = ($maxAmount > 0 && $item['amount'] > 0)
+                    ? max(15, min(100, (int)round(($item['amount'] / $maxAmount) * 100)))
+                    : 4;
             }
             $weeklySales = $weekData;
         }

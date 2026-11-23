@@ -12,6 +12,26 @@
     $firstName = explode(' ', $user->name)[0];
     $orders = $orders ?? collect();
     $latestOrder = $latestOrder ?? $orders->first();
+
+    $activeOrders = $orders->filter(function ($o) {
+        $st = $o->order_status ?: $o->status;
+        $shipSt = $o->shipment?->status;
+        if ($shipSt === 'delivered' || in_array($st, ['delivered', 'cancelled', 'failed', 'refunded'])) {
+            return false;
+        }
+        return true;
+    });
+    $activeOrdersCount = $activeOrders->count();
+    $latestActiveOrder = $activeOrders->first();
+
+    $completedOrders = $orders->filter(function ($o) {
+        $st = $o->order_status ?: $o->status;
+        return !in_array($st, ['cancelled', 'failed', 'refunded']);
+    });
+    $monthOrders = $completedOrders->filter(fn($o) => $o->created_at && $o->created_at->isCurrentMonth());
+    $monthTotal = (float) $monthOrders->sum('total');
+    $totalProductsBought = (int) $completedOrders->sum(fn($o) => $o->details ? $o->details->sum('quantity') : 0);
+    $pointsAvailable = (int) floor($completedOrders->sum('total') / 1000);
 @endphp
 
 <div class="profile-dashboard-wrapper">
@@ -76,154 +96,197 @@
 
     {{-- 3. Pedido en Camino (Foco Principal Destacado) --}}
     <div class="sl-card p-3 p-sm-4 mb-4" id="recentOrderCard">
-        <!-- Encabezado del pedido -->
-        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3 pb-2 border-bottom up-border-soft">
-            <div class="d-flex align-items-center gap-2">
-                <span class="sl-badge-subtle up-badge-live">
-                    <i class="bi bi-broadcast text-sl-primary"></i> Seguimiento en vivo
-                </span>
-                <span class="fw-bold up-meta-13">
-                    {{ $latestOrder ? ('Orden #' . ($latestOrder->reference ?? ('SP-' . str_pad($latestOrder->id, 4, '0', STR_PAD_LEFT)))) : 'Orden #SP-8421' }}
-                </span>
-            </div>
-            <span class="text-muted up-text-12">Despacho directo aliado</span>
-        </div>
-
-        <h3 class="font-outfit fw-bold mb-3 up-order-title">
-            Tu pedido más reciente está en camino
-        </h3>
-
-        <!-- Ficha compacta de producto y comercio -->
-        @php
-            $firstDetail = $latestOrder?->details?->first();
-            $orderProductName = $firstDetail?->product?->name ?? 'Audífonos Bluetooth Pro Bass (Edición Aldea)';
-            $orderPrice = $latestOrder ? ('$' . number_format($latestOrder->total, 0, ',', '.') . ' ' . ($latestOrder->currency ?? 'COP')) : '$149.900 COP';
-            $orderQty = $firstDetail ? ($firstDetail->quantity . ($firstDetail->quantity == 1 ? ' unidad' : ' unidades')) : '1 unidad';
-            $orderCompanyName = $latestOrder?->company?->name ?? 'TechStore Pro';
-        @endphp
-        <div class="p-3 rounded-4 mb-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 up-order-summary-box">
-            <div class="d-flex align-items-center gap-3">
-                <div class="rounded-3 bg-white d-flex align-items-center justify-content-center shadow-xs up-order-icon-box flex-shrink-0">
-                    <i class="bi bi-headphones fs-4"></i>
+        @if($latestActiveOrder)
+            @php
+                $firstDetail = $latestActiveOrder->details?->first();
+                $orderProductName = $firstDetail?->effective_product_name ?? $firstDetail?->product?->name ?? ('Pedido #' . $latestActiveOrder->id);
+                $orderPrice = '$' . number_format($latestActiveOrder->total, 0, ',', '.') . ' ' . ($latestActiveOrder->currency ?? 'COP');
+                $totalUnits = $latestActiveOrder->details ? $latestActiveOrder->details->sum('quantity') : 1;
+                $orderQty = $totalUnits . ($totalUnits == 1 ? ' unidad' : ' unidades');
+                $orderCompanyName = $latestActiveOrder->company?->name ?? ($firstDetail?->product?->company?->name ?? 'Comercio Local');
+                $shipStatus = $latestActiveOrder->shipment?->status ?? ($latestActiveOrder->order_status ?: $latestActiveOrder->status);
+                $stepIndex = match($shipStatus) {
+                    'pending', 'paid', 'approved', 'confirmed' => 1,
+                    'preparing', 'in_preparation', 'processing' => 2,
+                    'dispatched', 'shipped', 'in_transit', 'out_for_delivery' => 3,
+                    'delivered' => 4,
+                    default => 1,
+                };
+            @endphp
+            <!-- Encabezado del pedido -->
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3 pb-2 border-bottom up-border-soft">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="sl-badge-subtle up-badge-live">
+                        <i class="bi bi-broadcast text-sl-primary"></i> Seguimiento en vivo
+                    </span>
+                    <span class="fw-bold up-meta-13">
+                        Orden #{{ $latestActiveOrder->reference ?? ('SP-' . str_pad($latestActiveOrder->id, 4, '0', STR_PAD_LEFT)) }}
+                    </span>
                 </div>
-                <div class="min-w-0">
-                    <h6 class="fw-bold mb-1 up-text-14 text-truncate">
-                        {{ $orderProductName }}
-                    </h6>
-                    <div class="d-flex flex-wrap align-items-center gap-2 up-meta-13">
-                        <span class="fw-bold text-sl-primary">{{ $orderPrice }}</span>
-                        <span>•</span>
-                        <span>{{ $orderQty }}</span>
-                        <span>•</span>
-                        <span class="fw-semibold">{{ $orderCompanyName }}</span>
+                <span class="text-muted up-text-12">Despacho directo aliado</span>
+            </div>
+
+            <h3 class="font-outfit fw-bold mb-3 up-order-title">
+                Tu pedido más reciente está en curso
+            </h3>
+
+            <!-- Ficha compacta de producto y comercio -->
+            <div class="p-3 rounded-4 mb-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 up-order-summary-box">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-3 bg-white d-flex align-items-center justify-content-center shadow-xs up-order-icon-box flex-shrink-0">
+                        <i class="bi bi-box-seam fs-4"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <h6 class="fw-bold mb-1 up-text-14 text-truncate">
+                            {{ $orderProductName }}
+                        </h6>
+                        <div class="d-flex flex-wrap align-items-center gap-2 up-meta-13">
+                            <span class="fw-bold text-sl-primary">{{ $orderPrice }}</span>
+                            <span>•</span>
+                            <span>{{ $orderQty }}</span>
+                            <span>•</span>
+                            <span class="fw-semibold">{{ $orderCompanyName }}</span>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Botones de acción del pedido -->
-            <div class="d-flex align-items-center gap-2 flex-wrap">
-                @if($latestOrder)
-                    <a href="{{ route('user.orders.tracking', $latestOrder) }}" class="btn btn-sl-primary btn-sm">
+                <!-- Botones de acción del pedido -->
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <a href="{{ route('user.orders.tracking', $latestActiveOrder) }}" class="btn btn-sl-primary btn-sm">
                         <i class="bi bi-truck me-1"></i> Rastrear en tiempo real
                     </a>
-                @else
-                    <button type="button" class="btn btn-sl-outlined btn-sm" data-bs-toggle="modal" data-bs-target="#orderDetailsModal">
-                        <i class="bi bi-eye"></i> Ver detalles de orden
-                    </button>
-                @endif
-                <a href="{{ route('user.orders.index') }}" class="btn btn-sl-outlined btn-sm">
-                    <i class="bi bi-receipt me-1"></i> Mis compras ({{ $orders->count() }})
-                </a>
-                <a href="{{ route('chat.index') }}" class="btn btn-sl-primary btn-sm">
-                    <i class="bi bi-chat-dots"></i> Mensaje a tienda
-                </a>
+                    <a href="{{ route('user.orders.index') }}" class="btn btn-sl-outlined btn-sm">
+                        <i class="bi bi-receipt me-1"></i> Mis compras ({{ $orders->count() }})
+                    </a>
+                    <a href="{{ route('chat.index') }}" class="btn btn-sl-outlined btn-sm">
+                        <i class="bi bi-chat-dots"></i> Mensaje a tienda
+                    </a>
+                </div>
             </div>
-        </div>
 
-        @if($latestOrder && $latestOrder->shipment)
-            <!-- Barra de progreso en vivo del envío -->
-            <div class="mb-3">
-                <div class="d-flex justify-content-between flex-wrap gap-1 text-xs fw-bold text-muted mb-2">
-                    <span><i class="bi bi-box-seam me-1"></i>Preparación</span>
-                    <span><i class="bi bi-truck me-1"></i>Despacho</span>
-                    <span><i class="bi bi-arrow-left-right me-1"></i>En Tránsito</span>
-                    <span><i class="bi bi-bicycle me-1"></i>En Reparto</span>
-                    <span><i class="bi bi-check-circle-fill me-1"></i>Entregado</span>
-                </div>
-                <div class="progress" style="height: 8px; border-radius: 8px; background-color: #f1f5f9;">
-                    <div class="progress-bar" style="width: {{ $latestOrder->shipment->progress_percentage ?? 20 }}%; background: linear-gradient(90deg, var(--sl-primary), var(--sl-secondary)); border-radius: 8px;"></div>
-                </div>
-                @if($latestOrder->shipment->tracking_number)
-                    <div class="d-flex justify-content-between align-items-center pt-2 flex-wrap gap-2" style="font-size: 12px; color: var(--sl-text-muted);">
-                        <span><i class="bi bi-shield-check text-success me-1"></i> Envío asegurado y verificado por Spotlight.</span>
-                        <a href="{{ route('public.tracking', ['guia' => $latestOrder->shipment->tracking_number]) }}" target="_blank" class="text-decoration-none fw-semibold text-primary">
-                            <i class="bi bi-box-arrow-up-right me-1"></i>Ver en portal público de rastreo
-                        </a>
+            @if($latestActiveOrder->shipment)
+                <!-- Barra de progreso en vivo del envío -->
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between flex-wrap gap-1 text-xs fw-bold text-muted mb-2">
+                        <span><i class="bi bi-box-seam me-1"></i>Preparación</span>
+                        <span><i class="bi bi-truck me-1"></i>Despacho</span>
+                        <span><i class="bi bi-arrow-left-right me-1"></i>En Tránsito</span>
+                        <span><i class="bi bi-bicycle me-1"></i>En Reparto</span>
+                        <span><i class="bi bi-check-circle-fill me-1"></i>Entregado</span>
                     </div>
-                @endif
+                    <div class="progress" style="height: 8px; border-radius: 8px; background-color: #f1f5f9;">
+                        <div class="progress-bar" style="width: {{ $latestActiveOrder->shipment->progress_percentage ?? 20 }}%; background: linear-gradient(90deg, var(--sl-primary), var(--sl-secondary)); border-radius: 8px;"></div>
+                    </div>
+                    @if($latestActiveOrder->shipment->tracking_number)
+                        <div class="d-flex justify-content-between align-items-center pt-2 flex-wrap gap-2" style="font-size: 12px; color: var(--sl-text-muted);">
+                            <span><i class="bi bi-shield-check text-success me-1"></i> Envío asegurado y verificado por Spotlight.</span>
+                            <a href="{{ route('public.tracking', ['guia' => $latestActiveOrder->shipment->tracking_number]) }}" target="_blank" class="text-decoration-none fw-semibold text-primary">
+                                <i class="bi bi-box-arrow-up-right me-1"></i>Ver en portal público de rastreo
+                            </a>
+                        </div>
+                    @endif
+                </div>
+            @endif
+
+            <!-- Barra de progreso simple de 4 pasos -->
+            <div class="position-relative pt-2 pb-2 mb-3">
+                <div class="order-stepper-track">
+                    <div class="order-stepper-progress" style="width: {{ ($stepIndex - 1) * 33 }}%;"></div>
+                </div>
+
+                <div class="d-flex justify-content-between position-relative z-1">
+                    <!-- Paso 1 -->
+                    <div class="stepper-node">
+                        <div class="stepper-circle {{ $stepIndex > 1 ? 'completed' : ($stepIndex === 1 ? 'active' : 'pending') }}">
+                            <i class="bi {{ $stepIndex > 1 ? 'bi-check-lg' : 'bi-receipt' }} fs-5"></i>
+                        </div>
+                        <div class="fw-bold up-label-13">Confirmado</div>
+                        <div class="text-muted up-text-11">{{ $latestActiveOrder->created_at?->format('d/m H:i') }}</div>
+                    </div>
+
+                    <!-- Paso 2 -->
+                    <div class="stepper-node">
+                        <div class="stepper-circle {{ $stepIndex > 2 ? 'completed' : ($stepIndex === 2 ? 'active' : 'pending') }}">
+                            <i class="bi {{ $stepIndex > 2 ? 'bi-check-lg' : 'bi-box-seam' }} fs-5"></i>
+                        </div>
+                        <div class="fw-bold up-label-13">Preparando</div>
+                        <div class="text-muted up-text-11">{{ $stepIndex >= 2 ? 'En comercio' : 'Pendiente' }}</div>
+                    </div>
+
+                    <!-- Paso 3 -->
+                    <div class="stepper-node">
+                        <div class="stepper-circle {{ $stepIndex > 3 ? 'completed' : ($stepIndex === 3 ? 'active' : 'pending') }}">
+                            <i class="bi bi-truck fs-5"></i>
+                        </div>
+                        <div class="fw-bold {{ $stepIndex === 3 ? 'up-step-active' : 'up-label-13' }}">En ruta</div>
+                        @if($stepIndex === 3)
+                            <span class="sl-badge-subtle py-0 px-2 up-text-10">Ahora</span>
+                        @else
+                            <div class="text-muted up-text-11">{{ $stepIndex > 3 ? 'Completado' : 'Por despachar' }}</div>
+                        @endif
+                    </div>
+
+                    <!-- Paso 4 -->
+                    <div class="stepper-node">
+                        <div class="stepper-circle {{ $stepIndex === 4 ? 'completed' : 'pending' }}">
+                            <i class="bi bi-check2-circle fs-6"></i>
+                        </div>
+                        <div class="fw-semibold text-muted up-text-13">Entrega</div>
+                        <div class="text-muted up-text-11">Destino final</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-2 text-center text-md-start up-note">
+                <i class="bi bi-info-circle me-1 up-icon-secondary"></i> Servicio de mensajería directa aliado con seguimiento desde tu cuenta.
+            </div>
+        @else
+            <!-- Estado limpio en 0 para cuentas recién registradas o sin envíos activos -->
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3 pb-2 border-bottom up-border-soft">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="sl-badge-subtle">
+                        <i class="bi bi-truck text-sl-primary me-1"></i> 0 envíos en curso
+                    </span>
+                </div>
+                <span class="text-muted up-text-12">Estado logístico al día</span>
+            </div>
+
+            <div class="p-3 p-md-4 rounded-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 up-order-summary-box">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-3 bg-white d-flex align-items-center justify-content-center shadow-xs up-order-icon-box flex-shrink-0">
+                        <i class="bi bi-box2-heart fs-4 text-sl-primary"></i>
+                    </div>
+                    <div>
+                        <h5 class="font-outfit fw-bold mb-1 text-dark" style="font-size: 1.05rem;">
+                            No tienes envíos ni pedidos activos en este momento
+                        </h5>
+                        <p class="mb-0 text-muted up-text-13">
+                            Tus contadores inician en 0. Cuando realices una compra en Spotlight, aquí podrás rastrear el despacho, la transportadora y la guía en tiempo real.
+                        </p>
+                    </div>
+                </div>
+                <div class="flex-shrink-0">
+                    <a href="{{ route('user.dashboard') }}" class="btn btn-sl-primary btn-sm px-3 py-2">
+                        <i class="bi bi-shop me-1"></i> Explorar productos
+                    </a>
+                </div>
             </div>
         @endif
-
-        <!-- Barra de progreso simple de 4 pasos -->
-        <div class="position-relative pt-2 pb-2 mb-3">
-            <div class="order-stepper-track">
-                <div class="order-stepper-progress"></div>
-            </div>
-
-            <div class="d-flex justify-content-between position-relative z-1">
-                <!-- Paso 1 -->
-                <div class="stepper-node">
-                    <div class="stepper-circle completed">
-                        <i class="bi bi-check-lg fs-5"></i>
-                    </div>
-                    <div class="fw-bold up-label-13">Confirmado</div>
-                    <div class="text-muted up-text-11">10:15 AM</div>
-                </div>
-
-                <!-- Paso 2 -->
-                <div class="stepper-node">
-                    <div class="stepper-circle completed">
-                        <i class="bi bi-check-lg fs-5"></i>
-                    </div>
-                    <div class="fw-bold up-label-13">Preparando</div>
-                    <div class="text-muted up-text-11">11:45 AM</div>
-                </div>
-
-                <!-- Paso 3 (Actual) -->
-                <div class="stepper-node">
-                    <div class="stepper-circle active">
-                        <i class="bi bi-truck fs-5"></i>
-                    </div>
-                    <div class="fw-bold up-step-active">En ruta</div>
-                    <span class="sl-badge-subtle py-0 px-2 up-text-10">Ahora</span>
-                </div>
-
-                <!-- Paso 4 -->
-                <div class="stepper-node">
-                    <div class="stepper-circle pending">
-                        <i class="bi bi-box-seam fs-6"></i>
-                    </div>
-                    <div class="fw-semibold text-muted up-text-13">Entrega hoy</div>
-                    <div class="text-muted up-text-11">Estimada: 3:00 - 5:00 PM</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Aviso discreto de una sola línea sin caja punteada -->
-        <div class="pt-2 text-center text-md-start up-note">
-            <i class="bi bi-info-circle me-1 up-icon-secondary"></i> Servicio de mensajería directa aliado con contacto activo vía SMS y WhatsApp.
-        </div>
     </div>
 
-    {{-- 4. Fila de Métricas (4 tarjetas unificadas) --}}
+    {{-- 4. Fila de Métricas (4 tarjetas unificadas con datos reales en 0 para cuentas nuevas) --}}
     <div class="row g-3 mb-4">
         <!-- 1. Pedidos en curso -->
         <div class="col-sm-6 col-lg-3">
             <div class="sl-card p-3 p-md-3 h-100 d-flex flex-column">
                 <div class="text-muted mb-2 up-metric-label">Pedidos en curso</div>
-                <div class="metric-value-num mb-2">1 en camino</div>
+                <div class="metric-value-num mb-2">{{ $activeOrdersCount }} <span class="up-metric-unit">en curso</span></div>
                 <div class="mt-auto pt-2 border-top up-metric-foot">
-                    Llega hoy de <strong>TechStore Pro</strong>
+                    @if($latestActiveOrder)
+                        Último de <strong>{{ $latestActiveOrder->company?->name ?? 'Comercio Local' }}</strong>
+                    @else
+                        Sin envíos activos
+                    @endif
                 </div>
             </div>
         </div>
@@ -232,9 +295,9 @@
         <div class="col-sm-6 col-lg-3">
             <div class="sl-card p-3 p-md-3 h-100 d-flex flex-column">
                 <div class="text-muted mb-2 up-metric-label">Compras del mes</div>
-                <div class="metric-value-num mb-2">$235.000 <span class="up-metric-unit">COP</span></div>
+                <div class="metric-value-num mb-2">${{ number_format($monthTotal, 0, ',', '.') }} <span class="up-metric-unit">COP</span></div>
                 <div class="mt-auto pt-2 border-top up-metric-foot">
-                    3 órdenes locales completadas
+                    {{ $monthOrders->count() }} {{ $monthOrders->count() === 1 ? 'orden registrada este mes' : 'órdenes registradas este mes' }}
                 </div>
             </div>
         </div>
@@ -244,11 +307,11 @@
             <div class="sl-card p-3 p-md-3 h-100 d-flex flex-column">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <span class="text-muted up-metric-label">Garantías activas</span>
-                    <span class="sl-badge-subtle">100% protegido</span>
+                    <span class="sl-badge-subtle">{{ $totalProductsBought > 0 ? '100% protegido' : '0 activos' }}</span>
                 </div>
-                <div class="metric-value-num mb-2">2 productos</div>
+                <div class="metric-value-num mb-2">{{ $totalProductsBought }} <span class="up-metric-unit">{{ $totalProductsBought === 1 ? 'producto' : 'productos' }}</span></div>
                 <div class="mt-auto pt-2 border-top up-metric-foot">
-                    Audífonos Pro Bass y Teclado RGB
+                    {{ $totalProductsBought > 0 ? 'Respaldados por comercios locales' : '0 productos adquiridos' }}
                 </div>
             </div>
         </div>
@@ -260,9 +323,9 @@
                     <span class="text-muted up-metric-label">Puntos disponibles</span>
                     <span class="sl-badge-subtle">Canjeable</span>
                 </div>
-                <div class="metric-value-num mb-2">1.450 <span class="up-metric-unit">pts</span></div>
+                <div class="metric-value-num mb-2">{{ number_format($pointsAvailable, 0, ',', '.') }} <span class="up-metric-unit">pts</span></div>
                 <div class="mt-auto pt-2 border-top up-metric-foot">
-                    ≈ $14.500 COP en canjes
+                    ≈ ${{ number_format($pointsAvailable * 10, 0, ',', '.') }} COP en canjes
                 </div>
             </div>
         </div>
@@ -276,94 +339,66 @@
                 <h5 class="font-outfit fw-bold mb-0 up-section-title">
                     Historial de compras recientes
                 </h5>
-                <span class="text-muted up-text-13">12 compras totales</span>
+                <span class="text-muted up-text-13">{{ $orders->count() }} {{ $orders->count() === 1 ? 'compra total' : 'compras totales' }}</span>
             </div>
 
             <div class="sl-card p-3 mb-3">
                 <div class="d-flex flex-column gap-2">
-                    <!-- Fila 1 -->
-                    <div class="p-3 rounded-3 up-history-item">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <div>
-                                <h6 class="fw-bold mb-1 up-text-14">
-                                    Teclado Mecánico RGB 60% Switches Red
-                                </h6>
-                                <div class="text-muted up-text-12">TechStore Pro • 02/04/2026</div>
+                    @forelse($orders->take(5) as $ord)
+                        @php
+                            $ordFirstDetail = $ord->details?->first();
+                            $ordTitle = $ordFirstDetail?->effective_product_name ?? $ordFirstDetail?->product?->name ?? ('Orden #' . $ord->id);
+                            $extraItems = $ord->details ? max(0, $ord->details->count() - 1) : 0;
+                            if ($extraItems > 0) {
+                                $ordTitle .= ' (+' . $extraItems . ' más)';
+                            }
+                            $ordCompany = $ord->company?->name ?? ($ordFirstDetail?->product?->company?->name ?? 'Comercio Aliado');
+                            $ordStatus = $ord->shipment?->status ?? ($ord->order_status ?: $ord->status);
+                            $isDelivered = $ordStatus === 'delivered';
+                        @endphp
+                        <div class="p-3 rounded-3 up-history-item">
+                            <div class="d-flex justify-content-between align-items-start mb-2 gap-2">
+                                <div>
+                                    <h6 class="fw-bold mb-1 up-text-14">
+                                        {{ $ordTitle }}
+                                    </h6>
+                                    <div class="text-muted up-text-12">{{ $ordCompany }} • {{ $ord->created_at?->format('d/m/Y') }}</div>
+                                </div>
+                                @if($isDelivered)
+                                    <span class="sl-badge-success">
+                                        <i class="bi bi-check2"></i> Entregado
+                                    </span>
+                                @else
+                                    <span class="sl-badge-subtle">
+                                        <i class="bi bi-truck me-1"></i> {{ $ord->shipment?->status_label ?? 'En curso' }}
+                                    </span>
+                                @endif
                             </div>
-                            <span class="sl-badge-success">
-                                <i class="bi bi-check2"></i> Entregado
-                            </span>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center pt-2 border-top up-border-divider">
-                            <div class="fw-bold up-text-14">
-                                $195.000 <span class="text-muted fw-normal up-text-11">COP</span>
-                            </div>
-                            <div class="d-flex align-items-center gap-3">
-                                <a href="javascript:void(0)" onclick="alert('Descargando factura electrónica de compra #SP-8102...')" class="text-muted text-decoration-none up-text-12">
-                                    <i class="bi bi-file-earmark-arrow-down me-1"></i>Factura
-                                </a>
-                                <a href="{{ route('user.dashboard') }}" class="btn btn-sl-secondary btn-sm py-1 px-3">
-                                    <i class="bi bi-arrow-repeat"></i> Volver a pedir
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Fila 2 -->
-                    <div class="p-3 rounded-3 up-history-item">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <div>
-                                <h6 class="fw-bold mb-1 up-text-14">
-                                    Café Especial Artesanal Villa Diego (500g)
-                                </h6>
-                                <div class="text-muted up-text-12">Finca El Roble • 26/03/2026</div>
-                            </div>
-                            <span class="sl-badge-success">
-                                <i class="bi bi-check2"></i> Entregado
-                            </span>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center pt-2 border-top up-border-divider">
-                            <div class="fw-bold up-text-14">
-                                $32.000 <span class="text-muted fw-normal up-text-11">COP</span>
-                            </div>
-                            <div class="d-flex align-items-center gap-3">
-                                <a href="javascript:void(0)" onclick="alert('Descargando factura electrónica de compra #SP-7994...')" class="text-muted text-decoration-none up-text-12">
-                                    <i class="bi bi-file-earmark-arrow-down me-1"></i>Factura
-                                </a>
-                                <a href="{{ route('user.dashboard') }}" class="btn btn-sl-secondary btn-sm py-1 px-3">
-                                    <i class="bi bi-arrow-repeat"></i> Volver a pedir
-                                </a>
+                            <div class="d-flex justify-content-between align-items-center pt-2 border-top up-border-divider flex-wrap gap-2">
+                                <div class="fw-bold up-text-14">
+                                    ${{ number_format($ord->total, 0, ',', '.') }} <span class="text-muted fw-normal up-text-11">{{ $ord->currency ?? 'COP' }}</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-3">
+                                    <a href="{{ route('user.orders.tracking', $ord) }}" class="text-muted text-decoration-none up-text-12">
+                                        <i class="bi bi-geo-alt me-1"></i>Rastreo
+                                    </a>
+                                    <a href="{{ route('user.orders.index') }}" class="btn btn-sl-secondary btn-sm py-1 px-3">
+                                        <i class="bi bi-eye"></i> Ver orden
+                                    </a>
+                                </div>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Fila 3 -->
-                    <div class="p-3 rounded-3 up-history-item">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <div>
-                                <h6 class="fw-bold mb-1 up-text-14">
-                                    Queso Paipa Denominación de Origen 450g
-                                </h6>
-                                <div class="text-muted up-text-12">Lácteos Ubaté • 18/03/2026</div>
+                    @empty
+                        <div class="p-4 text-center">
+                            <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-2" style="width: 48px; height: 48px; background: var(--sl-primary-soft, #F6E7EB); color: var(--sl-primary, #7F1D3F);">
+                                <i class="bi bi-bag-check fs-5"></i>
                             </div>
-                            <span class="sl-badge-success">
-                                <i class="bi bi-check2"></i> Entregado
-                            </span>
+                            <h6 class="font-outfit fw-bold text-dark mb-1">0 compras registradas</h6>
+                            <p class="text-muted up-text-12 mb-0">
+                                Tu historial está en 0. Las órdenes que realices aparecerán aquí con su estado y factura.
+                            </p>
                         </div>
-                        <div class="d-flex justify-content-between align-items-center pt-2 border-top up-border-divider">
-                            <div class="fw-bold up-text-14">
-                                $28.000 <span class="text-muted fw-normal up-text-11">COP</span>
-                            </div>
-                            <div class="d-flex align-items-center gap-3">
-                                <a href="javascript:void(0)" onclick="alert('Descargando factura electrónica de compra #SP-7640...')" class="text-muted text-decoration-none up-text-12">
-                                    <i class="bi bi-file-earmark-arrow-down me-1"></i>Factura
-                                </a>
-                                <a href="{{ route('user.dashboard') }}" class="btn btn-sl-secondary btn-sm py-1 px-3">
-                                    <i class="bi bi-arrow-repeat"></i> Volver a pedir
-                                </a>
-                            </div>
-                        </div>
-                    </div>
+                    @endforelse
                 </div>
 
                 <!-- Mensaje de apoyo -->
@@ -373,11 +408,16 @@
             </div>
         </div>
 
-        <!-- Columna Derecha: Tiendas Favoritas y Ayuda Ligera -->
+        <!-- Columna Derecha: Tiendas Frecuentes y Ayuda Ligera -->
         <div class="col-lg-5">
+            @php
+                $frequentCompanies = $orders->map(function ($o) {
+                    return $o->company ?? $o->details?->first()?->product?->company;
+                })->filter()->unique('id')->take(3);
+            @endphp
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="font-outfit fw-bold mb-0 up-section-title">
-                    Tus tiendas favoritas
+                    Tus tiendas frecuentes
                 </h5>
                 <a href="{{ route('user.map') }}" class="text-decoration-none up-link-13">
                     Ver en mapa <i class="bi bi-arrow-right"></i>
@@ -385,62 +425,38 @@
             </div>
 
             <div class="d-flex flex-column gap-3 mb-4">
-                <!-- Tienda 1 -->
-                <div class="sl-card p-3 d-flex align-items-center justify-content-between gap-3">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="rounded-circle d-flex align-items-center justify-content-center up-fav-store-icon">
-                            <i class="bi bi-laptop fs-5"></i>
-                        </div>
-                        <div>
-                            <div class="d-flex align-items-center gap-2">
-                                <h6 class="fw-bold mb-0 up-text-14">TechStore Pro</h6>
-                                <span class="sl-badge-subtle py-0 px-2 up-text-11">Aliado</span>
+                @forelse($frequentCompanies as $favCompany)
+                    <div class="sl-card p-3 d-flex align-items-center justify-content-between gap-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center up-fav-store-icon">
+                                <i class="bi bi-shop fs-5"></i>
                             </div>
-                            <div class="text-muted up-text-12">Tecnología y Gadgets • ★ 4.9</div>
-                        </div>
-                    </div>
-                    <a href="{{ route('user.dashboard') }}" class="btn btn-sl-outlined btn-sm rounded-circle p-0 d-flex align-items-center justify-content-center up-fav-store-btn" title="Ver tienda">
-                        <i class="bi bi-shop"></i>
-                    </a>
-                </div>
-
-                <!-- Tienda 2 -->
-                <div class="sl-card p-3 d-flex align-items-center justify-content-between gap-3">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="rounded-circle d-flex align-items-center justify-content-center up-fav-store-icon-alt">
-                            <i class="bi bi-palette fs-5"></i>
-                        </div>
-                        <div>
-                            <div class="d-flex align-items-center gap-2">
-                                <h6 class="fw-bold mb-0 up-text-14">Artesanías del Valle</h6>
-                                <span class="sl-badge-subtle py-0 px-2 up-text-11">Local</span>
+                            <div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <h6 class="fw-bold mb-0 up-text-14">{{ $favCompany->name }}</h6>
+                                    <span class="sl-badge-subtle py-0 px-2 up-text-11">Verificado</span>
+                                </div>
+                                <div class="text-muted up-text-12">{{ $favCompany->category ?: 'Comercio Local' }} • {{ $favCompany->city ?: 'Ubaté' }}</div>
                             </div>
-                            <div class="text-muted up-text-12">Cerámica y Tejidos • ★ 4.8</div>
                         </div>
+                        <a href="{{ route('public.company', $favCompany) }}" class="btn btn-sl-outlined btn-sm rounded-circle p-0 d-flex align-items-center justify-content-center up-fav-store-btn" title="Ver tienda">
+                            <i class="bi bi-arrow-up-right"></i>
+                        </a>
                     </div>
-                    <a href="{{ route('user.dashboard') }}" class="btn btn-sl-outlined btn-sm rounded-circle p-0 d-flex align-items-center justify-content-center up-fav-store-btn" title="Ver tienda">
-                        <i class="bi bi-shop"></i>
-                    </a>
-                </div>
-
-                <!-- Tienda 3 -->
-                <div class="sl-card p-3 d-flex align-items-center justify-content-between gap-3">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="rounded-circle d-flex align-items-center justify-content-center up-fav-store-icon">
-                            <i class="bi bi-cup-hot fs-5"></i>
+                @empty
+                    <div class="sl-card p-4 text-center">
+                        <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-2" style="width: 44px; height: 44px; background: var(--sl-primary-soft, #F6E7EB); color: var(--sl-primary, #7F1D3F);">
+                            <i class="bi bi-shop-window fs-5"></i>
                         </div>
-                        <div>
-                            <div class="d-flex align-items-center gap-2">
-                                <h6 class="fw-bold mb-0 up-text-14">Lácteos & Delicias Villa</h6>
-                                <span class="sl-badge-subtle py-0 px-2 up-text-11">Artesanal</span>
-                            </div>
-                            <div class="text-muted up-text-12">Derivados lácteos • ★ 4.9</div>
-                        </div>
+                        <h6 class="font-outfit fw-bold text-dark mb-1">0 tiendas frecuentes</h6>
+                        <p class="text-muted up-text-12 mb-3">
+                            A medida que compres en los comercios de Spotlight, tus tiendas frecuentes aparecerán aquí para acceso rápido.
+                        </p>
+                        <a href="{{ route('user.dashboard') }}" class="btn btn-sl-outlined btn-sm">
+                            <i class="bi bi-compass me-1"></i> Descubrir tiendas
+                        </a>
                     </div>
-                    <a href="{{ route('user.dashboard') }}" class="btn btn-sl-outlined btn-sm rounded-circle p-0 d-flex align-items-center justify-content-center up-fav-store-btn" title="Ver tienda">
-                        <i class="bi bi-shop"></i>
-                    </a>
-                </div>
+                @endforelse
             </div>
 
             <!-- Ayuda: Tarjeta Ligera en Fondo #F6E7EB -->
@@ -458,111 +474,6 @@
         </div>
     </div>
 
-</div>
-
-{{-- ========================================================================= --}}
-{{-- VENTANA MODAL DE DETALLES DE LA ORDEN (Sin salir del panel)              --}}
-{{-- ========================================================================= --}}
-<div class="modal fade order-details-modal" id="orderDetailsModal" tabindex="-1" aria-labelledby="orderDetailsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
-            <div class="modal-header d-flex align-items-center justify-content-between">
-                <div class="d-flex align-items-center gap-2">
-                    <h5 class="modal-title font-outfit fw-bold text-dark mb-0 up-modal-title" id="orderDetailsModalLabel">
-                        Detalles de la Orden #SP-8421
-                    </h5>
-                    <span class="sl-badge-subtle py-1 px-3">En ruta</span>
-                </div>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-            </div>
-            <div class="modal-body p-4">
-                <!-- Info general de la orden -->
-                <div class="row g-3 mb-4 pb-3 border-bottom up-border-soft">
-                    <div class="col-sm-4">
-                        <div class="text-muted small">Fecha de compra</div>
-                        <div class="fw-bold text-dark">19 de Octubre, 2026</div>
-                    </div>
-                    <div class="col-sm-4">
-                        <div class="text-muted small">Comercio aliado</div>
-                        <div class="fw-bold text-dark">TechStore Pro <i class="bi bi-patch-check-fill text-primary up-verified-icon"></i></div>
-                    </div>
-                    <div class="col-sm-4">
-                        <div class="text-muted small">Dirección de entrega</div>
-                        <div class="fw-bold text-dark text-truncate" id="modalOrderAddress">
-                            {{ $user->address ?: 'Cra. 7 # 10-25, Apto 301, Ubaté' }}
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Detalle del Producto -->
-                <h6 class="font-outfit fw-bold text-dark mb-3">Producto en esta orden</h6>
-                <div class="p-3 rounded-4 d-flex align-items-center justify-content-between gap-3 mb-4 up-modal-product-box">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="rounded-3 bg-white d-flex align-items-center justify-content-center shadow-xs up-modal-icon-box">
-                            <i class="bi bi-headphones fs-3"></i>
-                        </div>
-                        <div>
-                            <div class="fw-bold text-dark up-fs-14">Audífonos Bluetooth Pro Bass (Edición Aldea)</div>
-                            <div class="text-muted small">SKU: TECH-AUD-001 • 1 unidad • Garantía 12 meses</div>
-                        </div>
-                    </div>
-                    <div class="text-end">
-                        <div class="fw-bold up-price-15">$149.900 COP</div>
-                        <span class="badge bg-success-subtle text-success py-1 px-2 up-text-11">Pagado con PSE</span>
-                    </div>
-                </div>
-
-                <!-- Desglose de Pago -->
-                <div class="row g-3 mb-4">
-                    <div class="col-md-6">
-                        <h6 class="font-outfit fw-bold text-dark mb-2">Resumen financiero</h6>
-                        <div class="d-flex justify-content-between py-1 text-muted small">
-                            <span>Subtotal productos:</span>
-                            <span class="text-dark fw-semibold">$149.900 COP</span>
-                        </div>
-                        <div class="d-flex justify-content-between py-1 text-muted small">
-                            <span>Envío ecológico directo:</span>
-                            <span class="text-success fw-bold">GRATIS</span>
-                        </div>
-                        <div class="d-flex justify-content-between py-2 border-top mt-1 fw-bold text-dark up-text-15">
-                            <span>Total de la orden:</span>
-                            <span class="text-sl-primary">$149.900 COP</span>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 border-start-md ps-md-4">
-                        <h6 class="font-outfit fw-bold text-dark mb-2">Línea de tiempo de entrega</h6>
-                        <div class="d-flex flex-column gap-2 small">
-                            <div class="d-flex align-items-center gap-2">
-                                <i class="bi bi-check-circle-fill text-success"></i>
-                                <span><strong>10:15 AM:</strong> Pago confirmado</span>
-                            </div>
-                            <div class="d-flex align-items-center gap-2">
-                                <i class="bi bi-check-circle-fill text-success"></i>
-                                <span><strong>11:45 AM:</strong> Paquete embalado en taller</span>
-                            </div>
-                            <div class="d-flex align-items-center gap-2 text-sl-primary">
-                                <i class="bi bi-truck"></i>
-                                <span><strong>1:30 PM:</strong> En ruta hacia tu dirección</span>
-                            </div>
-                            <div class="d-flex align-items-center gap-2 text-muted">
-                                <i class="bi bi-clock"></i>
-                                <span><strong>3:00 - 5:00 PM:</strong> Entrega estimada hoy</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer p-3 bg-light border-0 d-flex justify-content-between">
-                <button type="button" class="btn btn-sl-outlined btn-sm" data-bs-dismiss="modal">
-                    Cerrar
-                </button>
-                <a href="{{ route('chat.index') }}" class="btn btn-sl-primary btn-sm">
-                    <i class="bi bi-chat-dots me-1"></i> Mensaje a tienda
-                </a>
-            </div>
-        </div>
-    </div>
 </div>
 
 {{-- ========================================================================= --}}

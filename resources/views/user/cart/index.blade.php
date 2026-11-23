@@ -134,6 +134,16 @@
             <span class="badge badge-cyan px-3 py-2 fw-bold" style="font-size: 0.65rem; letter-spacing: 0.5px;">RUTA ACTIVA</span>
         </div>
         
+        @php
+            $userCompletedTotal = auth()->check()
+                ? auth()->user()->orders()->whereNotIn('status', ['cancelled', 'failed', 'refunded'])->sum('total')
+                : 0;
+            $userPoints = (int) floor($userCompletedTotal / 1000);
+            $canRedeemPoints = $userPoints >= 500;
+            $puntosDescuento = $canRedeemPoints ? 5000 : 0;
+            $finalTotal = max(0, $total - $puntosDescuento);
+            $pointsToEarn = (int) floor($finalTotal / 1000);
+        @endphp
         <div class="row g-3">
             <div class="col-md-6">
                 <div class="vs-card border-0 shadow-sm rounded-4 p-4 h-100" style="background: #f8fafc;">
@@ -155,15 +165,15 @@
                             <i class="bi bi-star-fill" style="color: var(--sl-primary, #7F1D3F);"></i>
                             <h6 class="fw-bold mb-0" style="color: var(--sl-primary, #7F1D3F); font-size: 0.85rem;">Spotlight Puntos</h6>
                         </div>
-                        <div class="fw-bold text-dark" style="font-size: 0.75rem;">1.450 <span class="text-muted fw-semibold">pts disponibles</span></div>
+                        <div class="fw-bold text-dark" style="font-size: 0.75rem;">{{ number_format($userPoints, 0, ',', '.') }} <span class="text-muted fw-semibold">pts disponibles</span></div>
                     </div>
                     <div class="bg-white rounded-4 p-3 d-flex justify-content-between align-items-center shadow-sm">
                         <div>
-                            <div class="fw-bold text-dark" style="font-size: 0.8rem;">Canjear 500 pts</div>
-                            <div class="fw-bold" style="color: var(--sl-primary, #7F1D3F); font-size: 0.65rem;">Ahorra $5.000 COP al instante</div>
+                            <div class="fw-bold text-dark" style="font-size: 0.8rem;">{{ $canRedeemPoints ? 'Canjear 500 pts' : '0 pts para canje inmediato' }}</div>
+                            <div class="fw-bold" style="color: var(--sl-primary, #7F1D3F); font-size: 0.65rem;">{{ $canRedeemPoints ? 'Ahorra $5.000 COP al instante' : 'Acumula 500 pts en tus compras para redimir' }}</div>
                         </div>
                         <div class="form-check form-switch m-0 p-0 d-flex align-items-center">
-                            <input class="form-check-input ms-0 me-2" type="checkbox" role="switch" checked style="width: 40px; height: 20px; border-color: var(--sl-primary, #7F1D3F); background-color: var(--sl-primary, #7F1D3F);">
+                            <input class="form-check-input ms-0 me-2" type="checkbox" role="switch" {{ $canRedeemPoints ? 'checked' : 'disabled' }} style="width: 40px; height: 20px; border-color: var(--sl-primary, #7F1D3F); {{ $canRedeemPoints ? 'background-color: var(--sl-primary, #7F1D3F);' : '' }}">
                         </div>
                     </div>
                 </div>
@@ -180,12 +190,6 @@
                     <i class="bi bi-receipt fs-4" style="color: var(--sl-primary, #7F1D3F);"></i>
                 </div>
                 
-                @php
-                    // Simulación visual de descuento con puntos para el UI (fijo)
-                    $puntosDescuento = 5000;
-                    $finalTotal = max(0, $total - $puntosDescuento);
-                @endphp
-                
                 <div class="d-flex justify-content-between align-items-end mb-3">
                     <span class="text-dark fw-medium" style="font-size: 0.85rem;">Subtotal de productos<br><span class="text-muted" style="font-size: 0.75rem;">({{ count($items) }} uds)</span></span>
                     <div class="text-end">
@@ -199,6 +203,7 @@
                     <span class="badge badge-cyan" style="font-size: 0.7rem; font-weight: 800; padding: 6px 10px;">GRATIS</span>
                 </div>
                 
+                @if($puntosDescuento > 0)
                 <div class="d-flex justify-content-between align-items-center mb-3 p-2 rounded" style="background: var(--sl-primary-soft, #F6E7EB);">
                     <span class="fw-bold d-flex align-items-center" style="font-size: 0.85rem; color: var(--sl-primary, #7F1D3F);">
                         <i class="bi bi-star-fill me-2" style="color: var(--sl-primary, #7F1D3F);"></i> Descuento Puntos
@@ -208,6 +213,7 @@
                         <div class="fw-bold" style="color: var(--sl-primary, #7F1D3F); font-size: 0.6rem;">COP</div>
                     </div>
                 </div>
+                @endif
                 
                 <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-light">
                     <span class="text-muted" style="font-size: 0.75rem;">Impuestos locales (IVA inc.)</span>
@@ -239,7 +245,7 @@
                         <i class="bi bi-award-fill" style="color: var(--sl-primary, #7F1D3F); font-size: 1.2rem;"></i>
                     </div>
                     <div style="font-size: 0.7rem; line-height: 1.3;" class="text-muted">
-                        <span class="fw-bold text-success">+320 Puntos</span> a ganar con esta compra para tu nivel Platino.
+                        <span class="fw-bold text-success">+{{ number_format($pointsToEarn, 0, ',', '.') }} Puntos</span> a ganar al completar esta compra.
                     </div>
                 </div>
                 

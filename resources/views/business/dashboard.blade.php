@@ -82,8 +82,8 @@
                     </div>
                     <div class="d-flex align-items-center text-muted gap-3 mt-2 fw-medium small">
                         <span><i class="bi bi-geo-alt me-1 text-secondary"></i>Aldea Digital</span>
-                        <span><i class="bi bi-star-fill text-warning me-1"></i>4.9 <span class="opacity-75">(42 calificaciones)</span></span>
-                        <span class="text-sl-primary"><i class="bi bi-truck me-1"></i>Envíos internacionales</span>
+                        <span><i class="bi bi-star-fill text-warning me-1"></i>{{ number_format($company->average_rating ?? 0, 1) }} <span class="opacity-75">({{ $company->reviews_count ?? 0 }} {{ ($company->reviews_count ?? 0) === 1 ? 'calificación' : 'calificaciones' }})</span></span>
+                        <span class="text-sl-primary"><i class="bi bi-truck me-1"></i>Envíos nacionales</span>
                     </div>
                 </div>
                 <div class="d-flex gap-2">
@@ -171,35 +171,45 @@
 
 <div class="row g-3 mb-4">
     @php
+    $prodCount = $company ? $company->products->count() : 0;
+    $inStockCount = $company ? $company->products->where('stock', '>', 0)->count() : 0;
+    $stockPct = $prodCount > 0 ? round(($inStockCount / $prodCount) * 100) : 0;
+    $expensePct = $income > 0 ? round(($expenses / $income) * 100, 1) : 0;
+    $marginPct = $income > 0 ? round(($net / $income) * 100, 1) : 0;
+
     $cards = [
         [
             'label'=>'INGRESOS TOTALES',
             'value'=>'$'.number_format($income,0,',','.'),
             'icon'=>'bi-arrow-up',
             'color'=>'#7F1D3F',
-            'subtext'=>'<span style="color:#7F1D3F; font-weight:600;"><i class="bi bi-graph-up me-1"></i>+14.5%</span> <span class="ms-1">este mes</span>'
+            'subtext'=> $income > 0
+                ? '<span style="color:#7F1D3F; font-weight:600;"><i class="bi bi-graph-up me-1"></i>Activo</span> <span class="ms-1">ventas acumuladas</span>'
+                : '<span class="text-muted">0 ventas registradas</span>'
         ],
         [
             'label'=>'EGRESOS TOTALES',
             'value'=>'$'.number_format($expenses,0,',','.'),
             'icon'=>'bi-arrow-down',
             'color'=>'#64748b',
-            'subtext'=>'Gastos operativos <span class="float-end fw-semibold">21.2% total</span>'
+            'subtext'=>'Gastos operativos <span class="float-end fw-semibold">'.$expensePct.'% total</span>'
         ],
         [
             'label'=>'GANANCIA NETA',
             'value'=>'$'.number_format($net,0,',','.'),
             'icon'=>'bi-graph-up',
             'color'=>'#10b981',
-            'subtext'=>'<span class="badge text-success me-2 rounded-pill px-2" style="background:#d1fae5;">Margen 78.7%</span> <span class="float-end">Saludable</span>',
+            'subtext'=> $income > 0
+                ? '<span class="badge text-success me-2 rounded-pill px-2" style="background:#d1fae5;">Margen '.$marginPct.'%</span> <span class="float-end">'.($net >= 0 ? 'Saludable' : 'Ajustar').'</span>'
+                : '<span class="badge text-secondary me-2 rounded-pill px-2" style="background:#f1f5f9;">Margen 0%</span> <span class="float-end">Sin movimientos</span>',
             'valueColor' => '#10b981'
         ],
         [
             'label'=>'PRODUCTOS',
-            'value'=>$company?$company->products->count():0,
+            'value'=>$prodCount,
             'icon'=>'bi-box-seam',
             'color'=>'#D98C9A',
-            'subtext'=>'<span style="color:#7F1D3F; font-weight:600;">100% con stock</span> <a href="'.route('business.products.create').'" class="float-end text-decoration-none fw-bold" style="color:#7F1D3F;">+ Agregar</a>'
+            'subtext'=>'<span style="color:#7F1D3F; font-weight:600;">'.($prodCount > 0 ? ($stockPct.'% con stock') : '0 publicados').'</span> <a href="'.route('business.products.create').'" class="float-end text-decoration-none fw-bold" style="color:#7F1D3F;">+ Agregar</a>'
         ],
     ];
     @endphp
@@ -253,7 +263,7 @@
                     </div>
                     @endforeach
                 @else
-                    @php $days = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']; $heights = [30, 45, 40, 20, 50, 85, 25]; @endphp
+                    @php $days = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']; $heights = [4, 4, 4, 4, 4, 4, 4]; @endphp
                     @foreach($days as $i => $day)
                     <div class="d-flex flex-column align-items-center" style="width: 12%;">
                         <div class="w-100 rounded" style="height: {{ $heights[$i] }}%; background: #f1f5f9;"></div>
