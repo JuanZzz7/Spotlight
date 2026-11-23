@@ -48,6 +48,17 @@
             </div>
 
             <div class="d-flex align-items-center gap-2 flex-wrap">
+                {{-- Botón en móvil/tablet para abrir el buscador y filtros sin que estorbe arriba --}}
+                <button type="button"
+                        class="btn btn-sm rounded-pill d-lg-none d-inline-flex align-items-center gap-1.5 px-3 py-1.5 fw-bold shadow-xs consumer-mobile-filter-trigger"
+                        onclick="toggleConsumerMobileDock(true)">
+                    <i class="bi bi-search"></i>
+                    <span>Buscar y Filtrar</span>
+                    @if($hasActiveFilters)
+                        <span class="badge rounded-pill bg-white text-dark ms-1" style="font-size: 0.65rem;">Activo</span>
+                    @endif
+                </button>
+
                 <span class="consumer-count-pill">
                     <strong>{{ $products->total() }}</strong> {{ $products->total() === 1 ? 'producto' : 'productos' }}
                 </span>
@@ -326,16 +337,24 @@
         </div>
     </div>
 
+    {{-- Backdrop en móvil para el panel de exploración --}}
+    <div class="consumer-mobile-dock-backdrop d-lg-none" id="consumerMobileDockBackdrop" onclick="toggleConsumerMobileDock(false)"></div>
+
     {{-- =======================================================================
          COLUMNA DERECHA: PANEL CON LAS 3 CÁPSULAS OVALADAS DEL WIREFRAME
          (1. Buscar | 2. Categoría | 3. Comercios)
          ======================================================================= --}}
-    <aside class="consumer-sidebar-dock" aria-label="Controles de exploración del mercado">
+    <aside class="consumer-sidebar-dock" id="consumerSidebarDock" aria-label="Controles de exploración del mercado">
         <div class="consumer-dock-sticky">
             
-            <div class="consumer-dock-header mb-3">
-                <span class="consumer-dock-subtitle">PANEL DE EXPLORACIÓN</span>
-                <h5 class="consumer-dock-title mb-0">Filtra a tu medida</h5>
+            <div class="consumer-dock-header mb-3 d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="consumer-dock-subtitle">PANEL DE EXPLORACIÓN</span>
+                    <h5 class="consumer-dock-title mb-0">Filtra a tu medida</h5>
+                </div>
+                <button type="button" class="btn btn-sm btn-light rounded-circle d-lg-none border d-inline-flex align-items-center justify-content-center" style="width: 34px; height: 34px;" onclick="toggleConsumerMobileDock(false)" aria-label="Cerrar panel de filtros">
+                    <i class="bi bi-x-lg"></i>
+                </button>
             </div>
 
             <form action="{{ route('user.dashboard') }}" method="GET" id="consumerDockForm" class="d-flex flex-column gap-3">
@@ -555,11 +574,26 @@
 </div>
 
 @push('styles')
-<link href="{{ asset('css/user.css') }}?v=2.5" rel="stylesheet">
+<link href="{{ asset('css/user.css') }}?v=2.7" rel="stylesheet">
 @endpush
 
 @push('scripts')
 <script>
+window.toggleConsumerMobileDock = function (open) {
+    const dock = document.getElementById('consumerSidebarDock');
+    const backdrop = document.getElementById('consumerMobileDockBackdrop');
+    if (!dock) return;
+    if (open) {
+        dock.classList.add('is-mobile-open');
+        backdrop?.classList.add('is-open');
+        document.body.style.overflow = 'hidden';
+    } else {
+        dock.classList.remove('is-mobile-open');
+        backdrop?.classList.remove('is-open');
+        document.body.style.overflow = '';
+    }
+};
+
 window.setProductView = function (mode) {
     const btnGrid = document.getElementById('btnViewGrid');
     const btnList = document.getElementById('btnViewList');
