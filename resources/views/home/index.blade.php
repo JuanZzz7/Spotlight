@@ -4,405 +4,7 @@
 @push('styles')
 <!-- Leaflet Map CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-
-<style>
-    /* ==========================================================================
-       SPOTLIGHT - ALDEA DIGITAL
-       Identidad Visual Oficial: Borgoña, Rosa Empolvado, Rosa Suave, Blanco Marfil y Carbón
-       ========================================================================== */
-
-    :root {
-        --ald-burgundy: #7F1D3F;
-        --ald-burgundy-dark: #5E122C;
-        --ald-rose-dust: #D98C9A;
-        --ald-rose-soft: #F6E7EB;
-        --ald-ivory: #FFFCF7;
-        --ald-charcoal: #29252A;
-        --ald-card: #FFFFFF;
-        --ald-border: #EEDDDC;
-        --ald-text: #29252A;
-        --ald-muted: #736B75;
-
-        /* Alias retrocompatibles mapeados a la paleta oficial */
-        --ald-purple: #7F1D3F;
-        --ald-purple-dark: #5E122C;
-        --ald-purple-soft: #F6E7EB;
-        --ald-coral: #D98C9A;
-        --ald-coral-soft: #FAF0F2;
-        --ald-cyan: #7F1D3F;
-        --ald-cyan-soft: #F6E7EB;
-        --ald-amber: #D98C9A;
-        --ald-bg: #FFFCF7;
-    }
-
-    body {
-        background-color: var(--sl-bg);
-        color: var(--sl-text-body);
-        overflow-x: hidden;
-    }
-
-    /* Ambient Brand Accents (Sutiles y elegantes) */
-    .ambient-glow-1 {
-        position: absolute;
-        top: -120px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 850px;
-        height: 480px;
-        background: radial-gradient(ellipse, rgba(127, 29, 63, 0.08) 0%, rgba(217, 140, 154, 0.04) 45%, rgba(255, 252, 247, 0) 70%);
-        z-index: -1;
-        pointer-events: none;
-    }
-
-    .ambient-glow-2 {
-        position: absolute;
-        top: 45%;
-        right: -100px;
-        width: 600px;
-        height: 600px;
-        background: radial-gradient(circle, rgba(246, 231, 235, 0.5) 0%, rgba(127, 29, 63, 0.03) 50%, rgba(255, 252, 247, 0) 70%);
-        z-index: -1;
-        pointer-events: none;
-    }
-
-    /* Navbar */
-    .spotlight-nav {
-        background: rgba(255, 252, 247, 0.92);
-        backdrop-filter: blur(14px);
-        -webkit-backdrop-filter: blur(14px);
-        border-bottom: 1px solid var(--sl-border);
-        transition: all 0.25s ease;
-        position: sticky;
-        top: 0;
-        z-index: 1030;
-    }
-
-    .brand-mark {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        text-decoration: none;
-    }
-
-    .brand-logo-img {
-        width: 42px;
-        height: 42px;
-        object-fit: contain;
-        display: block;
-        transition: transform 0.22s ease;
-    }
-
-    .brand-mark:hover .brand-logo-img {
-        transform: rotate(-6deg) scale(1.06);
-    }
-
-    .brand-logo-badge {
-        width: 40px;
-        height: 40px;
-        border-radius: 12px;
-        background: linear-gradient(135deg, #7F1D3F 0%, #D98C9A 100%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #fff;
-        font-weight: 900;
-        font-size: 1.25rem;
-        box-shadow: 0 4px 14px rgba(127, 29, 63, 0.25);
-    }
-
-    .brand-text {
-        font-family: var(--sl-font-display);
-        font-weight: 800;
-        font-size: 1.35rem;
-        letter-spacing: -0.03em;
-        color: var(--sl-text-heading);
-        line-height: 1;
-    }
-
-    .brand-tagline {
-        font-size: 0.65rem;
-        font-weight: 700;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        color: var(--sl-primary);
-    }
-
-    .nav-pill-link {
-        font-weight: 600;
-        font-size: 0.9rem;
-        color: var(--sl-text-body);
-        padding: 0.5rem 1rem;
-        border-radius: var(--sl-radius-pill);
-        transition: all 0.18s ease;
-        text-decoration: none;
-    }
-
-    .nav-pill-link:hover {
-        background-color: var(--sl-primary-soft);
-        color: var(--sl-primary);
-    }
-
-    /* Hero Section */
-    .hero-container {
-        padding: 4.5rem 0 3.5rem;
-    }
-
-    .hero-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.45rem 1.15rem;
-        background: var(--sl-primary-soft);
-        border: 1px solid rgba(127, 29, 63, 0.2);
-        border-radius: var(--sl-radius-pill);
-        font-size: 0.8rem;
-        font-weight: 700;
-        color: var(--sl-primary);
-        margin-bottom: 1.5rem;
-    }
-
-    .hero-badge .pulse-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background-color: var(--sl-primary);
-        box-shadow: 0 0 0 3px rgba(217, 140, 154, 0.35);
-    }
-
-    .hero-title {
-        font-size: clamp(2.5rem, 5.5vw, 4.5rem);
-        font-weight: 900;
-        line-height: 1.08;
-        letter-spacing: -0.035em;
-        color: var(--sl-text-heading);
-        margin-bottom: 1.25rem;
-    }
-
-    .hero-title .highlight-text {
-        background: linear-gradient(135deg, #7F1D3F 0%, #D98C9A 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-
-    .hero-lead {
-        font-size: 1.15rem;
-        line-height: 1.6;
-        color: var(--sl-text-body);
-        max-width: 620px;
-        margin: 0 auto 2.25rem;
-        font-weight: 500;
-    }
-
-    /* Product Cards */
-    .product-card {
-        background: var(--sl-surface);
-        border: 1px solid var(--sl-border);
-        border-radius: 20px;
-        padding: 1rem;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.22s ease;
-    }
-
-    .product-card:hover {
-        transform: translateY(-4px);
-        box-shadow: var(--sl-shadow-hover);
-        border-color: var(--sl-accent);
-    }
-
-    .product-img-wrapper {
-        height: 210px;
-        border-radius: 14px;
-        overflow: hidden;
-        background: #FDF9FA;
-        position: relative;
-        margin-bottom: 1rem;
-        border: 1px solid rgba(238, 221, 220, 0.5);
-    }
-
-    .product-img-wrapper img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.35s ease;
-    }
-
-    .product-card:hover .product-img-wrapper img {
-        transform: scale(1.05);
-    }
-
-    .product-price-tag {
-        font-family: var(--sl-font-display);
-        font-size: 1.35rem;
-        font-weight: 800;
-        color: var(--sl-primary);
-        letter-spacing: -0.02em;
-    }
-
-    .btn-cart-circle {
-        width: 42px;
-        height: 42px;
-        border-radius: 50%;
-        background-color: var(--sl-primary-soft);
-        color: var(--sl-primary);
-        border: 1px solid rgba(127, 29, 63, 0.2);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.1rem;
-        transition: all 0.2s ease;
-        text-decoration: none;
-    }
-
-    .btn-cart-circle:hover {
-        background-color: var(--sl-primary);
-        color: #ffffff;
-        transform: scale(1.08);
-        box-shadow: 0 4px 12px rgba(127, 29, 63, 0.28);
-    }
-
-    /* Business / Company Cards */
-    .company-card-wrap {
-        position: relative;
-    }
-
-    .company-village-card {
-        background: var(--sl-surface);
-        border: 1px solid var(--sl-border);
-        border-radius: 20px;
-        overflow: hidden;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
-    }
-
-    .company-card-wrap:hover .company-village-card {
-        transform: translateY(-4px);
-        box-shadow: var(--sl-shadow-hover);
-        border-color: var(--sl-accent);
-    }
-
-    .company-banner-box {
-        height: 145px;
-        position: relative;
-        background: linear-gradient(135deg, #7F1D3F 0%, #D98C9A 100%);
-    }
-
-    .company-avatar-box {
-        position: absolute;
-        bottom: -24px;
-        left: 20px;
-        width: 62px;
-        height: 62px;
-        border-radius: 18px;
-        background: #ffffff;
-        padding: 3px;
-        box-shadow: 0 4px 14px rgba(41, 37, 42, 0.12);
-        z-index: 2;
-    }
-
-    .company-avatar-inner {
-        width: 100%;
-        height: 100%;
-        border-radius: 15px;
-        overflow: hidden;
-        background: var(--sl-primary-soft);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    /* Tooltip */
-    .company-tooltip {
-        position: absolute;
-        bottom: calc(100% + 12px);
-        left: 50%;
-        transform: translateX(-50%) translateY(8px);
-        width: 310px;
-        background: #ffffff;
-        border-radius: 18px;
-        box-shadow: 0 20px 50px rgba(41, 37, 42, 0.15), 0 4px 16px rgba(41, 37, 42, 0.05);
-        padding: 18px;
-        z-index: 1000;
-        pointer-events: none;
-        opacity: 0;
-        transition: opacity 0.22s ease, transform 0.22s ease;
-        border: 1px solid var(--sl-border);
-    }
-
-    .tooltip-arrow {
-        position: absolute;
-        bottom: -8px;
-        left: 50%;
-        transform: translateX(-50%) rotate(-135deg);
-        width: 16px;
-        height: 16px;
-        background: #ffffff;
-        border-right: 1px solid var(--sl-border);
-        border-bottom: 1px solid var(--sl-border);
-    }
-
-    .company-card-wrap:hover .company-tooltip {
-        opacity: 1;
-        transform: translateX(-50%) translateY(0);
-        pointer-events: auto;
-    }
-
-    .company-card-wrap:nth-child(3n) .company-tooltip,
-    .company-card-wrap:last-child .company-tooltip {
-        bottom: auto;
-        top: calc(100% + 12px);
-        transform: translateX(-50%) translateY(-8px);
-    }
-
-    .company-card-wrap:nth-child(3n):hover .company-tooltip,
-    .company-card-wrap:last-child:hover .company-tooltip {
-        transform: translateX(-50%) translateY(0);
-    }
-
-    .tooltip-header { display: flex; gap: 12px; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--sl-border-subtle); }
-    .tooltip-logo, .tooltip-logo-placeholder { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; }
-    .tooltip-logo-placeholder { background: linear-gradient(135deg, #7F1D3F, #D98C9A); display: flex; align-items: center; justify-content: center; color: #fff; }
-    .tooltip-name { font-weight: 700; font-size: 0.95rem; color: var(--sl-text-heading); }
-    .tooltip-badge { background: var(--sl-primary-soft); color: var(--sl-primary); font-size: 0.72rem; font-weight: 700; padding: 2px 10px; border-radius: 20px; }
-    .tooltip-desc { font-size: 0.8rem; color: var(--sl-text-muted); margin-bottom: 10px; }
-    .tooltip-grid { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
-    .tooltip-info-item { display: flex; gap: 8px; font-size: 0.78rem; color: var(--sl-text-body); }
-    .tooltip-info-item i { color: var(--sl-primary); }
-    .tooltip-cta { display: block; text-align: center; background: linear-gradient(135deg, #7F1D3F, #D98C9A); color: #fff; border-radius: 12px; padding: 9px; font-size: 0.84rem; font-weight: 700; text-decoration: none; transition: opacity 0.2s; }
-    .tooltip-cta:hover { opacity: 0.92; color: #fff; }
-
-    /* Highlights Ribbon */
-    .village-feature-box {
-        background: #ffffff;
-        border: 1px solid var(--sl-border);
-        border-radius: 18px;
-        padding: 1.5rem;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        gap: 1.25rem;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .village-feature-box:hover {
-        transform: translateY(-3px);
-        box-shadow: var(--sl-shadow-md);
-    }
-
-    .feature-icon-circle {
-        width: 52px;
-        height: 52px;
-        border-radius: 14px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.4rem;
-        flex-shrink: 0;
-    }
-</style>
+<link href="{{ asset('css/home.css') }}" rel="stylesheet">
 @endpush
 
 @section('content')
@@ -420,7 +22,9 @@
             <img src="{{ asset('images/logo-symbol-burgundy.png') }}" alt="Spotlight Logo" class="brand-logo-img">
             <div>
                 <div class="brand-text">SPOTLIGHT</div>
-                <div class="brand-tagline">ALDEA DIGITAL</div>
+                <div class="brand-tagline">
+                    <span class="lang-en">DIGITAL VILLAGE</span><span class="lang-es">ALDEA DIGITAL</span>
+                </div>
             </div>
         </a>
 
@@ -594,89 +198,116 @@
                 </p>
             </div>
             
-            <a href="{{ auth()->check() && auth()->user()->role === 'user' ? route('user.dashboard') : route('login') }}" class="btn btn-pill-light fw-bold text-primary d-inline-flex align-items-center gap-2">
-                <span class="lang-en">View more products</span><span class="lang-es">Ver más productos</span>
-                <i class="bi bi-arrow-right fs-5"></i>
-            </a>
+            <div class="d-flex align-items-center gap-2">
+                {{-- Flechas de control de carrusel --}}
+                <div class="d-flex align-items-center gap-1 me-2">
+                    <button type="button" id="btnCarouselPrev" class="carousel-nav-arrow" aria-label="Anterior">
+                        <i class="bi bi-chevron-left"></i>
+                    </button>
+                    <button type="button" id="btnCarouselNext" class="carousel-nav-arrow" aria-label="Siguiente">
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+                </div>
+
+                <a href="{{ auth()->check() && auth()->user()->role === 'user' ? route('user.dashboard') : route('login') }}" class="btn btn-pill-light fw-bold text-primary d-inline-flex align-items-center gap-2">
+                    <span class="lang-en">View more products</span><span class="lang-es">Ver más productos</span>
+                    <i class="bi bi-arrow-right fs-5"></i>
+                </a>
+            </div>
         </div>
         
-        {{-- Grid de Productos Reales (Solo 4 productos) --}}
-        <div class="row g-4 mb-4">
-            @forelse($products->take(4) as $product)
-            <div class="col-sm-6 col-md-3">
-                <div class="product-card">
-                    
-                    <div class="product-img-wrapper">
-                        <a href="{{ route('public.product', $product) }}">
-                            <img src="{{ $product->image_url }}" alt="{{ $product->name }}" loading="lazy">
-                        </a>
-                        @if($product->category)
-                            <span class="badge badge-purple position-absolute top-0 start-0 m-2 shadow-sm" style="font-size: 0.68rem;">
-                                {{ $product->category }}
-                            </span>
-                        @endif
-                        @if($product->isMexican() || ($product->company && $product->company->isMexican()))
-                            <span class="badge position-absolute top-0 end-0 m-2 shadow-sm" style="background: #006847; color: #fff; font-size: 0.65rem; font-weight: 700;">
-                                🇲🇽 MX
-                            </span>
-                        @else
-                            <span class="badge position-absolute top-0 end-0 m-2 shadow-sm" style="background: #003893; color: #fff; font-size: 0.65rem; font-weight: 700;">
-                                🇨🇴 CO
-                            </span>
-                        @endif
-                    </div>
-
-                    <div class="d-flex flex-column flex-fill">
-                        <div class="d-flex align-items-center gap-1 text-muted small mb-1">
-                            <i class="bi bi-shop text-primary" style="font-size: 0.8rem;"></i>
-                            <span class="text-truncate fw-medium" style="max-width: 170px;">{{ $product->company->name }}</span>
-                        </div>
-
-                        <h5 class="fw-bold text-dark mb-1 text-truncate" title="{{ $product->name }}" style="font-size: 1rem;">
-                            <a href="{{ route('public.product', $product) }}" class="text-dark text-decoration-none">{{ $product->name }}</a>
-                        </h5>
-
-                        <div class="d-flex align-items-center gap-1 mb-2">
-                            <i class="bi bi-star-fill text-warning" style="font-size: 0.75rem;"></i>
-                            <span class="fw-bold text-dark text-xs">{{ $product->average_rating > 0 ? number_format($product->average_rating, 1) : '5.0' }}</span>
-                            <span class="text-muted text-xs">({{ $product->reviews_count }})</span>
-                            <a href="{{ route('public.product', $product) }}#reviews-section" class="text-xs text-primary text-decoration-none ms-1">Reseñas</a>
-                        </div>
-
-                        <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top border-light">
-                            <div class="product-price-tag">
-                                ${{ number_format($product->price, ($product->currency === 'MXN' ? 2 : 0), ',', '.') }} <span class="text-muted" style="font-size: 0.7rem;">{{ $product->currency ?? 'COP' }}</span>
-                            </div>
-                            
-                            {{-- Botón de Carrito (Lógica 100% intacta) --}}
-                            @auth
-                                @if(auth()->user()->role === 'user')
-                                    <form action="{{ route('user.cart.add', $product) }}" method="POST" class="d-inline m-0">
-                                        @csrf
-                                        <button class="btn-cart-circle" title="Agregar al carrito" aria-label="Agregar al carrito">
-                                            <i class="bi bi-cart-plus"></i>
-                                        </button>
-                                    </form>
-                                @endif
+        {{-- Carrusel de Productos Destacados (Scroll horizontal fluido izquierda a derecha) --}}
+        <div class="featured-carousel-wrapper position-relative mb-4">
+            <div id="featuredProductsTrack" class="featured-products-track">
+                @forelse($products as $product)
+                <div class="featured-carousel-item">
+                    <div class="product-card h-100">
+                        
+                        <div class="product-img-wrapper">
+                            <a href="{{ route('public.product', $product) }}">
+                                <img src="{{ $product->image_url }}" alt="{{ $product->name }}" loading="lazy">
+                            </a>
+                            @if($product->category)
+                                <span class="badge badge-purple position-absolute top-0 start-0 m-2 shadow-sm" style="font-size: 0.68rem;">
+                                    {{ $product->category }}
+                                </span>
+                            @endif
+                            @if($product->isMexican() || ($product->company && $product->company->isMexican()))
+                                <span class="badge position-absolute top-0 end-0 m-2 shadow-sm" style="background: #006847; color: #fff; font-size: 0.65rem; font-weight: 700;">
+                                    🇲🇽 MX
+                                </span>
                             @else
-                                <a href="{{ route('login') }}" class="btn-cart-circle" title="Inicia sesión para comprar" aria-label="Inicia sesión para comprar">
-                                    <i class="bi bi-cart-plus"></i>
-                                </a>
-                            @endauth
+                                <span class="badge position-absolute top-0 end-0 m-2 shadow-sm" style="background: #003893; color: #fff; font-size: 0.65rem; font-weight: 700;">
+                                    🇨🇴 CO
+                                </span>
+                            @endif
                         </div>
-                    </div>
 
+                        <div class="d-flex flex-column flex-fill">
+                            <div class="d-flex align-items-center gap-1 text-muted small mb-1">
+                                <i class="bi bi-shop text-primary" style="font-size: 0.8rem;"></i>
+                                <span class="text-truncate fw-medium" style="max-width: 170px;">{{ $product->company->name }}</span>
+                            </div>
+
+                            <h5 class="fw-bold text-dark mb-1 text-truncate" title="{{ $product->name }}" style="font-size: 1rem;">
+                                <a href="{{ route('public.product', $product) }}" class="text-dark text-decoration-none">{{ $product->name }}</a>
+                            </h5>
+
+                            <div class="d-flex align-items-center gap-1 mb-2">
+                                <i class="bi bi-star-fill text-warning" style="font-size: 0.75rem;"></i>
+                                <span class="fw-bold text-dark text-xs">{{ $product->average_rating > 0 ? number_format($product->average_rating, 1) : '5.0' }}</span>
+                                <span class="text-muted text-xs">({{ $product->reviews_count }})</span>
+                                <a href="{{ route('public.product', $product) }}#reviews-section" class="text-xs text-primary text-decoration-none ms-1">
+                                    <span class="lang-en">Reviews</span><span class="lang-es">Reseñas</span>
+                                </a>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top border-light">
+                                <div>
+                                    @if($product->effective_currency === 'MXN')
+                                        <div class="product-price-tag lh-1">
+                                            ${{ number_format($product->price_in_cop, 0, ',', '.') }} <span class="text-muted" style="font-size: 0.7rem;">COP</span>
+                                        </div>
+                                        <small class="d-block text-muted mt-0.5" style="font-size: 0.68rem; font-weight: 600;">
+                                            🇲🇽 ${{ number_format($product->price, 2, ',', '.') }} MXN
+                                        </small>
+                                    @else
+                                        <div class="product-price-tag">
+                                            ${{ number_format($product->price, (floor($product->price) != $product->price ? 2 : 0), ',', '.') }} <span class="text-muted" style="font-size: 0.7rem;">COP</span>
+                                        </div>
+                                    @endif
+                                </div>
+                                
+                                {{-- Botón de Carrito (Lógica 100% intacta) --}}
+                                @auth
+                                    @if(auth()->user()->role === 'user')
+                                        <form action="{{ route('user.cart.add', $product) }}" method="POST" class="d-inline m-0">
+                                            @csrf
+                                            <button class="btn-cart-circle" title="Agregar al carrito" aria-label="Agregar al carrito">
+                                                <i class="bi bi-cart-plus"></i>
+                                            </button>
+                                        </form>
+                                    @endif
+                                @else
+                                    <a href="{{ route('login') }}" class="btn-cart-circle" title="Inicia sesión para comprar" aria-label="Inicia sesión para comprar">
+                                        <i class="bi bi-cart-plus"></i>
+                                    </a>
+                                @endauth
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
-            </div>
-            @empty
-            <div class="col-12 text-center py-5">
-                <div class="py-5 bg-white rounded-4 border p-4">
-                    <i class="bi bi-box-seam fs-1 text-muted mb-2 d-block"></i>
-                    <p class="text-muted fw-medium mb-0 lang-en">No featured products published yet.</p>
-                    <p class="text-muted fw-medium mb-0 lang-es">No hay productos publicados aún en la aldea.</p>
+                @empty
+                <div class="col-12 text-center py-5">
+                    <div class="py-5 bg-white rounded-4 border p-4">
+                        <i class="bi bi-box-seam fs-1 text-muted mb-2 d-block"></i>
+                        <p class="text-muted fw-medium mb-0 lang-en">No featured products published yet.</p>
+                        <p class="text-muted fw-medium mb-0 lang-es">No hay productos publicados aún en la aldea.</p>
+                    </div>
                 </div>
+                @endforelse
             </div>
-            @endforelse
         </div>
 
         {{-- Botón con flecha para ver más productos --}}
@@ -707,8 +338,12 @@
                             <i class="bi bi-heart-fill fs-5"></i>
                         </div>
                         <div>
-                            <div class="fw-bold text-dark small">Comunidad Viva</div>
-                            <div class="text-muted" style="font-size: 0.72rem;">Creatividad sin fronteras</div>
+                            <div class="fw-bold text-dark small">
+                                <span class="lang-en">Living Community</span><span class="lang-es">Comunidad Viva</span>
+                            </div>
+                            <div class="text-muted" style="font-size: 0.72rem;">
+                                <span class="lang-en">Creativity without borders</span><span class="lang-es">Creatividad sin fronteras</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -938,6 +573,114 @@
         }
     });
 
+    // --- FEATURED PRODUCTS CAROUSEL (UNO POR UNO, LOOP NATURAL Y RETORNO DIRECTO) ---
+    const carouselTrack = document.getElementById('featuredProductsTrack');
+    const btnCarouselPrev = document.getElementById('btnCarouselPrev');
+    const btnCarouselNext = document.getElementById('btnCarouselNext');
+
+    if (carouselTrack) {
+        let autoPlayTimer = null;
+        let isTransitioning = false;
+        let resumeTimeout = null;
+        const intervalTime = 3000; // Avanza automáticamente cada 3 segundos
+
+        function getItemStep() {
+            const firstItem = carouselTrack.querySelector('.featured-carousel-item');
+            if (!firstItem) return 300;
+            const style = window.getComputedStyle(carouselTrack);
+            const gap = parseFloat(style.gap) || 24;
+            return firstItem.offsetWidth + gap;
+        }
+
+        function scrollNextItem() {
+            if (isTransitioning) return;
+            isTransitioning = true;
+
+            const step = getItemStep();
+            const maxScrollLeft = carouselTrack.scrollWidth - carouselTrack.clientWidth;
+            const currentScroll = carouselTrack.scrollLeft;
+
+            // Si está en el final o le falta menos de medio ítem para llegar, vuelve suavemente al primer artículo (0)
+            if (currentScroll >= (maxScrollLeft - 15)) {
+                carouselTrack.scrollTo({ left: 0, behavior: 'smooth' });
+            } else {
+                // Avanza al siguiente índice exacto para que quede centrado uno por uno
+                const nextTarget = Math.min(maxScrollLeft, Math.round((currentScroll + step) / step) * step);
+                carouselTrack.scrollTo({ left: nextTarget, behavior: 'smooth' });
+            }
+
+            setTimeout(() => {
+                isTransitioning = false;
+            }, 500);
+        }
+
+        function scrollPrevItem() {
+            if (isTransitioning) return;
+            isTransitioning = true;
+
+            const step = getItemStep();
+            const maxScrollLeft = carouselTrack.scrollWidth - carouselTrack.clientWidth;
+            const currentScroll = carouselTrack.scrollLeft;
+
+            // Si ya está en la primera tarjeta (<= 15px) y pulsa atrás, va al final
+            if (currentScroll <= 15) {
+                carouselTrack.scrollTo({ left: maxScrollLeft, behavior: 'smooth' });
+            } else {
+                // Retrocede exactamente un artículo hacia la primera
+                const prevTarget = Math.max(0, Math.round((currentScroll - step) / step) * step);
+                carouselTrack.scrollTo({ left: prevTarget, behavior: 'smooth' });
+            }
+
+            setTimeout(() => {
+                isTransitioning = false;
+            }, 500);
+        }
+
+        function startAutoPlay() {
+            stopAutoPlay();
+            autoPlayTimer = setInterval(scrollNextItem, intervalTime);
+        }
+
+        function stopAutoPlay() {
+            if (autoPlayTimer) {
+                clearInterval(autoPlayTimer);
+                autoPlayTimer = null;
+            }
+        }
+
+        function scheduleResume() {
+            if (resumeTimeout) clearTimeout(resumeTimeout);
+            resumeTimeout = setTimeout(() => {
+                startAutoPlay();
+            }, 2500);
+        }
+
+        if (btnCarouselPrev) {
+            btnCarouselPrev.addEventListener('click', () => {
+                stopAutoPlay();
+                scrollPrevItem();
+                scheduleResume();
+            });
+        }
+
+        if (btnCarouselNext) {
+            btnCarouselNext.addEventListener('click', () => {
+                stopAutoPlay();
+                scrollNextItem();
+                scheduleResume();
+            });
+        }
+
+        // Si el usuario hace scroll manual o toca una tarjeta, pausar temporalmente y reanudar solo
+        carouselTrack.addEventListener('mouseenter', stopAutoPlay);
+        carouselTrack.addEventListener('mouseleave', startAutoPlay);
+        carouselTrack.addEventListener('touchstart', stopAutoPlay, { passive: true });
+        carouselTrack.addEventListener('touchend', scheduleResume);
+
+        // Iniciar pase automático inmediatamente
+        startAutoPlay();
+    }
+
     // --- MAP SCRIPTS ---
     let modalMap = null;
     let modalMarker = null;
@@ -999,31 +742,97 @@
 @endpush
 
 {{-- Modern International Footer --}}
-<footer class="py-5 mt-5 bg-white border-top border-sl">
+<footer class="py-5 mt-5 bg-white border-top border-sl sl-footer">
     <div class="container">
-        <div class="row g-4 align-items-center justify-content-between">
-            <div class="col-md-5">
-                <div class="d-flex align-items-center gap-2 mb-2">
-                    <img src="{{ asset('images/logo-symbol-burgundy.png') }}" alt="Spotlight Logo" style="width: 32px; height: 32px; object-fit: contain;">
-                    <span class="brand-text fs-5">SPOTLIGHT</span>
+        <div class="row g-4 justify-content-between pb-4">
+            <div class="col-lg-5 col-md-12">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <img src="{{ asset('images/logo-symbol-burgundy.png') }}" alt="Spotlight Logo" class="sl-footer-logo">
+                    <div>
+                        <span class="brand-text fs-5 d-block">SPOTLIGHT</span>
+                        <span class="brand-tagline">
+                            <span class="lang-en">DIGITAL VILLAGE</span><span class="lang-es">ALDEA DIGITAL</span>
+                        </span>
+                    </div>
                 </div>
-                <p class="text-muted small mb-0" style="max-width: 420px; line-height: 1.5;">
-                    <span class="lang-en">The digital village connecting creators, products, and communities.</span>
-                    <span class="lang-es">Aldea digital que conecta creadores, productos y comunidades.</span>
+                <p class="text-muted small mb-3 sl-footer-desc">
+                    <span class="lang-en">The digital village connecting creators, products, and communities with secure commerce and local identity.</span>
+                    <span class="lang-es">Aldea digital que conecta creadores, productos y comunidades con comercio seguro e identidad local.</span>
                 </p>
+                <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill sl-footer-badge">
+                    <i class="bi bi-shield-check"></i>
+                    <span class="lang-en">100% Verified Local & Regional Commerce</span>
+                    <span class="lang-es">Comercio Local y Regional 100% Verificado</span>
+                </div>
             </div>
-            <div class="col-md-7 d-flex flex-wrap justify-content-md-end gap-4 text-muted small fw-semibold">
-                <a href="#productos" class="text-muted text-decoration-none hover-opacity-100">
-                    <span class="lang-en">Marketplace</span><span class="lang-es">Productos</span>
-                </a>
-                <a href="#empresas" class="text-muted text-decoration-none hover-opacity-100">
-                    <span class="lang-en">Shops</span><span class="lang-es">Tiendas</span>
-                </a>
-                <a href="#comunidad" class="text-muted text-decoration-none hover-opacity-100">
-                    <span class="lang-en">Community</span><span class="lang-es">Comunidad</span>
-                </a>
-                <span class="text-muted opacity-50">|</span>
-                <span class="text-muted">© {{ date('Y') }} Spotlight</span>
+
+            <div class="col-lg-3 col-sm-6">
+                <h6 class="sl-footer-heading">
+                    <span class="lang-en">EXPLORE</span><span class="lang-es">EXPLORAR</span>
+                </h6>
+                <ul class="sl-footer-list">
+                    <li>
+                        <a href="#productos" class="sl-footer-link">
+                            <span class="lang-en">Marketplace</span><span class="lang-es">Productos</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#empresas" class="sl-footer-link">
+                            <span class="lang-en">Shops</span><span class="lang-es">Tiendas</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#comunidad" class="sl-footer-link">
+                            <span class="lang-en">Community</span><span class="lang-es">Comunidad</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('public.tracking') }}" class="sl-footer-link">
+                            <span class="lang-en">Order Tracking</span><span class="lang-es">Rastreo de Envíos</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="col-lg-3 col-sm-6">
+                <h6 class="sl-footer-heading">
+                    <span class="lang-en">SUPPORT & LEGAL</span><span class="lang-es">SOPORTE & LEGAL</span>
+                </h6>
+                <ul class="sl-footer-list">
+                    <li>
+                        <a href="{{ route('public.legal', 'privacidad') }}" class="sl-footer-link">
+                            <span class="lang-en">Privacy Policy</span><span class="lang-es">Política de Privacidad</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('public.legal', 'terminos') }}" class="sl-footer-link">
+                            <span class="lang-en">Terms of Service</span><span class="lang-es">Términos del Servicio</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('public.legal', 'cookies') }}" class="sl-footer-link">
+                            <span class="lang-en">Cookie Policy</span><span class="lang-es">Política de cookies</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('public.legal', 'devoluciones') }}" class="sl-footer-link">
+                            <span class="lang-en">Returns & Refunds</span><span class="lang-es">Devoluciones y reembolsos</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('public.legal', 'pqrs') }}" class="sl-footer-link">
+                            <span class="lang-en">PQRS & Warranties</span><span class="lang-es">PQRS & Garantías</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="pt-4 text-center text-muted small">
+            <div>
+                © {{ date('Y') }} <strong>Spotlight</strong> —
+                <span class="lang-en">All rights reserved.</span>
+                <span class="lang-es">Todos los derechos reservados.</span>
             </div>
         </div>
     </div>

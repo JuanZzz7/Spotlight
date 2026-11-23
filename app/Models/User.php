@@ -33,6 +33,38 @@ class User extends Authenticatable
         return null;
     }
 
+    public function getDisplayNameAttribute(): string
+    {
+        if ($this->role === 'business' && $this->relationLoaded('company') && $this->company && !empty($this->company->name)) {
+            return $this->company->name;
+        }
+        if ($this->role === 'business' && $this->company()->exists()) {
+            return $this->company?->name ?: $this->name;
+        }
+        return $this->name;
+    }
+
+    public function getDisplayInitialAttribute(): string
+    {
+        $name = $this->display_name;
+        $words = preg_split('/\s+/', trim($name));
+        if (count($words) >= 2) {
+            return mb_strtoupper(mb_substr($words[0], 0, 1) . mb_substr($words[1], 0, 1));
+        }
+        return mb_strtoupper(mb_substr($name, 0, 2));
+    }
+
+    public function getDisplayLogoAttribute(): ?string
+    {
+        if ($this->role === 'business') {
+            $comp = $this->relationLoaded('company') ? $this->company : $this->company()->first();
+            if ($comp && !empty($comp->logo)) {
+                return asset('storage/' . $comp->logo);
+            }
+        }
+        return $this->avatar_url;
+    }
+
     public function company()
     {
         return $this->hasOne(Company::class);

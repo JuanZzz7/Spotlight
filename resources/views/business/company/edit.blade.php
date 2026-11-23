@@ -4,74 +4,7 @@
 
 @push('styles')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
-<style>
-    #map { z-index: 1; border-radius: 1rem; border: 1px solid #dee2e6; height: 350px; width: 100%; min-height: 350px; }    .section-save-bar {
-        background: #f8f9fa;
-        border-top: 1px solid #e9ecef;
-        padding: 14px 24px;
-        border-radius: 0 0 1rem 1rem;
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-        gap: 10px;
-    }
-    .settings-nav-btn {
-        transition: all 0.25s ease;
-        border-radius: 12px;
-        font-weight: 600;
-        border: 1px solid #e2e8f0;
-        background: #ffffff;
-        color: #475569;
-        padding: 12px 18px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        width: 100%;
-        text-align: left;
-    }
-    .settings-nav-btn:hover {
-        background: #f8fafc;
-        border-color: #cbd5e1;
-        transform: translateY(-1px);
-        color: #0f172a;
-    }
-    .settings-nav-btn.active {
-        background: #0f172a;
-        color: #ffffff;
-        border-color: #0f172a;
-        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
-    }
-    .settings-nav-btn.active .btn-icon-box {
-        background: rgba(255, 255, 255, 0.2);
-        color: #ffffff;
-    }
-    .settings-nav-btn.active .badge-status {
-        background: rgba(255, 255, 255, 0.25) !important;
-        color: #ffffff !important;
-    }
-    .settings-nav-btn.active .chevron-icon {
-        transform: rotate(90deg);
-        color: #ffffff;
-    }
-    .btn-icon-box {
-        width: 38px;
-        height: 38px;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.1rem;
-        transition: all 0.25s ease;
-    }
-    .chevron-icon {
-        transition: transform 0.25s ease;
-    }
-    @@keyframes spin {
-        from { transform: rotate(0deg); }
-        to   { transform: rotate(360deg); }
-    }
-</style>
+<link href="{{ asset('css/business.css') }}" rel="stylesheet">
 @endpush
 
 @section('dashboard-content')
@@ -179,17 +112,17 @@
                             <div class="w-100 h-100 d-flex align-items-center justify-content-center text-muted" id="bannerPlaceholder">
                                 <div class="text-center">
                                     <i class="bi bi-image fs-1 d-block mb-1"></i>
-                                    <span class="small">Banner de la empresa (Recomendado: 1200x400)</span>
+                                    <span class="small">Banner de la empresa (Recomendado: 1200x400 &bull; Todo tipo de imágenes)</span>
                                 </div>
                             </div>
                         @endif
 
                         {{-- Boton cambiar banner superpuesto --}}
                         <div class="position-absolute bottom-0 end-0 p-2 d-flex flex-column align-items-end gap-1">
-                            <label for="bannerInput" class="btn btn-dark btn-sm rounded-pill px-3 shadow mb-0">
+                            <label for="bannerInput" class="btn btn-dark btn-sm rounded-pill px-3 shadow mb-0 cursor-pointer">
                                 <i class="bi bi-camera me-1"></i> Cambiar Banner
                             </label>
-                            <input type="file" name="banner" id="bannerInput" class="d-none" accept="image/jpeg,image/png,image/gif,image/webp,image/bmp">
+                            <input type="file" name="banner" id="bannerInput" class="d-none" accept="image/*,.svg,.avif,.webp,.png,.jpg,.jpeg,.gif,.bmp,.heic">
                             <div id="bannerFileInfo" class="d-none">
                                 <span class="badge bg-dark bg-opacity-75 text-white rounded-pill px-2 py-1" style="font-size:0.7rem;">
                                     <i class="bi bi-file-image me-1"></i>
@@ -211,31 +144,142 @@
                             <label for="logoInput" class="position-absolute bottom-0 end-0 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center cursor-pointer shadow" style="width: 32px; height: 32px; border: 2px solid white;">
                                 <i class="bi bi-camera-fill text-xs"></i>
                             </label>
-                            <input type="file" name="logo" id="logoInput" class="d-none" accept="image/*">
+                            <input type="file" name="logo" id="logoInput" class="d-none" accept="image/*,.svg,.avif,.webp,.png,.jpg,.jpeg,.gif,.bmp,.heic">
                         </div>
                     </div>
                 </div>
 
                 <div class="row g-4 mt-2">
                     <div class="col-md-7">
-                        <label class="form-label text-sm fw-semibold text-dark">Nombre público de la empresa *</label>
+                        <div class="d-flex align-items-center mb-2" style="height: 24px;">
+                            <label class="form-label text-sm fw-semibold text-dark mb-0">Nombre público de la empresa *</label>
+                        </div>
                         <input type="text" name="name" class="form-control form-control-lg"
                                value="{{ old('name', $company->name) }}" required
                                placeholder="Ej: Mi Negocio Digital">
                     </div>
                     <div class="col-md-5">
-                        <label class="form-label text-sm fw-semibold text-dark">Categoría</label>
-                        <select name="category" class="form-select form-select-lg">
-                            <option value="">Seleccionar...</option>
-                            @foreach(['Tecnología','Moda','Alimentos','Belleza','Hogar','Deportes','Arte','Educación','Salud','Otros'] as $cat)
-                                <option value="{{ $cat }}" {{ old('category',$company->category)===$cat?'selected':'' }}>{{ $cat }}</option>
+                        <div class="d-flex align-items-center justify-content-between mb-2" style="height: 24px;">
+                            <label class="form-label text-sm fw-semibold text-dark mb-0">Categoría Principal *</label>
+                            <button type="button" class="btn btn-link p-0 text-decoration-none text-xs fw-semibold text-primary d-inline-flex align-items-center gap-1" data-bs-toggle="collapse" data-bs-target="#newCompanyCategoryCollapse">
+                                <i class="bi bi-plus-circle"></i>
+                                <span>Crear nueva</span>
+                            </button>
+                        </div>
+                        <select name="category" id="company_category_select" class="form-select form-select-lg">
+                            <option value="">Seleccionar categoría...</option>
+                            @php
+                                $currentCat = old('category', $company->category);
+                                $tagLabels = isset($tags) ? $tags->pluck('label')->unique()->toArray() : [];
+                                $defaultCats = ['Tecnología','Moda','Alimentos','Belleza','Hogar','Deportes','Arte','Educación','Salud','Panadería','Comida y bebida','Otros'];
+                                $allCatOptions = array_unique(array_merge($defaultCats, $tagLabels, $currentCat ? [$currentCat] : []));
+                                sort($allCatOptions);
+                            @endphp
+                            @foreach($allCatOptions as $cat)
+                                <option value="{{ $cat }}" {{ $currentCat === $cat ? 'selected' : '' }}>{{ $cat }}</option>
                             @endforeach
                         </select>
                     </div>
+
+                    {{-- Formulario para crear nueva categoría directamente desde la empresa --}}
+                    <div class="col-12 collapse mt-2" id="newCompanyCategoryCollapse">
+                        <div class="p-3.5 bg-light rounded-4 border">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <h6 class="fw-bold text-dark text-xs mb-0 d-flex align-items-center gap-1.5">
+                                    <i class="bi bi-magic text-primary"></i> Crear Categoría para tu Empresa y Productos
+                                </h6>
+                                <span class="badge bg-white text-primary border rounded-pill px-2 py-0.5 text-2xs fw-bold">CATÁLOGO EMPRESARIAL</span>
+                            </div>
+                            <p class="text-xs text-muted mb-3">
+                                Esta categoría quedará disponible de inmediato tanto como rubro de tu empresa como para categorizar cualquiera de tus productos con animación temática.
+                            </p>
+                            <div class="row g-2 align-items-end">
+                                <div class="col-sm-6">
+                                    <label class="text-2xs fw-semibold text-dark mb-1">Nombre de la categoría</label>
+                                    <input type="text" id="company_quick_tag_label" name="new_category_label" class="form-control form-control-sm" placeholder="Ej: Ropa Deportiva, Postres Artesanales">
+                                </div>
+                                <div class="col-sm-3">
+                                    <label class="text-2xs fw-semibold text-dark mb-1">Color temático</label>
+                                    <input type="color" id="company_quick_tag_color" name="new_category_color" class="form-control form-control-sm form-control-color w-100" value="#7F1D3F" title="Color temático para la vitrina">
+                                </div>
+                                <div class="col-sm-3">
+                                    <button type="button" id="btn_save_company_tag" class="btn btn-sm btn-primary w-100 fw-semibold text-xs py-1.5">
+                                        <i class="bi bi-check-lg me-1"></i> Guardar y Usar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Listado de Categorías Creadas por esta Empresa --}}
+                    @if(isset($myCustomTags) && $myCustomTags->count() > 0)
+                    <div class="col-12 mt-2 pt-2 border-top" id="customTagsContainerBlock">
+                        <label class="form-label text-2xs fw-bold text-muted text-uppercase mb-2 d-flex align-items-center gap-1">
+                            <i class="bi bi-bookmark-star-fill text-primary"></i> Categorías Creadas por tu Empresa
+                        </label>
+                        <div class="d-flex flex-wrap gap-2" id="companyCustomTagsBadges">
+                            @foreach($myCustomTags as $customTag)
+                                <span class="badge rounded-pill px-3 py-1.5 fw-semibold text-xs d-inline-flex align-items-center gap-1.5 shadow-2xs"
+                                      style="background-color: #FFFFFF; border: 1.5px solid {{ $customTag->accent_color }}; color: #29252A;">
+                                    <span class="rounded-circle d-inline-block" style="width: 8px; height: 8px; background-color: {{ $customTag->accent_color }};"></span>
+                                    <span>{{ $customTag->label }}</span>
+                                </span>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
                     <div class="col-12">
                         <label class="form-label text-sm fw-semibold text-dark">Descripción de la empresa</label>
                         <textarea name="description" class="form-control" rows="4"
                                   placeholder="Cuéntanos un poco sobre lo que hace tu empresa...">{{ old('description', $company->description) }}</textarea>
+                    </div>
+
+                    {{-- ══════════════════════════════════════════════════
+                         FOTOGRAFÍAS DEL ESTABLECIMIENTO / LOCAL COMERCIAL
+                    ══════════════════════════════════════════════════ --}}
+                    <div class="col-12 mt-3 pt-3 border-top">
+                        <div class="d-flex flex-column flex-sm-row sm-align-items-center justify-content-between gap-2 mb-3">
+                            <div>
+                                <label class="form-label text-sm fw-bold text-dark mb-0 d-flex align-items-center gap-1.5">
+                                    <i class="bi bi-images text-primary"></i> Fotografías del Establecimiento
+                                </label>
+                                <small class="text-muted d-block" style="font-size: 0.75rem;">
+                                    Sube fotos de la fachada, vitrina o interior de tu local comercial para que los compradores conozcan tu espacio físico.
+                                </small>
+                            </div>
+                            <div>
+                                <label for="establishmentPhotosInput" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1.5 text-xs fw-semibold mb-0 cursor-pointer d-inline-flex align-items-center gap-1 shadow-2xs">
+                                    <i class="bi bi-cloud-plus-fill fs-6"></i> + Subir fotos del local
+                                </label>
+                                <input type="file" name="establishment_photos[]" id="establishmentPhotosInput" class="d-none" multiple accept="image/jpeg,image/png,image/jpg,image/webp">
+                            </div>
+                        </div>
+
+                        {{-- Galería de Fotos del Establecimiento --}}
+                        <div class="row g-2" id="establishmentGalleryRow">
+                            @if(!empty($company->establishment_photo_urls))
+                                @foreach($company->establishment_photos as $index => $photoPath)
+                                    <div class="col-6 col-sm-4 col-md-3" id="est_photo_col_{{ $index }}">
+                                        <div class="position-relative rounded-3 overflow-hidden border shadow-2xs" style="height: 110px; background: #FAF7F8;">
+                                            <img src="{{ asset('storage/' . $photoPath) }}" class="w-100 h-100" style="object-fit: cover;" alt="Establecimiento">
+                                            <label class="position-absolute top-0 end-0 m-1.5 badge bg-danger rounded-circle p-1 cursor-pointer shadow-xs" title="Marcar para eliminar">
+                                                <input type="checkbox" name="delete_establishment_photos[]" value="{{ $photoPath }}" class="d-none" onchange="document.getElementById('est_photo_col_{{ $index }}').style.opacity = this.checked ? '0.3' : '1'; document.getElementById('est_photo_col_{{ $index }}').style.filter = this.checked ? 'grayscale(1)' : 'none';">
+                                                <i class="bi bi-trash-fill text-white" style="font-size: 0.75rem;"></i>
+                                            </label>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @else
+                                <div class="col-12" id="emptyEstablishmentNotice">
+                                    <div class="p-3.5 rounded-4 border bg-light text-center text-muted">
+                                        <i class="bi bi-shop fs-3 d-block text-secondary mb-1"></i>
+                                        <span class="text-xs fw-semibold text-dark d-block mb-0.5">Aún no has agregado fotos del establecimiento</span>
+                                        <span class="text-2xs text-muted">Haz clic en <strong>"+ Subir fotos del local"</strong> para exhibir tu negocio local en Ubaté.</span>
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+                        <div id="newEstablishmentPreviews" class="row g-2 pt-2"></div>
                     </div>
                 </div>
             </div>
@@ -347,82 +391,233 @@
                     </div>
                 </div>
 
-                <h6 class="fw-bold text-dark border-bottom pb-2 mb-4">
-                    <i class="bi bi-clock-history me-2 text-primary"></i>Horario de Atención
+                <h6 class="fw-bold text-dark border-bottom pb-2 mb-4 d-flex align-items-center justify-content-between">
+                    <span><i class="bi bi-clock-history me-2 text-primary"></i>Horario de Atención</span>
+                    <span class="text-xs text-muted fw-normal">Configura tus días y jornadas de servicio</span>
                 </h6>
+
+                {{-- 1. Días de Atención al Público --}}
+                <div class="mb-4 pb-2">
+                    <div class="d-flex flex-column flex-sm-row sm-align-items-center justify-content-between gap-1 mb-2">
+                        <label class="form-label text-sm fw-bold text-dark mb-0 d-flex align-items-center gap-1">
+                            <i class="bi bi-calendar3 text-primary"></i> Días de Atención
+                        </label>
+                        <span class="text-xs text-muted">Selecciona los días en que tu negocio abre sus puertas</span>
+                    </div>
+                    @php
+                        $selectedDays = $company->operating_days ?? ['monday','tuesday','wednesday','thursday','friday','saturday'];
+                    @endphp
+                    <div class="d-flex flex-wrap gap-2 pt-1">
+                        @foreach([
+                            'monday'    => 'Lunes',
+                            'tuesday'   => 'Martes',
+                            'wednesday' => 'Miércoles',
+                            'thursday'  => 'Jueves',
+                            'friday'    => 'Viernes',
+                            'saturday'  => 'Sábado',
+                            'sunday'    => 'Domingo'
+                        ] as $dayKey => $dayLabel)
+                            <div class="day-pill-check">
+                                <input class="btn-check" type="checkbox" name="operating_days[]" id="day_{{ $dayKey }}" value="{{ $dayKey }}" {{ in_array($dayKey, $selectedDays) ? 'checked' : '' }}>
+                                <label for="day_{{ $dayKey }}">
+                                    <i class="bi bi-check-circle-fill d-none day-check-icon"></i>
+                                    {{ $dayLabel }}
+                                </label>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+
+                {{-- 2. Tarjetas de Horario (Entre Semana y Fines de Semana) en 2 Columnas Simétricas --}}
                 <div class="row g-3 mb-4">
+                    {{-- Tarjeta 1: Horario Entre Semana --}}
                     <div class="col-md-6">
-                        <label class="form-label text-sm fw-semibold text-dark">Hora de Apertura</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-door-open text-success"></i></span>
-                            <input type="time" name="opening_time" class="form-control border-start-0"
-                                   value="{{ old('opening_time', $company->opening_time ? substr($company->opening_time, 0, 5) : '08:00') }}">
-                        </div>
-                        <small class="text-muted">Hora habitual en la que abre tu local o atención</small>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label text-sm fw-semibold text-dark">Hora de Cierre</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-door-closed text-danger"></i></span>
-                            <input type="time" name="closing_time" class="form-control border-start-0"
-                                   value="{{ old('closing_time', $company->closing_time ? substr($company->closing_time, 0, 5) : '19:00') }}">
-                        </div>
-                        <small class="text-muted">Hora habitual en la que finaliza la atención</small>
-                    </div>
-                    <div class="col-12 mt-2">
-                        <label class="form-label text-sm fw-semibold text-dark d-block">Días de Atención</label>
-                        @php
-                            $selectedDays = $company->operating_days ?? ['monday','tuesday','wednesday','thursday','friday','saturday'];
-                        @endphp
-                        <div class="d-flex flex-wrap gap-2">
-                            @foreach([
-                                'monday' => 'Lunes',
-                                'tuesday' => 'Martes',
-                                'wednesday' => 'Miércoles',
-                                'thursday' => 'Jueves',
-                                'friday' => 'Viernes',
-                                'saturday' => 'Sábado',
-                                'sunday' => 'Domingo'
-                            ] as $dayKey => $dayLabel)
-                                <div class="form-check form-check-inline bg-light px-3 py-2 rounded-pill border mb-0">
-                                    <input class="form-check-input" type="checkbox" name="operating_days[]" id="day_{{ $dayKey }}" value="{{ $dayKey }}" {{ in_array($dayKey, $selectedDays) ? 'checked' : '' }}>
-                                    <label class="form-check-label small fw-semibold cursor-pointer" for="day_{{ $dayKey }}">{{ $dayLabel }}</label>
+                        <div class="schedule-card-box h-100 d-flex flex-column justify-content-between">
+                            <div>
+                                <div class="d-flex align-items-center justify-content-between pb-2 mb-3 border-bottom">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="schedule-card-icon schedule-icon-weekday">
+                                            <i class="bi bi-briefcase-fill"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0 fw-bold text-dark text-sm">Lunes a Viernes</h6>
+                                            <small class="text-muted text-xs">Jornada habitual entre semana</small>
+                                        </div>
+                                    </div>
+                                    <span class="badge badge-schedule-standard rounded-pill px-2.5 py-1">ESTÁNDAR</span>
                                 </div>
-                            @endforeach
+
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <label class="schedule-time-label">Apertura</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light border-end-0 text-success"><i class="bi bi-door-open"></i></span>
+                                            <input type="time" name="opening_time" class="form-control border-start-0 text-sm fw-semibold text-dark"
+                                                   value="{{ old('opening_time', $company->opening_time ? substr($company->opening_time, 0, 5) : '08:00') }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="schedule-time-label">Cierre</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light border-end-0 text-danger"><i class="bi bi-door-closed"></i></span>
+                                            <input type="time" name="closing_time" class="form-control border-start-0 text-sm fw-semibold text-dark"
+                                                   value="{{ old('closing_time', $company->closing_time ? substr($company->closing_time, 0, 5) : '19:00') }}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-3 pt-2 text-xs text-muted border-top d-flex align-items-center gap-1.5">
+                                <i class="bi bi-clock-history text-primary"></i>
+                                <span>Horario base de lunes a viernes</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Tarjeta 2: Horario Fines de Semana --}}
+                    <div class="col-md-6">
+                        <div class="schedule-card-box h-100 d-flex flex-column justify-content-between" id="weekendScheduleCard">
+                            <div>
+                                <div class="d-flex align-items-center justify-content-between pb-2 mb-3 border-bottom">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="schedule-card-icon schedule-icon-weekend">
+                                            <i class="bi bi-sun-fill"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0 fw-bold text-dark text-sm">Fines de Semana</h6>
+                                            <small class="text-muted text-xs">Sábados y Domingos</small>
+                                        </div>
+                                    </div>
+                                    <div class="form-check form-switch mb-0" title="Activar horario especial">
+                                        <input class="form-check-input cursor-pointer" type="checkbox" name="has_weekend_schedule" id="has_weekend_schedule" value="1"
+                                               {{ old('has_weekend_schedule', $company->has_weekend_schedule) ? 'checked' : '' }}
+                                               onchange="toggleWeekendSchedule(this.checked)">
+                                    </div>
+                                </div>
+
+                                {{-- Campos para Horario de Fines de Semana --}}
+                                <div id="weekendScheduleFields" class="{{ old('has_weekend_schedule', $company->has_weekend_schedule) ? '' : 'd-none' }}">
+                                    <div class="row g-2">
+                                        <div class="col-6">
+                                            <label class="schedule-time-label">Apertura</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-light border-end-0 text-success"><i class="bi bi-door-open"></i></span>
+                                                <input type="time" name="weekend_opening_time" id="weekend_opening_time" class="form-control border-start-0 text-sm fw-semibold text-dark"
+                                                       value="{{ old('weekend_opening_time', $company->weekend_opening_time ? substr($company->weekend_opening_time, 0, 5) : '09:00') }}">
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="schedule-time-label">Cierre</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-light border-end-0 text-danger"><i class="bi bi-door-closed"></i></span>
+                                                <input type="time" name="weekend_closing_time" id="weekend_closing_time" class="form-control border-start-0 text-sm fw-semibold text-dark"
+                                                       value="{{ old('weekend_closing_time', $company->weekend_closing_time ? substr($company->weekend_closing_time, 0, 5) : '15:00') }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- Mensaje de Ayuda cuando está inactivo --}}
+                                <div id="weekendScheduleNotice" class="py-2 text-center {{ old('has_weekend_schedule', $company->has_weekend_schedule) ? 'd-none' : '' }}">
+                                    <p class="text-xs text-muted mb-0 fst-italic">
+                                        <i class="bi bi-arrow-repeat me-1 text-secondary"></i> Mismo horario de entre semana. Activa el interruptor para personalizar sábados y domingos.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="mt-3 pt-2 text-xs text-muted border-top d-flex align-items-center justify-content-between">
+                                <span id="weekendStatusBadge" class="d-flex align-items-center gap-1">
+                                    @if(old('has_weekend_schedule', $company->has_weekend_schedule))
+                                        <span class="badge badge-schedule-active rounded-pill px-2.5 py-1">Horario especial activo</span>
+                                    @else
+                                        <span class="badge badge-schedule-inactive rounded-pill px-2.5 py-1">Mismo horario estándar</span>
+                                    @endif
+                                </span>
+                                <small class="text-muted">Personalizable</small>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <h6 class="fw-bold text-dark border-bottom pb-2 mb-4">
-                    <i class="bi bi-geo-alt-fill me-2 text-danger"></i>Ubicación en el Mapa
+                <h6 class="fw-bold text-dark border-bottom pb-2 mb-3 d-flex align-items-center justify-content-between">
+                    <span><i class="bi bi-geo-alt-fill me-2 text-danger"></i>Ubicación Física del Establecimiento</span>
+                    <span class="badge bg-light text-primary border rounded-pill px-3 py-1 text-xs fw-semibold">
+                        <i class="bi bi-pin-map-fill me-1"></i> Precisión Geográfica
+                    </span>
                 </h6>
-                <div id="map" class="rounded-4 border mb-3 shadow-sm"></div>
+
+                {{-- Selector de Departamento y Municipio/Ciudad --}}
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label text-xs fw-bold text-dark mb-1 d-flex align-items-center gap-1">
+                            <i class="bi bi-map-fill text-primary"></i> Departamento / Estado <span class="text-danger">*</span>
+                        </label>
+                        <select name="state" id="company_state_select" class="form-select form-select-sm fw-semibold">
+                            {{-- Poblado dinámicamente con colombia-geo.js --}}
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-xs fw-bold text-dark mb-1 d-flex align-items-center gap-1">
+                            <i class="bi bi-buildings-fill text-primary"></i> Ciudad / Municipio <span class="text-danger">*</span>
+                        </label>
+                        <select name="city" id="company_city_select" class="form-select form-select-sm fw-semibold">
+                            {{-- Poblado dinámicamente según departamento --}}
+                        </select>
+                    </div>
+                </div>
+
+                {{-- Buscador de Dirección Acotado --}}
+                <div class="mb-3 p-3 rounded-4 bg-light border">
+                    <label class="form-label text-xs fw-bold text-dark mb-1.5 d-flex align-items-center justify-content-between">
+                        <span><i class="bi bi-signpost-split-fill text-primary me-1"></i> Dirección o Calle en esta Ciudad</span>
+                        <span class="text-2xs text-muted fw-normal">Ej. Carrera 7 # 8-20, Calle 10 con 5</span>
+                    </label>
+                    <div class="input-group mb-2">
+                        <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-geo-alt"></i></span>
+                        <input type="text" name="address" id="company_address_search" class="form-control form-control-sm border-start-0"
+                               value="{{ old('address', $company->address) }}" placeholder="Escribe la dirección física aquí..." autocomplete="off">
+                        <button type="button" class="btn btn-sm btn-primary px-3 fw-semibold shadow-2xs" id="btn_search_address_map">
+                            <i class="bi bi-search me-1"></i> Ubicar en el mapa
+                        </button>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                        <small class="text-muted text-2xs">
+                            <i class="bi bi-info-circle me-1 text-primary"></i>La búsqueda se acota exclusivamente al municipio y departamento seleccionado.
+                        </small>
+                        <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none text-primary fw-semibold text-2xs" id="btn_center_current_location">
+                            <i class="bi bi-cursor-fill me-1"></i> Centrar con mi GPS actual
+                        </button>
+                    </div>
+                </div>
+
+                {{-- Mapa Leaflet Interactivo --}}
+                <div id="map" class="rounded-4 border mb-3 shadow-sm" style="height: 330px;"></div>
+
+                {{-- Coordenadas de Alta Precisión --}}
                 <div class="row g-2 mb-2">
                     <div class="col-6">
-                        <label class="text-xs text-muted">Latitud</label>
-                        <input type="text" name="latitude" id="lat" class="form-control form-control-sm"
-                               value="{{ old('latitude', $company->latitude) }}">
+                        <label class="text-2xs text-muted fw-semibold">Latitud exacta</label>
+                        <input type="text" name="latitude" id="lat" class="form-control form-control-sm bg-light text-muted"
+                               value="{{ old('latitude', $company->latitude) }}" readonly>
                     </div>
                     <div class="col-6">
-                        <label class="text-xs text-muted">Longitud</label>
-                        <input type="text" name="longitude" id="lng" class="form-control form-control-sm"
-                               value="{{ old('longitude', $company->longitude) }}">
+                        <label class="text-2xs text-muted fw-semibold">Longitud exacta</label>
+                        <input type="text" name="longitude" id="lng" class="form-control form-control-sm bg-light text-muted"
+                               value="{{ old('longitude', $company->longitude) }}" readonly>
                     </div>
                 </div>
-                <p class="text-xs text-muted"><i class="bi bi-info-circle me-1"></i>Haz clic en el mapa para marcar la ubicación exacta de tu local o negocio.</p>
 
-                {{-- Campo de dirección: auto-completado desde el mapa --}}
-                <input type="hidden" name="address" id="address-hidden" value="{{ old('address', $company->address) }}">
-                <div class="mt-2 p-3 rounded-3" style="background:#f0fdf4; border:1px solid #bbf7d0;">
-                    <label class="text-xs fw-semibold text-success d-block mb-1">
-                        <i class="bi bi-geo-alt-fill me-1"></i>Dirección detectada desde el mapa
-                    </label>
-                    <div id="address-display" class="text-sm text-dark">
-                        @if($company->address)
-                            {{ $company->address }}
-                        @else
-                            <span class="text-muted">Mueve el pin para obtener la dirección automáticamente.</span>
-                        @endif
+                {{-- Dirección Confirmada en Mapa --}}
+                <div class="mt-2 p-3 rounded-4 border" style="background: #FFFDF9; border-color: #F1D4DC !important;">
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <label class="text-xs fw-bold text-dark mb-0 d-flex align-items-center gap-1">
+                            <i class="bi bi-patch-check-fill text-success"></i> Ubicación detectada en el mapa:
+                        </label>
+                        <span class="badge bg-light text-primary border rounded-pill px-2.5 py-0.5 text-2xs fw-semibold">
+                            Arrastra el marcador para afinar
+                        </span>
+                    </div>
+                    <div id="address-display" class="text-xs text-dark fw-medium">
+                        {{ $company->address ?: 'Haz clic o arrastra el pin en el mapa para marcar la puerta exacta de tu negocio.' }}
                     </div>
                 </div>
 
@@ -532,6 +727,7 @@
 
 @push('scripts')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="{{ asset('js/colombia-geo.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -586,77 +782,31 @@ document.addEventListener('DOMContentLoaded', function () {
         switchSection('panel-' + activeTarget);
     }
 
-    // ─── Mapa Leaflet ───────────────────────────────────────
-    let safeLat = parseFloat("{{ $company->latitude ?: 5.3086 }}");
-    let safeLng = parseFloat("{{ $company->longitude ?: -73.8149 }}");
-    if (isNaN(safeLat)) safeLat = 5.3086;
-    if (isNaN(safeLng)) safeLng = -73.8149;
-
-    document.getElementById('lat').value = safeLat.toFixed(8);
-    document.getElementById('lng').value = safeLng.toFixed(8);
-
+    // ─── Inicialización de Ubicación Precisa y Mapa Leaflet ────────
     try {
-        delete L.Icon.Default.prototype._getIconUrl;
-        L.Icon.Default.mergeOptions({
-            iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
-            iconUrl:       'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
-            shadowUrl:     'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+        const locPicker = window.initSpotlightPreciseLocation({
+            country: "{{ $company->country ?: 'CO' }}",
+            stateSelectId: 'company_state_select',
+            citySelectId: 'company_city_select',
+            addressInputId: 'company_address_search',
+            latInputId: 'lat',
+            lngInputId: 'lng',
+            searchBtnId: 'btn_search_address_map',
+            gpsBtnId: 'btn_center_current_location',
+            statusDisplayId: 'address-display',
+            mapId: 'map',
+            initialState: "{{ old('state', $company->state ?: ($company->isMexican() ? 'Puebla' : 'Cundinamarca')) }}",
+            initialCity: "{{ old('city', $company->city ?: ($company->isMexican() ? 'Puebla' : 'Ubaté')) }}",
+            initialLat: "{{ old('latitude', $company->latitude ?: ($company->isMexican() ? 19.0414 : 5.3086)) }}",
+            initialLng: "{{ old('longitude', $company->longitude ?: ($company->isMexican() ? -98.2063 : -73.8149)) }}"
         });
-
-        const map = L.map('map').setView([safeLat, safeLng], 13);
-        globalLeafletMap = map;
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors',
-            maxZoom: 19
-        }).addTo(map);
-
-        let marker = L.marker([safeLat, safeLng], { draggable: true }).addTo(map);
-        setTimeout(() => { map.invalidateSize(); }, 400);
-
-        function updateCoords(lat, lng) {
-            document.getElementById('lat').value = lat.toFixed(8);
-            document.getElementById('lng').value = lng.toFixed(8);
-            // Auto-completar la dirección desde el mapa
-            fetchAddress(lat, lng);
-        }
-
-        function fetchAddress(lat, lng) {
-            var display = document.getElementById('address-display');
-            var hidden  = document.getElementById('address-hidden');
-            if (display) display.innerHTML = '<span class="text-muted"><i class="bi bi-arrow-repeat" style="display:inline-block;animation:spin 1s linear infinite;"></i> Obteniendo dirección...</span>';
-            fetch('https://nominatim.openstreetmap.org/reverse?lat=' + lat + '&lon=' + lng + '&format=json&accept-language=es')
-                .then(function(r) { return r.json(); })
-                .then(function(data) {
-                    var a = data.address || {};
-                    var label = '';
-                    if (a.road)         label += a.road;
-                    if (a.house_number) label += ' ' + a.house_number;
-                    var city = a.city || a.town || a.municipality || a.village || '';
-                    if (city) label += (label ? ', ' : '') + city;
-                    if (!label && data.display_name) label = data.display_name.split(',').slice(0,3).join(', ');
-                    label = label || (lat.toFixed(4) + ', ' + lng.toFixed(4));
-                    if (display) display.textContent = label;
-                    if (hidden)  hidden.value = label;
-                })
-                .catch(function() {
-                    var fallback = lat.toFixed(4) + ', ' + lng.toFixed(4);
-                    if (display) display.textContent = fallback;
-                    if (hidden)  hidden.value = fallback;
-                });
-        }
-
-        map.on('click', function (e) {
-            marker.setLatLng([e.latlng.lat, e.latlng.lng]);
-            updateCoords(e.latlng.lat, e.latlng.lng);
-        });
-        marker.on('dragend', function () {
-            updateCoords(marker.getLatLng().lat, marker.getLatLng().lng);
-        });
-
+        globalLeafletMap = locPicker ? locPicker.map : null;
     } catch (err) {
-        console.error('Error Leaflet:', err);
-        document.getElementById('map').innerHTML =
-            '<div class="d-flex align-items-center justify-content-center h-100 text-muted"><p>No se pudo cargar el mapa. Verifica tu conexión a internet.</p></div>';
+        console.error('Error al inicializar mapa:', err);
+        const mapBox = document.getElementById('map');
+        if (mapBox) {
+            mapBox.innerHTML = '<div class="d-flex align-items-center justify-content-center h-100 text-muted"><p>No se pudo cargar el mapa. Verifica tu conexión a internet.</p></div>';
+        }
     }
 
     // ─── Spinner en botones al enviar ──────────────────────
@@ -669,6 +819,35 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
+
+    // ─── Control horario fines de semana ───────────────────
+    window.toggleWeekendSchedule = function (isChecked) {
+        const fields = document.getElementById('weekendScheduleFields');
+        const notice = document.getElementById('weekendScheduleNotice');
+        const badge  = document.getElementById('weekendStatusBadge');
+
+        if (fields) {
+            if (isChecked) {
+                fields.classList.remove('d-none');
+            } else {
+                fields.classList.add('d-none');
+            }
+        }
+        if (notice) {
+            if (isChecked) {
+                notice.classList.add('d-none');
+            } else {
+                notice.classList.remove('d-none');
+            }
+        }
+        if (badge) {
+            if (isChecked) {
+                badge.innerHTML = '<span class="badge badge-schedule-active rounded-pill px-2.5 py-1">Horario especial activo</span>';
+            } else {
+                badge.innerHTML = '<span class="badge badge-schedule-inactive rounded-pill px-2.5 py-1">Mismo horario estándar</span>';
+            }
+        }
+    };
 
     // ─── Preview de imágenes ───────────────────────────────
     function previewImage(input, previewId, placeholderId) {
@@ -693,30 +872,217 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    document.getElementById('logoInput').addEventListener('change', function () {
-        previewImage(this, 'logoPreview', 'logoPlaceholder');
-    });
-    document.getElementById('bannerInput').addEventListener('change', function () {
-        const file = this.files[0];
+    // ─── Optimizador de imágenes grandes para evitar límite de servidor ──
+    async function processAndOptimizeImage(file, maxDimension = 2400) {
+        if (!file || file.type.includes('svg') || file.type.includes('gif')) {
+            return file;
+        }
+        if (file.size <= 1.8 * 1024 * 1024) {
+            return file;
+        }
+
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => {
+                let width = img.width;
+                let height = img.height;
+
+                if (width > maxDimension || height > maxDimension) {
+                    if (width > height) {
+                        height = Math.round((height * maxDimension) / width);
+                        width = maxDimension;
+                    } else {
+                        width = Math.round((width * maxDimension) / height);
+                        height = maxDimension;
+                    }
+                }
+
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                const mimeType = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
+                canvas.toBlob((blob) => {
+                    if (!blob || blob.size >= file.size) {
+                        resolve(file);
+                        return;
+                    }
+                    const optimized = new File([blob], file.name.replace(/\.[^/.]+$/, "") + (mimeType === 'image/png' ? '.png' : '.jpg'), {
+                        type: mimeType,
+                        lastModified: Date.now()
+                    });
+                    resolve(optimized);
+                }, mimeType, 0.92);
+            };
+            img.onerror = () => resolve(file);
+            img.src = URL.createObjectURL(file);
+        });
+    }
+
+    document.getElementById('logoInput')?.addEventListener('change', async function () {
+        let file = this.files[0];
         if (!file) return;
 
-        const maxBytes = 2 * 1024 * 1024; // 2 MB
+        if (file.size > 1.8 * 1024 * 1024 && !file.type.includes('svg') && !file.type.includes('gif')) {
+            try {
+                const optimized = await processAndOptimizeImage(file, 1200);
+                const dt = new DataTransfer();
+                dt.items.add(optimized);
+                this.files = dt.files;
+            } catch (err) {
+                console.warn(err);
+            }
+        }
+        previewImage(this, 'logoPreview', 'logoPlaceholder');
+    });
+
+    document.getElementById('bannerInput')?.addEventListener('change', async function () {
+        let file = this.files[0];
+        if (!file) return;
+
+        // Si la imagen es pesada (> 1.8 MB), se optimiza suavemente en el navegador para garantizar que suba sin error de PHP
+        if (file.size > 1.8 * 1024 * 1024 && !file.type.includes('svg') && !file.type.includes('gif')) {
+            try {
+                const optimized = await processAndOptimizeImage(file, 2400);
+                const dt = new DataTransfer();
+                dt.items.add(optimized);
+                this.files = dt.files;
+                file = optimized;
+            } catch (err) {
+                console.warn(err);
+            }
+        }
+
+        const maxBytes = 10 * 1024 * 1024; // 10 MB
         if (file.size > maxBytes) {
-            alert('El banner supera el límite de 2 MB permitido por el servidor. Por favor selecciona una imagen de hasta 2 MB.');
+            alert('El banner supera el límite máximo de 10 MB. Por favor selecciona una imagen más liviana.');
             this.value = '';
-            document.getElementById('bannerFileInfo').classList.add('d-none');
+            document.getElementById('bannerFileInfo')?.classList.add('d-none');
             return;
         }
 
         // Mostrar tipo y tamaño
-        const typeLabel = file.type.replace('image/', '').toUpperCase();
+        const typeLabel = file.type ? file.type.replace('image/', '').toUpperCase() : file.name.split('.').pop().toUpperCase();
         const sizeMB    = (file.size / (1024 * 1024)).toFixed(2);
-        document.getElementById('bannerFileType').textContent = typeLabel;
-        document.getElementById('bannerFileSize').textContent = sizeMB + ' MB';
-        document.getElementById('bannerFileInfo').classList.remove('d-none');
+        const typeEl = document.getElementById('bannerFileType');
+        const sizeEl = document.getElementById('bannerFileSize');
+        const infoEl = document.getElementById('bannerFileInfo');
+        if (typeEl) typeEl.textContent = typeLabel;
+        if (sizeEl) sizeEl.textContent = sizeMB + ' MB';
+        if (infoEl) infoEl.classList.remove('d-none');
 
         // Preview
         previewImage(this, 'bannerPreview', 'bannerPlaceholder');
+    });
+
+    // ─── Creación de Categoría rápida para la Empresa ───────
+    document.getElementById('btn_save_company_tag')?.addEventListener('click', async function () {
+        const labelInput = document.getElementById('company_quick_tag_label');
+        const colorInput = document.getElementById('company_quick_tag_color');
+        const label = labelInput?.value.trim();
+        const accent = colorInput?.value || '#7F1D3F';
+
+        if (!label) {
+            alert('Por favor escribe el nombre de la categoría.');
+            labelInput?.focus();
+            return;
+        }
+
+        const btn = this;
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span>';
+
+        try {
+            const response = await fetch('{{ route('business.products.tags.quick_create') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ label, accent })
+            });
+
+            const data = await response.json();
+            if (data.success && data.tag) {
+                // 1. Agregar y seleccionar la opción en el select principal
+                const select = document.getElementById('company_category_select');
+                if (select) {
+                    let opt = Array.from(select.options).find(o => o.value === data.tag.label);
+                    if (!opt) {
+                        opt = new Option(data.tag.label, data.tag.label, true, true);
+                        select.add(opt);
+                    }
+                    select.value = data.tag.label;
+                }
+
+                // 2. Agregar la insignia visual si existe el contenedor
+                const badgesContainer = document.getElementById('companyCustomTagsBadges');
+                if (badgesContainer) {
+                    const badge = document.createElement('span');
+                    badge.className = 'badge rounded-pill px-3 py-1.5 fw-semibold text-xs d-inline-flex align-items-center gap-1.5 shadow-2xs';
+                    badge.style.backgroundColor = '#FFFFFF';
+                    badge.style.border = `1.5px solid ${data.tag.accent}`;
+                    badge.style.color = '#29252A';
+                    badge.innerHTML = `<span class="rounded-circle d-inline-block" style="width: 8px; height: 8px; background-color: ${data.tag.accent};"></span><span>${data.tag.label}</span>`;
+                    badgesContainer.prepend(badge);
+                }
+
+                // 3. Limpiar y cerrar collapse
+                labelInput.value = '';
+                const collapseElem = document.getElementById('newCompanyCategoryCollapse');
+                if (collapseElem && window.bootstrap) {
+                    const bsCollapse = bootstrap.Collapse.getInstance(collapseElem) || new bootstrap.Collapse(collapseElem, { toggle: false });
+                    bsCollapse.hide();
+                }
+            } else {
+                alert(data.message || 'No se pudo crear la categoría.');
+            }
+        } catch (e) {
+            console.error(e);
+            alert('Ocurrió un error al crear la categoría.');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+    });
+
+    // ── Previsualización interactiva de fotos del establecimiento ──
+    const estInput = document.getElementById('establishmentPhotosInput');
+    const estPreviews = document.getElementById('newEstablishmentPreviews');
+    const emptyNotice = document.getElementById('emptyEstablishmentNotice');
+
+    estInput?.addEventListener('change', function() {
+        if (!estPreviews) return;
+        estPreviews.innerHTML = '';
+        if (this.files && this.files.length > 0) {
+            if (emptyNotice) emptyNotice.style.display = 'none';
+
+            Array.from(this.files).forEach((file, index) => {
+                if (file.size > 3 * 1024 * 1024) {
+                    alert(`El archivo "${file.name}" supera el límite de 3 MB.`);
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const col = document.createElement('div');
+                    col.className = 'col-6 col-sm-4 col-md-3';
+                    col.innerHTML = `
+                        <div class="position-relative rounded-3 overflow-hidden border shadow-2xs" style="height: 110px; background: #FAF7F8;">
+                            <img src="${e.target.result}" class="w-100 h-100" style="object-fit: cover;" alt="Nuevo local">
+                            <span class="position-absolute bottom-0 start-0 end-0 p-1 text-center text-white text-2xs fw-bold" style="background: rgba(127, 29, 63, 0.85);">
+                                <i class="bi bi-clock-history me-1"></i> Por guardar
+                            </span>
+                        </div>
+                    `;
+                    estPreviews.appendChild(col);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
     });
 });
 </script>

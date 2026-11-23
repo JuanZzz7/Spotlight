@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
-use App\Models\{Company, Product};
+use App\Models\{Company, Product, Tag};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
@@ -15,25 +15,57 @@ class DashboardController extends Controller
         $category  = $request->get('category');
         $companyId = $request->get('company_id');
         $market    = $request->get('country');
+        $sort      = $request->get('sort', 'latest');
 
-        $products = Product::where('active', true)
-            ->with('company')
-            ->when($query, fn($q) => $q->where('name', 'like', "%$query%"))
-            ->when($category, fn($q) => $q->whereHas('company', fn($c) => $c->where('category', $category)))
+        $activeTag = null;
+        if ($category) {
+            $activeTag = Tag::where('name', $category)->orWhere('label', $category)->first();
+        }
+
+        $productsQuery = Product::where('active', true)
+            ->with(['company', 'tags'])
+            ->when($query, fn($q) => $q->where(function ($sub) use ($query) {
+                $sub->where('name', 'like', "%$query%")
+                    ->orWhere('description', 'like', "%$query%");
+            }))
+            ->when($category, function ($q) use ($category) {
+                $q->where(function ($sub) use ($category) {
+                    $sub->whereHas('tags', fn($t) => $t->where('name', $category)->orWhere('label', $category))
+                        ->orWhereHas('company', fn($c) => $c->where('category', $category));
+                });
+            })
             ->when($companyId, fn($q) => $q->where('company_id', $companyId))
             ->when($market && in_array($market, ['CO', 'MX']), fn($q) => $q->where(function ($sub) use ($market) {
                 $sub->where('country', $market)
                     ->orWhereHas('company', fn($c) => $c->where('country', $market));
-            }))
-            ->latest()->paginate(12)
-            ->withQueryString();
+            }));
 
-        $companies  = Company::where('status', 'active')
+        $productsQuery = match ($sort) {
+            'price_asc'  => $productsQuery->orderBy('price', 'asc'),
+            'price_desc' => $productsQuery->orderBy('price', 'desc'),
+            'name_asc'   => $productsQuery->orderBy('name', 'asc'),
+            default      => $productsQuery->latest(),
+        };
+
+        $products = $productsQuery->paginate(9)->withQueryString();
+
+        $companies = Company::where('status', 'active')
+            ->withCount(['products' => fn($q) => $q->where('active', true)])
             ->when($market && in_array($market, ['CO', 'MX']), fn($q) => $q->where('country', $market))
             ->get();
-        $categories = Company::where('status', 'active')->distinct()->pluck('category')->filter();
 
-        return view('user.dashboard', compact('products', 'companies', 'categories', 'market'));
+        // Categorías/etiquetas para la exploración del comprador
+        $allTags = Tag::whereHas('products', fn($p) => $p->where('active', true))
+            ->orWhereNull('company_id')
+            ->orderBy('label')
+            ->get();
+
+        $categories = $allTags->pluck('label')->unique()->filter();
+        if ($categories->isEmpty()) {
+            $categories = Company::where('status', 'active')->distinct()->pluck('category')->filter();
+        }
+
+        return view('user.dashboard', compact('products', 'companies', 'categories', 'allTags', 'activeTag', 'market', 'sort'));
     }
 
     public function panel(Request $request)
@@ -76,11 +108,15 @@ class DashboardController extends Controller
                     'rating'           => $rating > 0 ? $rating : null,
                     'reviews_count'    => $reviewsCount,
                     'products'         => $company->products->map(function ($product) {
+                        $formattedPrice = $product->effective_currency === 'MXN'
+                            ? $product->formatted_price_cop . ' (🇲🇽 $' . number_format($product->price, 2, ',', '.') . ' MXN)'
+                            : '$' . number_format($product->price, 0, ',', '.') . ' COP';
+
                         return [
                             'id'              => $product->id,
                             'name'            => $product->name,
                             'price'           => (float) $product->price,
-                            'formatted_price' => '$' . number_format($product->price, 0, ',', '.'),
+                            'formatted_price' => $formattedPrice,
                             'image_url'       => $product->image_url,
                             'stock'           => $product->stock,
                             'add_cart_url'    => route('user.cart.add', $product->id),

@@ -3,73 +3,7 @@
 
 @push('styles')
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-    :root {
-        --sl-burgundy: #7F1D3F;
-        --sl-dusty-rose: #D98C9A;
-        --sl-soft-rose: #F6E7EB;
-        --sl-ivory: #FFFCF7;
-        --sl-charcoal: #29252A;
-        --bancolombia-yellow: #FDDA24;
-    }
-    body {
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        background: linear-gradient(180deg, #F8F9FA 0%, #FFFFFF 100%);
-        color: var(--sl-charcoal);
-    }
-    .font-outfit {
-        font-family: 'Outfit', sans-serif;
-    }
-    .qr-card {
-        background: #ffffff;
-        border: 1px solid #ECE7E1;
-        border-radius: 24px;
-        box-shadow: 0 12px 35px rgba(41, 37, 42, 0.08);
-    }
-    .qr-box {
-        background: #ffffff;
-        padding: 20px;
-        border-radius: 20px;
-        border: 2px dashed #CBD5E1;
-        display: inline-block;
-        position: relative;
-    }
-    .badge-timer {
-        background-color: #FEF3C7;
-        color: #92400E;
-        border: 1px solid #FDE68A;
-        border-radius: 50rem;
-        padding: 6px 16px;
-        font-weight: 700;
-        font-size: 0.85rem;
-    }
-    .pulse-dot {
-        width: 10px;
-        height: 10px;
-        background-color: #10B981;
-        border-radius: 50%;
-        display: inline-block;
-        animation: pulse 1.5s infinite;
-    }
-    @keyframes pulse {
-        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-        70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
-        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-    }
-    .btn-confirm-qr {
-        background: linear-gradient(135deg, var(--sl-burgundy) 0%, #A52A4A 100%);
-        color: white;
-        font-weight: 700;
-        border: none;
-        transition: all 0.2s ease;
-    }
-    .btn-confirm-qr:hover {
-        background: linear-gradient(135deg, #671532 0%, var(--sl-burgundy) 100%);
-        color: white;
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(127, 29, 63, 0.35);
-    }
-</style>
+<link href="{{ asset('css/checkout.css') }}" rel="stylesheet">
 @endpush
 
 @section('content')

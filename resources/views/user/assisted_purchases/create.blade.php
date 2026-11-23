@@ -52,6 +52,11 @@
                         <h5 class="fw-bold text-dark mb-1">{{ $product->name }}</h5>
                         <div class="text-muted small">
                             Precio de lista: <strong class="text-dark fs-6">{{ $product->formatted_price }}</strong>
+                            @if($product->effective_currency === 'MXN')
+                                <span class="badge bg-light text-dark border ms-1" style="font-size: 0.72rem;">
+                                    🇨🇴 Equivalente: ≈ {{ $product->formatted_price_cop }}
+                                </span>
+                            @endif
                             • Disponibles: {{ $product->stock }} unidades
                         </div>
                     </div>

@@ -1,0 +1,201 @@
+/* ==========================================================================
+   CHECKOUT.CSS - Pasarela de Pago, PSE, QR y Resultado de Transacción
+   ========================================================================== */
+
+:root {
+    --sl-burgundy: #7F1D3F;
+    --sl-dusty-rose: #D98C9A;
+    --sl-soft-rose: #F6E7EB;
+    --sl-ivory: #FFFCF7;
+    --sl-charcoal: #29252A;
+    --pse-blue: #0A3A60;
+    --bancolombia-yellow: #FDDA24;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background-color: #F8F9FA;
+    color: var(--sl-charcoal);
+}
+
+.font-outfit {
+    font-family: 'Outfit', sans-serif;
+}
+
+/* 1. Checkout Principal (user/cart/checkout.blade.php) */
+.checkout-card {
+    background-color: var(--sl-ivory);
+    border: 1px solid #ECE7E1;
+    border-radius: 20px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.step-badge {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, var(--sl-burgundy), var(--sl-dusty-rose));
+    color: #ffffff;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--sl-dusty-rose) !important;
+    box-shadow: 0 0 0 0.25rem rgba(217, 140, 154, 0.25) !important;
+}
+
+.payment-method-pill {
+    border: 2px solid #E2E8F0;
+    border-radius: 16px;
+    padding: 14px 16px;
+    transition: all 0.25s ease;
+    background: #ffffff;
+    cursor: pointer;
+    user-select: none;
+}
+.payment-method-pill:hover {
+    border-color: var(--sl-dusty-rose);
+    transform: translateY(-2px);
+}
+.payment-method-pill.active {
+    border-color: var(--sl-burgundy) !important;
+    background: var(--sl-soft-rose) !important;
+    box-shadow: 0 4px 14px rgba(127, 29, 63, 0.15);
+}
+.credit-card-visual {
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.22);
+}
+
+.btn-wompi-pay {
+    background: linear-gradient(135deg, #7F1D3F 0%, #A32852 100%);
+    color: #ffffff;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 50rem;
+    padding: 14px 24px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 14px rgba(127, 29, 63, 0.35);
+}
+.btn-wompi-pay:hover:not(:disabled) {
+    background: linear-gradient(135deg, #641530 0%, #851e41 100%);
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(127, 29, 63, 0.45);
+}
+
+.vendor-badge {
+    background: var(--sl-soft-rose);
+    color: var(--sl-burgundy);
+    font-weight: 700;
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    border-radius: 20px;
+}
+
+/* 2. Autorización PSE (checkout/pse_authorize.blade.php) */
+.pse-header-card {
+    background: linear-gradient(135deg, #0A3A60 0%, #155E95 100%);
+    color: #ffffff;
+    border-radius: 20px 20px 0 0;
+}
+.pse-body-card {
+    background: #ffffff;
+    border: 1px solid #E2E8F0;
+    border-top: none;
+    border-radius: 0 0 20px 20px;
+}
+.btn-approve {
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    color: white;
+    font-weight: 700;
+    border: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.btn-approve:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.35);
+    color: white;
+}
+.btn-cancel {
+    background: #F1F5F9;
+    color: #64748B;
+    font-weight: 600;
+    border: 1px solid #CBD5E1;
+    transition: all 0.2s ease;
+}
+.btn-cancel:hover {
+    background: #E2E8F0;
+    color: #334155;
+}
+.bank-badge {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 12px;
+    padding: 6px 16px;
+}
+
+/* 3. Pago con QR (checkout/qr_payment.blade.php) */
+.qr-card {
+    background: #ffffff;
+    border: 1px solid #ECE7E1;
+    border-radius: 24px;
+    box-shadow: 0 12px 35px rgba(41, 37, 42, 0.08);
+}
+.qr-box {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 20px;
+    border: 2px dashed #CBD5E1;
+    display: inline-block;
+    position: relative;
+}
+.badge-timer {
+    background-color: #FEF3C7;
+    color: #92400E;
+    border: 1px solid #FDE68A;
+    border-radius: 50rem;
+    padding: 6px 16px;
+    font-weight: 700;
+    font-size: 0.85rem;
+}
+.pulse-dot {
+    width: 10px;
+    height: 10px;
+    background-color: #10B981;
+    border-radius: 50%;
+    display: inline-block;
+    animation: pulse 1.5s infinite;
+}
+@keyframes pulse {
+    0%   { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+    70%  { transform: scale(1);    box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+.btn-confirm-qr {
+    background: linear-gradient(135deg, var(--sl-burgundy) 0%, #A52A4A 100%);
+    color: white;
+    font-weight: 700;
+    border: none;
+    transition: all 0.2s ease;
+}
+.btn-confirm-qr:hover {
+    background: linear-gradient(135deg, #671532 0%, var(--sl-burgundy) 100%);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(127, 29, 63, 0.35);
+}
+
+/* 4. Resultado de Transacción (checkout/result.blade.php) */
+.result-card {
+    background-color: var(--sl-ivory);
+    border: 1px solid #ECE7E1;
+    border-radius: 20px;
+}
+

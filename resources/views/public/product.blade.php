@@ -2,128 +2,37 @@
 @section('title', $product->name . ' - Spotlight')
 
 @push('styles')
+<link href="{{ asset('css/public.css') }}" rel="stylesheet">
 <style>
-    .star-rating-select {
-        display: inline-flex;
-        flex-direction: row-reverse;
-        justify-content: flex-end;
-        gap: 6px;
-    }
-    .star-rating-select input {
-        display: none;
-    }
-    .star-rating-select label {
-        font-size: 2rem;
-        color: #d1d5db;
+    .gallery-thumb-btn {
+        width: 64px;
+        height: 64px;
+        border: 2px solid #eae5e7 !important;
+        border-radius: 12px;
+        padding: 2px;
+        background: #fff;
         cursor: pointer;
-        transition: color 0.15s ease, transform 0.15s ease;
+        transition: all 0.2s ease-in-out;
+        flex-shrink: 0;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.06);
     }
-    .star-rating-select label:hover,
-    .star-rating-select label:hover ~ label,
-    .star-rating-select input:checked ~ label {
-        color: #f59e0b;
-        transform: scale(1.1);
+    .gallery-thumb-btn:hover {
+        transform: translateY(-2px);
+        border-color: #D98C9A !important;
     }
-    .product-hero-card {
-        border-radius: 24px;
-        background: #ffffff;
-        border: 1px solid var(--sl-border);
-        box-shadow: var(--sl-shadow-sm);
+    .gallery-thumb-btn.active {
+        border-color: #7F1D3F !important;
+        box-shadow: 0 0 0 3px rgba(127, 29, 63, 0.15) !important;
     }
-    .product-img-stage {
-        background: linear-gradient(135deg, #FFFCF7 0%, #F6E7EB 100%);
-        border-radius: 20px;
-        min-height: 380px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-        overflow: hidden;
-        border: 1px solid rgba(238, 221, 220, 0.4);
-    }
-    .product-img-stage img {
-        max-height: 340px;
+    .gallery-thumb-btn img {
         width: 100%;
-        object-fit: contain;
-        transition: transform 0.3s ease;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 8px;
     }
-    .product-img-stage:hover img {
-        transform: scale(1.05);
+    #mainProductImg {
+        transition: opacity 0.2s ease-in-out;
     }
-    .review-bubble {
-        border-radius: 18px;
-        background: #ffffff;
-        border: 1px solid var(--sl-border);
-        box-shadow: var(--sl-shadow-xs);
-        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-    }
-    .review-bubble:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--sl-shadow-hover);
-        border-color: var(--sl-accent);
-    }
-    .star-filled {
-        color: #f59e0b;
-    }
-    .star-empty {
-        color: #e2e8f0;
-    }
-    .nav-pill-custom {
-        background: #ffffff;
-        border: 1px solid var(--sl-border);
-        color: var(--sl-text-body);
-        border-radius: 50px;
-        padding: 6px 16px;
-        font-weight: 600;
-        font-size: 0.85rem;
-        text-decoration: none;
-        transition: all 0.2s ease;
-    }
-    .nav-pill-custom:hover {
-        background: var(--sl-primary-soft);
-        color: var(--sl-primary);
-        border-color: var(--sl-accent);
-    }
-    /* Estilos de botones para devolverse a seguir viendo productos */
-    .btn-return-products {
-        background-color: #ffffff;
-        color: #7F1D3F;
-        border: 1.5px solid #D98C9A;
-        font-size: 0.88rem;
-        transition: all 0.22s ease;
-        text-decoration: none;
-    }
-    .btn-return-products:hover {
-        background: #7F1D3F;
-        color: #ffffff;
-        border-color: #7F1D3F;
-        transform: translateX(-4px);
-        box-shadow: 0 4px 14px rgba(127, 29, 63, 0.25);
-    }
-    .btn-return-products i {
-        transition: transform 0.2s ease;
-    }
-    .btn-return-products:hover i {
-        transform: translateX(-3px);
-    }
-    .btn-return-secondary {
-        background: #FFFCF7;
-        color: #7F1D3F;
-        border: 1.5px solid #D98C9A;
-        font-size: 0.88rem;
-        transition: all 0.2s ease;
-        text-decoration: none;
-    }
-    .btn-return-secondary:hover {
-        background: #F6E7EB;
-        color: #5E122C;
-        border-color: #7F1D3F;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(127, 29, 63, 0.12);
-    }
-    /* Translation Logic */
-    html[lang="es"] .lang-en { display: none !important; }
-    html[lang="en"] .lang-es { display: none !important; }
 </style>
 @endpush
 
@@ -301,6 +210,20 @@
                         </div>
                     </div>
 
+                    {{-- Galería de Miniaturas Interactivas --}}
+                    @if(count($product->all_images) > 1)
+                        <div class="product-gallery-strip mt-3 d-flex align-items-center gap-2 overflow-x-auto pb-1" id="productGalleryStrip">
+                            @foreach($product->all_images as $idx => $imgUrl)
+                                <button type="button" 
+                                        class="gallery-thumb-btn {{ $loop->first ? 'active' : '' }}" 
+                                        data-img-src="{{ $imgUrl }}"
+                                        aria-label="Ver imagen {{ $idx + 1 }}">
+                                    <img src="{{ $imgUrl }}" alt="Miniatura {{ $idx + 1 }}">
+                                </button>
+                            @endforeach
+                        </div>
+                    @endif
+
                     <!-- Company Card Mini -->
                     @if($product->company)
                     <div class="mt-4 p-3 rounded-4 bg-light d-flex align-items-center justify-content-between border">
@@ -366,13 +289,48 @@
                             <span class="text-muted fw-semibold" style="font-size: 0.8rem;">
                                 <span class="lang-en">Unit Price</span><span class="lang-es">Precio oficial</span>:
                             </span>
-                            <div class="d-flex align-items-baseline gap-2">
-                                <span class="fw-black display-5" style="color: var(--sl-primary, #7F1D3F); font-family: 'Outfit', sans-serif;">
-                                    ${{ number_format($product->price, ($product->currency === 'MXN' ? 2 : 0), ',', '.') }}
-                                </span>
-                                <span class="fw-bold text-muted fs-6">{{ $product->currency ?? 'COP' }}</span>
-                            </div>
-                            <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1 mt-1" style="font-size: 0.75rem;">
+                            @if($product->effective_currency === 'MXN')
+                                <div class="d-flex flex-wrap align-items-baseline gap-2" id="heroPriceBlock"
+                                     data-cop="${{ number_format($product->price_in_cop, 0, ',', '.') }}"
+                                     data-mxn="${{ number_format($product->price, 2, ',', '.') }}"
+                                     data-mode="COP">
+                                    <span class="fw-black display-5" id="heroMainPriceVal" style="color: var(--sl-primary, #7F1D3F); font-family: 'Outfit', sans-serif;">
+                                        ${{ number_format($product->price_in_cop, 0, ',', '.') }}
+                                    </span>
+                                    <span class="fw-bold text-muted fs-5" id="heroMainPriceCur">COP</span>
+                                    <span class="badge rounded-pill bg-light text-dark border px-2.5 py-1 ms-1" style="font-size: 0.72rem;">
+                                        🇨🇴 Conversión automática para Colombia
+                                    </span>
+                                </div>
+
+                                <div class="mt-2 p-2.5 px-3 rounded-4 border d-flex flex-wrap align-items-center justify-content-between gap-2"
+                                     style="background: #FAF5F6; border-color: rgba(127, 29, 63, 0.18) !important;">
+                                    <div class="d-flex align-items-center gap-2 text-xs">
+                                        <span class="fw-bold text-dark">
+                                            🇲🇽 Precio de origen: <span style="color: #7F1D3F;">${{ number_format($product->price, 2, ',', '.') }} MXN</span>
+                                        </span>
+                                        <span class="text-muted">•</span>
+                                        <span class="text-muted">
+                                            🇨🇴 Equivalente: <strong>≈ ${{ number_format($product->price_in_cop, 0, ',', '.') }} COP</strong>
+                                            <small class="text-muted">(1 MXN ≈ ${{ number_format(\App\Models\Product::mxnToCopRate(), 0, ',', '.') }} COP)</small>
+                                        </span>
+                                    </div>
+                                    <button type="button"
+                                            class="btn btn-sm rounded-pill px-3 py-1 fw-bold shadow-2xs"
+                                            style="background: #7F1D3F; color: #fff; font-size: 0.72rem;"
+                                            onclick="const blk = document.getElementById('heroPriceBlock'); const isCop = blk.dataset.mode === 'COP'; blk.dataset.mode = isCop ? 'MXN' : 'COP'; document.getElementById('heroMainPriceVal').textContent = isCop ? blk.dataset.mxn : blk.dataset.cop; document.getElementById('heroMainPriceCur').textContent = isCop ? 'MXN' : 'COP'; this.innerHTML = isCop ? '<i class=\'bi bi-arrow-left-right me-1\'></i>Ver en Pesos Colombianos (COP)' : '<i class=\'bi bi-arrow-left-right me-1\'></i>Ver en Pesos Mexicanos (MXN)';">
+                                        <i class="bi bi-arrow-left-right me-1"></i>Ver en Pesos Mexicanos (MXN)
+                                    </button>
+                                </div>
+                            @else
+                                <div class="d-flex align-items-baseline gap-2">
+                                    <span class="fw-black display-5" style="color: var(--sl-primary, #7F1D3F); font-family: 'Outfit', sans-serif;">
+                                        ${{ number_format($product->price, (floor($product->price) != $product->price ? 2 : 0), ',', '.') }}
+                                    </span>
+                                    <span class="fw-bold text-muted fs-6">COP</span>
+                                </div>
+                            @endif
+                            <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1 mt-2" style="font-size: 0.75rem;">
                                 <i class="bi bi-shield-check me-1"></i> <span class="lang-en">Guaranteed direct price without hidden markups</span><span class="lang-es">Precio directo de creador sin comisiones ocultas</span>
                             </span>
                         </div>
@@ -744,8 +702,19 @@
                                             <span class="fw-bold text-xs">{{ $rel->average_rating > 0 ? number_format($rel->average_rating, 1) : '5.0' }}</span>
                                             <span class="text-muted text-xs">({{ $rel->reviews_count }})</span>
                                         </div>
-                                        <div class="fw-bold fs-6 mt-auto" style="color: var(--sl-primary, #7F1D3F);">
-                                            ${{ number_format($rel->price, 0, ',', '.') }} <span class="text-muted text-xs">COP</span>
+                                        <div class="mt-auto">
+                                            @if($rel->effective_currency === 'MXN')
+                                                <div class="fw-bold fs-6 lh-1" style="color: var(--sl-primary, #7F1D3F);">
+                                                    ${{ number_format($rel->price_in_cop, 0, ',', '.') }} <span class="text-muted text-xs">COP</span>
+                                                </div>
+                                                <small class="text-muted d-block mt-0.5" style="font-size: 0.68rem;">
+                                                    🇲🇽 ${{ number_format($rel->price, 2, ',', '.') }} MXN
+                                                </small>
+                                            @else
+                                                <div class="fw-bold fs-6" style="color: var(--sl-primary, #7F1D3F);">
+                                                    ${{ number_format($rel->price, 0, ',', '.') }} <span class="text-muted text-xs">COP</span>
+                                                </div>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
@@ -794,6 +763,26 @@ document.addEventListener('DOMContentLoaded', () => {
             if (ratingLabel && labelsMap[e.target.value]) {
                 ratingLabel.textContent = labelsMap[e.target.value];
             }
+        });
+    });
+
+    // Intercambio dinámico de imagen principal desde miniaturas de galería
+    const galleryBtns = document.querySelectorAll('.gallery-thumb-btn');
+    const mainImg = document.getElementById('mainProductImg');
+
+    galleryBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const targetSrc = this.getAttribute('data-img-src');
+            if (!targetSrc || !mainImg || mainImg.src === targetSrc) return;
+
+            galleryBtns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+
+            mainImg.style.opacity = '0.3';
+            setTimeout(() => {
+                mainImg.src = targetSrc;
+                mainImg.style.opacity = '1';
+            }, 150);
         });
     });
 });

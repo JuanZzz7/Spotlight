@@ -1,21 +1,26 @@
 {{-- Componente Reutilizable: Centro de Tutoriales y Guía de Formalización --}}
+@once
+@push('styles')
+<link href="{{ asset('css/business.css') }}" rel="stylesheet">
+@endpush
+@endonce
 <div class="formalization-tutorials-wrapper">
     {{-- AVISO LEGAL DE NO INTERMEDIACIÓN --}}
-    <div class="alert alert-warning border-0 rounded-4 p-4 mb-4 shadow-sm" style="background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border-left: 5px solid #d97706 !important;">
+    <div class="alert alert-warning border-0 rounded-4 p-4 mb-4 shadow-sm formalization-legal-alert">
         <div class="d-flex align-items-start gap-3">
-            <div class="rounded-circle p-2 d-flex align-items-center justify-content-center flex-shrink-0" style="background: rgba(217, 119, 6, 0.15); width: 44px; height: 44px;">
-                <i class="bi bi-shield-exclamation text-warning fs-4" style="color: #b45309 !important;"></i>
+            <div class="rounded-circle p-2 d-flex align-items-center justify-content-center flex-shrink-0 formalization-legal-icon">
+                <i class="bi bi-shield-exclamation fs-4"></i>
             </div>
             <div>
-                <h6 class="fw-bold mb-1" style="color: #92400e;">
+                <h6 class="fw-bold mb-1 text-warning-emphasis">
                     <i class="bi bi-info-circle me-1"></i> Aviso Importante: Spotlight NO realiza trámites de formalización
                 </h6>
-                <p class="small mb-2 text-dark" style="line-height: 1.55;">
+                <p class="small mb-2 text-dark lh-base">
                     Nuestra plataforma es un canal tecnológico y marketplace para impulsar tus ventas. 
                     <strong>Nosotros NO gestionamos, NO cobramos, NO intermediamos ni radicamos ningún trámite mercantil, legal ni tributario</strong> 
                     ante la Cámara de Comercio ni ante la DIAN.
                 </p>
-                <div class="small fw-semibold" style="color: #b45309;">
+                <div class="small fw-semibold text-warning-emphasis">
                     <i class="bi bi-check-circle-fill me-1"></i>
                     Este apartado es una <strong>guía pedagógica con tutoriales paso a paso y enlaces a portales oficiales</strong> para que tú o tu contador de confianza realicen el proceso de forma directa, autónoma y segura.
                 </div>
@@ -28,10 +33,10 @@
         <div class="col-md-4">
             <div class="p-3 bg-white rounded-4 border shadow-xs h-100">
                 <div class="d-flex align-items-center gap-2 mb-2">
-                    <span class="badge rounded-circle p-2" style="background: #F6E7EB; color: #7F1D3F;"><i class="bi bi-receipt fs-6"></i></span>
+                    <span class="badge rounded-circle p-2 bg-sl-primary-soft text-sl-primary"><i class="bi bi-receipt fs-6"></i></span>
                     <strong class="small text-dark">Facturación Electrónica DIAN</strong>
                 </div>
-                <p class="text-muted small mb-0" style="font-size: 0.78rem;">Podrás emitir facturas legales validadas ante la DIAN para venderle a empresas y entidades estatales.</p>
+                <p class="text-muted small mb-0">Podrás emitir facturas legales validadas ante la DIAN para venderle a empresas y entidades estatales.</p>
             </div>
         </div>
         <div class="col-md-4">
@@ -40,7 +45,7 @@
                     <span class="badge rounded-circle p-2 bg-success bg-opacity-10 text-success"><i class="bi bi-patch-check fs-6"></i></span>
                     <strong class="small text-dark">Sello de Empresa Verificada</strong>
                 </div>
-                <p class="text-muted small mb-0" style="font-size: 0.78rem;">Mayor confianza para tus compradores en Spotlight con insignia oficial de comercio formal.</p>
+                <p class="text-muted small mb-0">Mayor confianza para tus compradores en Spotlight con insignia oficial de comercio formal.</p>
             </div>
         </div>
         <div class="col-md-4">
@@ -49,7 +54,7 @@
                     <span class="badge rounded-circle p-2 bg-primary bg-opacity-10 text-primary"><i class="bi bi-bank fs-6"></i></span>
                     <strong class="small text-dark">Acceso Bancario y Créditos</strong>
                 </div>
-                <p class="text-muted small mb-0" style="font-size: 0.78rem;">Acceso a cuentas bancarias comerciales a nombre del negocio y líneas de crédito empresarial.</p>
+                <p class="text-muted small mb-0">Acceso a cuentas bancarias comerciales a nombre del negocio y líneas de crédito empresarial.</p>
             </div>
         </div>
     </div>

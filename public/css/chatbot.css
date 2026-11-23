@@ -1,0 +1,547 @@
+/* ==========================================================================
+   CHATBOT.CSS - Widget Flotante del Asistente IA Spotlight
+   Paleta Oficial Spotlight: Borgoña & Rosa Empolvado
+   ========================================================================== */
+
+:root {
+    --sbot-primary: #7F1D3F;
+    --sbot-primary-dark: #5E122C;
+    --sbot-accent: #D98C9A;
+    --sbot-soft: #F6E7EB;
+    --sbot-bg: #FFFCF7;
+    --sbot-border: #e2e8f0;
+}
+
+/* ── Floating trigger (FAB) ────────────────────────────────────── */
+#sbot-fab-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    left: auto;
+    z-index: 1040;
+}
+
+#sbot-btn {
+    position: relative;
+    height: 46px;
+    padding: 5px 16px 5px 6px;
+    border-radius: 999px;
+    border: 1.5px solid rgba(255, 255, 255, 0.28);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #ffffff;
+    background: linear-gradient(135deg, #7F1D3F 0%, #5E122C 100%);
+    box-shadow: 0 8px 24px rgba(127, 29, 63, 0.3), 0 2px 8px rgba(41, 37, 42, 0.12);
+    transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.22s ease, background 0.22s ease;
+    outline: none;
+    font-family: var(--sl-font-display, 'Outfit', sans-serif);
+}
+#sbot-btn:hover {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 14px 32px rgba(127, 29, 63, 0.48), 0 4px 12px rgba(41, 37, 42, 0.18);
+}
+#sbot-btn:active {
+    transform: scale(0.97);
+}
+
+.sbot-btn-icon-wrap {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    color: #ffffff;
+    flex-shrink: 0;
+}
+
+.sbot-icon-hidden {
+    display: none;
+}
+
+.sbot-fab-label {
+    font-size: 0.88rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: #ffffff;
+    white-space: nowrap;
+}
+
+.sbot-fab-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #34D399;
+    box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.25);
+    flex-shrink: 0;
+}
+
+.sbot-lang-label {
+    font-size: 0.7rem;
+}
+
+.sbot-inline-code {
+    background: rgba(0, 0, 0, 0.06);
+    padding: 2px 4px;
+    border-radius: 4px;
+}
+
+/* ── Chat Window ───────────────────────────────────────────────── */
+#sbot-window {
+    position: fixed;
+    bottom: 84px;
+    right: 24px;
+    left: auto;
+    z-index: 1050;
+    width: 380px;
+    max-width: calc(100vw - 32px);
+    height: 520px;
+    max-height: calc(100vh - 120px);
+    background: #ffffff;
+    border: 1px solid rgba(217, 140, 154, 0.3);
+    border-radius: 20px;
+    box-shadow: 0 16px 40px rgba(127, 29, 63, 0.18), 0 4px 14px rgba(0,0,0,0.06);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transform-origin: bottom right;
+    animation: sbotIn 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+#sbot-window[hidden] {
+    display: none !important;
+}
+
+@keyframes sbotIn {
+    from { opacity: 0; transform: scale(0.88) translateY(12px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ── Header ────────────────────────────────────────────────────── */
+#sbot-header {
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #7F1D3F 0%, #5E122C 100%);
+    color: #ffffff;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+}
+.sbot-hd-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.sbot-avatar-wrap {
+    position: relative;
+}
+.sbot-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background-color: #ffffff;
+    color: #7F1D3F;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.sbot-status-dot {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background-color: #10b981;
+    border: 2px solid #7F1D3F;
+}
+.sbot-hd-name {
+    font-weight: 700;
+    font-size: 1rem;
+    color: #ffffff;
+    line-height: 1.2;
+    letter-spacing: -0.3px;
+}
+.sbot-hd-status {
+    font-size: 0.72rem;
+    color: #F6E7EB;
+}
+.sbot-hd-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* ── Messages Area ─────────────────────────────────────────────── */
+#sbot-msgs {
+    flex: 1;
+    padding: 16px;
+    overflow-y: auto;
+    background-color: #f8fafc;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    scroll-behavior: smooth;
+}
+
+.sbot-date-sep {
+    text-align: center;
+    margin: 6px 0;
+}
+.sbot-date-sep span {
+    background: #e2e8f0;
+    color: #475569;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 999px;
+}
+
+/* Message rows */
+.sbot-row {
+    display: flex;
+    flex-direction: column;
+    max-width: 82%;
+    animation: sbotMsgIn 0.2s ease-out forwards;
+}
+@keyframes sbotMsgIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.sbot-row.user {
+    align-self: flex-end;
+    align-items: flex-end;
+}
+.sbot-row.bot {
+    align-self: flex-start;
+    align-items: flex-start;
+}
+
+/* Bubbles */
+.sbot-bubble {
+    padding: 10px 14px;
+    font-size: 0.88rem;
+    line-height: 1.45;
+    word-break: break-word;
+}
+
+.sbot-bubble-user {
+    background: #7F1D3F;
+    color: #ffffff;
+    border-radius: 18px 18px 4px 18px;
+    box-shadow: 0 2px 8px rgba(127, 29, 63, 0.25);
+}
+
+.sbot-bubble-bot {
+    background: #ffffff;
+    color: #29252A;
+    border: 1px solid #e2e8f0;
+    border-radius: 18px 18px 18px 4px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+
+.sbot-ts {
+    font-size: 0.65rem;
+    color: #94a3b8;
+    margin-top: 3px;
+    padding: 0 4px;
+}
+
+/* ── Typing Animation ──────────────────────────────────────────── */
+#sbot-typing {
+    padding: 0 16px 8px;
+    background: #f8fafc;
+}
+.sbot-dot-anim {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background-color: #7F1D3F;
+    border-radius: 50%;
+    margin-right: 3px;
+    animation: sbotBounce 1.2s infinite;
+}
+.sbot-dot-anim:nth-child(2) { animation-delay: 0.2s; }
+.sbot-dot-anim:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes sbotBounce {
+    0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+    40%           { transform: translateY(-5px); opacity: 1; }
+}
+
+/* ── Bottom: Quick Replies & Input ─────────────────────────────── */
+.sbot-bottom-area {
+    flex-shrink: 0;
+    background: #ffffff;
+    border-top: 1px solid var(--sbot-border);
+}
+
+.sbot-quick-replies {
+    display: flex;
+    gap: 6px;
+    padding: 10px 14px 6px;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: none;
+}
+.sbot-quick-replies::-webkit-scrollbar { display: none; }
+
+.sbot-chip {
+    background: #F6E7EB;
+    color: #7F1D3F;
+    border: 1px solid #D98C9A;
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 0.74rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    flex-shrink: 0;
+}
+.sbot-chip:hover {
+    background: #7F1D3F;
+    color: #ffffff;
+    border-color: #7F1D3F;
+    transform: translateY(-1px);
+}
+
+#sbot-form {
+    padding: 8px 12px 12px;
+}
+.sbot-input-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f8fafc;
+    border: 1.5px solid #D98C9A;
+    border-radius: 24px;
+    padding: 4px 6px 4px 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.sbot-input-group:focus-within {
+    border-color: #7F1D3F;
+    box-shadow: 0 0 0 3px rgba(127, 29, 63, 0.12);
+    background: #ffffff;
+}
+
+.sbot-input-wrapper {
+    flex: 1;
+}
+
+#sbot-input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    font-size: 0.88rem;
+    color: #1e293b;
+    outline: none;
+    resize: none;
+    padding: 6px 0;
+    max-height: 80px;
+    line-height: 1.35;
+    font-family: inherit;
+}
+
+#sbot-send {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: #7F1D3F;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: transform 0.2s, background-color 0.2s;
+    flex-shrink: 0;
+}
+#sbot-send:hover {
+    background: #5E122C;
+    transform: scale(1.05);
+}
+#sbot-send:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+    #sbot-fab-container { bottom: 18px; right: 18px; }
+    #sbot-window { right: 12px; bottom: 84px; width: calc(100vw - 24px); height: calc(100vh - 110px); }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   DISPONIBILIDAD DE TIENDA & ESTADO DE CHAT (MENÚ DESPLEGABLE)
+   ════════════════════════════════════════════════════════════════ */
+.store-status-menu {
+    min-width: 290px !important;
+    border-radius: 18px !important;
+    padding: 8px !important;
+    border: 1px solid #f1f5f9 !important;
+    box-shadow: 0 12px 32px -4px rgba(41, 37, 42, 0.12), 0 4px 12px -2px rgba(41, 37, 42, 0.05) !important;
+    background: #ffffff !important;
+}
+
+.store-status-header {
+    padding: 8px 12px 8px 12px !important;
+    font-size: 0.7rem !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.6px !important;
+    text-transform: uppercase !important;
+    color: #64748b !important;
+}
+
+/* Botones de opción de estado */
+.dropdown-menu .status-option-btn {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 9px 12px !important;
+    margin-bottom: 4px !important;
+    border-radius: 12px !important;
+    border: 1px solid transparent !important;
+    background-color: transparent !important;
+    color: #1e293b !important;
+    text-align: left !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    cursor: pointer !important;
+    text-decoration: none !important;
+}
+
+.dropdown-menu .status-option-btn:hover {
+    background-color: #f8fafc !important;
+    border-color: #f1f5f9 !important;
+}
+
+.status-dot-indicator {
+    width: 10px !important;
+    height: 10px !important;
+    border-radius: 50% !important;
+    flex-shrink: 0 !important;
+    transition: all 0.2s ease !important;
+}
+
+.status-title {
+    font-size: 0.85rem !important;
+    font-weight: 700 !important;
+    line-height: 1.25 !important;
+    color: #1e293b !important;
+    display: block !important;
+    transition: color 0.15s ease !important;
+}
+
+.status-subtitle {
+    font-size: 0.72rem !important;
+    line-height: 1.3 !important;
+    color: #64748b !important;
+    display: block !important;
+    transition: color 0.15s ease !important;
+}
+
+.status-check-icon {
+    font-size: 1.05rem !important;
+    margin-left: auto !important;
+    opacity: 0 !important;
+    transform: scale(0.6) !important;
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+/* ─── 1. Estado En línea (Online) ─── */
+.dropdown-menu .status-option-btn[data-status="online"].active {
+    background-color: #ecfdf5 !important;
+    border-color: #a7f3d0 !important;
+}
+.dropdown-menu .status-option-btn[data-status="online"].active .status-title {
+    color: #065f46 !important;
+}
+.dropdown-menu .status-option-btn[data-status="online"].active .status-subtitle {
+    color: #047857 !important;
+}
+.dropdown-menu .status-option-btn[data-status="online"].active .status-dot-indicator {
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25) !important;
+}
+.dropdown-menu .status-option-btn[data-status="online"].active .status-check-icon {
+    opacity: 1 !important;
+    transform: scale(1) !important;
+    color: #059669 !important;
+}
+
+/* ─── 2. Estado Ausente (Away) ─── */
+.dropdown-menu .status-option-btn[data-status="away"].active {
+    background-color: #fffbeb !important;
+    border-color: #fde68a !important;
+}
+.dropdown-menu .status-option-btn[data-status="away"].active .status-title {
+    color: #92400e !important;
+}
+.dropdown-menu .status-option-btn[data-status="away"].active .status-subtitle {
+    color: #b45309 !important;
+}
+.dropdown-menu .status-option-btn[data-status="away"].active .status-dot-indicator {
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25) !important;
+}
+.dropdown-menu .status-option-btn[data-status="away"].active .status-check-icon {
+    opacity: 1 !important;
+    transform: scale(1) !important;
+    color: #d97706 !important;
+}
+
+/* ─── 3. Estado Ocupado (Busy) ─── */
+.dropdown-menu .status-option-btn[data-status="busy"].active {
+    background-color: #fff1f2 !important;
+    border-color: #fecdd3 !important;
+}
+.dropdown-menu .status-option-btn[data-status="busy"].active .status-title {
+    color: #9f1239 !important;
+}
+.dropdown-menu .status-option-btn[data-status="busy"].active .status-subtitle {
+    color: #be123c !important;
+}
+.dropdown-menu .status-option-btn[data-status="busy"].active .status-dot-indicator {
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.25) !important;
+}
+.dropdown-menu .status-option-btn[data-status="busy"].active .status-check-icon {
+    opacity: 1 !important;
+    transform: scale(1) !important;
+    color: #e11d48 !important;
+}
+
+/* ─── 4. Estado Fuera de horario (Offline) ─── */
+.dropdown-menu .status-option-btn[data-status="offline"].active {
+    background-color: #f8fafc !important;
+    border-color: #cbd5e1 !important;
+}
+.dropdown-menu .status-option-btn[data-status="offline"].active .status-title {
+    color: #334155 !important;
+}
+.dropdown-menu .status-option-btn[data-status="offline"].active .status-subtitle {
+    color: #64748b !important;
+}
+.dropdown-menu .status-option-btn[data-status="offline"].active .status-dot-indicator {
+    box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.25) !important;
+}
+.dropdown-menu .status-option-btn[data-status="offline"].active .status-check-icon {
+    opacity: 1 !important;
+    transform: scale(1) !important;
+    color: #64748b !important;
+}
+
+/* Switch de Visibilidad en Menú */
+#storeVisibilityToggle:checked {
+    background-color: #7F1D3F !important;
+    border-color: #7F1D3F !important;
+}
+

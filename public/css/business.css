@@ -1,0 +1,678 @@
+/* ==========================================================================
+   BUSINESS.CSS - Estilos del Panel Empresarial, Registro y Formalización
+   Paleta Oficial Spotlight: Borgoña (#7F1D3F), Rosa Empolvado (#D98C9A),
+   Rosa Suave (#F6E7EB), Blanco Marfil (#FFFCF7), Carbón Oscuro (#29252A)
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Formulario de Registro y Tipo de Negocio (register-form.blade.php)
+   -------------------------------------------------------------------------- */
+.animate-fade-in {
+    animation: fadeIn 0.35s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.business-type-card {
+    display: block;
+    background: #ffffff;
+    border: 2px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 0.95rem 1.15rem;
+    cursor: pointer;
+    transition: all 0.22s ease;
+}
+
+.business-type-card:hover {
+    border-color: #D98C9A;
+    background: #FFFCF7;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(127, 29, 63, 0.08);
+}
+
+.type-icon-box {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: #F6E7EB;
+    color: #7F1D3F;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    transition: all 0.22s ease;
+}
+
+.btn-check:checked + .business-type-card {
+    border-color: #7F1D3F !important;
+    background-color: #FFFCF7 !important;
+    box-shadow: 0 6px 18px rgba(127, 29, 63, 0.15) !important;
+}
+
+.btn-check:checked + .business-type-card .type-icon-box {
+    background: #7F1D3F !important;
+    color: #ffffff !important;
+}
+
+.btn-check:checked + .business-type-card .text-heading {
+    color: #7F1D3F !important;
+}
+
+.popular-type-badge {
+    font-size: 0.68rem;
+    right: 12px !important;
+    z-index: 2;
+    background: linear-gradient(135deg, #7F1D3F, #D98C9A);
+    color: #ffffff;
+}
+
+#register-map-container {
+    height: 220px;
+    background: #e2e8f0;
+}
+
+#company_reg_map {
+    width: 100%;
+    height: 100%;
+    min-height: 220px;
+    z-index: 1;
+}
+
+.formalization-inline-card {
+    background: linear-gradient(135deg, #fff9fa 0%, #ffffff 100%);
+    border-color: rgba(127, 29, 63, 0.18) !important;
+}
+
+.step-circle-xs {
+    width: 24px;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+}
+
+.mx-header-banner {
+    background: linear-gradient(135deg, rgba(127, 29, 63, 0.08), rgba(217, 140, 154, 0.15));
+    border: 1px solid rgba(127, 29, 63, 0.15);
+}
+
+.mx-fiscal-card {
+    background-color: #fafbfc;
+    border-color: #e2e8f0;
+}
+
+/* --------------------------------------------------------------------------
+   2. Ajustes de Empresa (business/company/edit.blade.php)
+   -------------------------------------------------------------------------- */
+#map {
+    z-index: 1;
+    border-radius: 1rem;
+    border: 1px solid #dee2e6;
+    height: 350px;
+    width: 100%;
+    min-height: 350px;
+}
+
+.section-save-bar {
+    background: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+    padding: 14px 24px;
+    border-radius: 0 0 1rem 1rem;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+}
+
+.settings-nav-btn {
+    transition: all 0.25s ease;
+    border-radius: 12px;
+    font-weight: 600;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    color: #475569;
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    text-align: left;
+}
+
+.settings-nav-btn:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    transform: translateY(-1px);
+    color: #0f172a;
+}
+
+.settings-nav-btn.active {
+    background: #0f172a;
+    color: #ffffff;
+    border-color: #0f172a;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+}
+
+.settings-nav-btn.active .btn-icon-box {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+}
+
+.settings-nav-btn.active .badge-status {
+    background: rgba(255, 255, 255, 0.25) !important;
+    color: #ffffff !important;
+}
+
+.settings-nav-btn.active .chevron-icon {
+    transform: rotate(90deg);
+    color: #ffffff;
+}
+
+.btn-icon-box {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    transition: all 0.25s ease;
+}
+
+.chevron-icon {
+    transition: transform 0.25s ease;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+/* --------------------------------------------------------------------------
+   3. Productos e Inventario (business/products/index.blade.php)
+   -------------------------------------------------------------------------- */
+.active-filter-pill {
+    background: var(--sl-primary, #7F1D3F) !important;
+    color: #ffffff !important;
+    border: 1px solid var(--sl-primary, #7F1D3F) !important;
+    box-shadow: 0 4px 10px rgba(127, 29, 63, 0.2) !important;
+}
+
+.inactive-filter-pill {
+    background: #f8fafc;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+}
+
+.inactive-filter-pill:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+}
+
+.view-btn {
+    border: none;
+    background: transparent;
+    transition: all 0.2s ease;
+}
+
+.active-view-btn {
+    background: var(--sl-primary, #7F1D3F) !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 6px rgba(127, 29, 63, 0.3) !important;
+}
+
+/* --------------------------------------------------------------------------
+   4. Egresos y Transacciones (business/expenses/index.blade.php)
+   -------------------------------------------------------------------------- */
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.expenses-table tbody tr:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* --------------------------------------------------------------------------
+   5. Panel Principal Empresario (business/dashboard.blade.php)
+   -------------------------------------------------------------------------- */
+.dashboard-brand-banner {
+    height: 140px;
+    position: relative;
+    background: linear-gradient(135deg, #29252A 0%, #3D1222 50%, #7F1D3F 100%);
+}
+
+.dashboard-brand-banner-img {
+    object-fit: cover;
+    opacity: 0.5;
+}
+
+.dashboard-active-store-badge {
+    background: rgba(0, 0, 0, 0.5) !important;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dashboard-status-dot {
+    width: 8px;
+    height: 8px;
+    background-color: #a3e635;
+}
+
+.dashboard-cover-btn {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dashboard-logo-wrapper {
+    bottom: -30px;
+    left: 30px;
+    z-index: 3;
+}
+
+.dashboard-logo-card {
+    width: 85px;
+    height: 85px;
+    border-radius: 18px;
+    border: 1px solid #f1f5f9;
+}
+
+.dashboard-logo-inner {
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+.dashboard-formal-banner {
+    background: #ffffff;
+    border: 1px solid #bbf7d0 !important;
+    border-left: 6px solid #10b981 !important;
+}
+
+.dashboard-formal-icon {
+    background: #dcfce7;
+    width: 56px;
+    height: 56px;
+    border: 1px solid #bbf7d0;
+    color: #15803d;
+}
+
+.dashboard-informal-banner {
+    background: #ffffff;
+    border: 1px solid #fed7aa !important;
+    border-left: 6px solid #f59e0b !important;
+}
+
+.dashboard-informal-icon {
+    background: #fef3c7;
+    width: 56px;
+    height: 56px;
+    border: 1px solid #fde68a;
+    color: #b45309;
+}
+
+.dashboard-tutorials-btn {
+    background: #f59e0b;
+    color: #000000;
+    border: none;
+    font-size: 0.9rem;
+}
+
+.dashboard-tutorials-btn:hover {
+    background: #d97706;
+    color: #000000;
+}
+
+.dashboard-quick-icon {
+    width: 42px;
+    height: 42px;
+    background: var(--sl-primary-soft, #F6E7EB);
+    color: var(--sl-primary, #7F1D3F);
+}
+
+.dashboard-security-box {
+    background-color: var(--sl-primary-soft, #F6E7EB);
+    border: 1px dashed rgba(127, 29, 63, 0.3);
+}
+
+.dashboard-sales-table {
+    border-collapse: separate;
+    border-spacing: 0 12px;
+}
+
+.dashboard-sales-row {
+    background: #ffffff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    border-radius: 12px;
+}
+
+/* --------------------------------------------------------------------------
+   6. Guía y Tutoriales de Formalización (formalization-tutorials.blade.php)
+   -------------------------------------------------------------------------- */
+.formalization-legal-alert {
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+    border-left: 5px solid #d97706 !important;
+}
+
+.formalization-legal-icon {
+    background: rgba(217, 119, 6, 0.15);
+    width: 44px;
+    height: 44px;
+    color: #b45309;
+}
+
+.formalization-video-thumb {
+    height: 120px;
+}
+
+.formalization-video-thumb img {
+    object-fit: cover;
+    opacity: 0.65;
+}
+
+.formalization-step-badge {
+    width: 32px;
+    height: 32px;
+    background: var(--sl-primary, #7F1D3F);
+    color: #ffffff;
+}
+
+/* --------------------------------------------------------------------------
+   7. Configuración de Horarios de Empresa (company/edit.blade.php)
+   -------------------------------------------------------------------------- */
+.day-pill-check {
+    display: inline-block;
+}
+
+.day-pill-check .btn-check + label {
+    border: 1.5px solid #E6DDE0;
+    background-color: #FAF7F8;
+    color: #4A454E;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    padding: 0.4rem 0.95rem;
+    border-radius: 50rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    user-select: none;
+}
+
+.day-pill-check .btn-check + label:hover {
+    border-color: #D98C9A;
+    background-color: #FFF8FA;
+    color: #7F1D3F;
+}
+
+.day-pill-check .btn-check:checked + label {
+    background-color: #7F1D3F;
+    border-color: #7F1D3F;
+    color: #FFFFFF;
+    box-shadow: 0 2px 6px rgba(127, 29, 63, 0.22);
+}
+
+.day-pill-check .btn-check:checked + label .day-check-icon {
+    display: inline-block !important;
+}
+
+.schedule-card-box {
+    background: #FFFFFF;
+    border: 1.5px solid #EDE5E8;
+    border-radius: 16px;
+    padding: 1.25rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.schedule-card-box:focus-within {
+    border-color: #D98C9A;
+    box-shadow: 0 4px 14px rgba(127, 29, 63, 0.08);
+}
+
+.schedule-card-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.schedule-icon-weekday {
+    background: #F6E7EB;
+    color: #7F1D3F;
+}
+
+.schedule-icon-weekend {
+    background: #FAF0F2;
+    color: #B83A5D;
+}
+
+/* Switch estilizado con la paleta de Spotlight */
+.schedule-card-box .form-switch .form-check-input {
+    width: 2.75em;
+    height: 1.45em;
+    cursor: pointer;
+    border-color: #D1D5DB;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.schedule-card-box .form-switch .form-check-input:checked {
+    background-color: #7F1D3F;
+    border-color: #7F1D3F;
+}
+
+.schedule-card-box .form-switch .form-check-input:focus {
+    border-color: #D98C9A;
+    box-shadow: 0 0 0 0.2rem rgba(127, 29, 63, 0.15);
+}
+
+/* Etiquetas de Apertura y Cierre con alta legibilidad */
+.schedule-time-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #374151;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-bottom: 0.35rem;
+    display: block;
+}
+
+/* Badges estilizados */
+.badge-schedule-standard {
+    background: #F6E7EB;
+    color: #7F1D3F;
+    border: 1px solid #EED4DC;
+    font-weight: 700;
+    font-size: 0.6875rem;
+    letter-spacing: 0.03em;
+}
+
+.badge-schedule-active {
+    background: #ECFDF5;
+    color: #065F46;
+    border: 1px solid #A7F3D0;
+    font-weight: 600;
+    font-size: 0.6875rem;
+}
+
+.badge-schedule-inactive {
+    background: #F3F4F6;
+    color: #6B7280;
+    border: 1px solid #E5E7EB;
+    font-weight: 500;
+    font-size: 0.6875rem;
+}
+
+/* --------------------------------------------------------------------------
+   8. Selector de Categorías / Etiquetas en Productos
+   -------------------------------------------------------------------------- */
+.tag-pill-check {
+    display: inline-block;
+}
+
+.tag-pill-check .btn-check + label {
+    border: 1.5px solid #E5E7EB;
+    background: #FFFFFF;
+    color: #4B5563;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    padding: 0.35rem 0.85rem;
+    border-radius: 50rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    user-select: none;
+}
+
+.tag-pill-check .btn-check + label:hover {
+    border-color: #D98C9A;
+    background: #FFF8FA;
+    transform: translateY(-1px);
+}
+
+.tag-pill-check .btn-check:checked + label {
+    border-color: var(--tag-accent, #7F1D3F);
+    background: var(--tag-accent, #7F1D3F);
+    color: #FFFFFF !important;
+    box-shadow: 0 2px 8px rgba(127, 29, 63, 0.22);
+}
+
+.tag-pill-check .btn-check:checked + label i {
+    color: #FFFFFF !important;
+}
+
+/* --------------------------------------------------------------------------
+   9. Vista Previa en Vivo y Selección de Imagen (create.blade.php)
+   -------------------------------------------------------------------------- */
+.preview-sticky-dock {
+    position: sticky;
+    top: 24px;
+}
+
+.image-source-tab-btn {
+    border: 1.5px solid #E5E7EB;
+    background: #FFFFFF;
+    color: #4B5563;
+    font-weight: 600;
+    font-size: 0.8125rem;
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.image-source-tab-btn:hover {
+    border-color: #D98C9A;
+    background: #FAF7F8;
+    color: #7F1D3F;
+}
+
+.btn-check:checked + .image-source-tab-btn {
+    border-color: #7F1D3F;
+    background: #F6E7EB;
+    color: #7F1D3F;
+    box-shadow: 0 2px 8px rgba(127, 29, 63, 0.12);
+}
+
+.establishment-img-option {
+    border: 1.5px solid #E5E7EB;
+    border-radius: 12px;
+    padding: 0.6rem;
+    cursor: pointer;
+    background: #FFFFFF;
+    transition: all 0.2s ease;
+}
+
+.establishment-img-option:hover {
+    border-color: #D98C9A;
+    background: #FAF7F8;
+    transform: translateY(-2px);
+}
+
+.btn-check:checked + .establishment-img-option {
+    border-color: #7F1D3F;
+    background: #FFF8FA;
+    box-shadow: 0 0 0 2px #7F1D3F;
+}
+
+.live-preview-box {
+    background: #FFFFFF;
+    border: 1px solid #EDE5E8;
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(127, 29, 63, 0.06);
+    overflow: hidden;
+}
+
+/* --------------------------------------------------------------------------
+   10. Zona de Carga de Imagen Espaciosa y Amigable
+   -------------------------------------------------------------------------- */
+.spacious-upload-dropzone {
+    border: 2px dashed #D98C9A;
+    background: #FFFCF7;
+    border-radius: 16px;
+    padding: 1.75rem 1.25rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    position: relative;
+}
+
+.spacious-upload-dropzone:hover,
+.spacious-upload-dropzone.dragover {
+    border-color: #7F1D3F;
+    background: #FAF2F4;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(127, 29, 63, 0.08);
+}
+
+.upload-icon-circle {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: #F6E7EB;
+    color: #7F1D3F;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.75rem;
+    transition: transform 0.2s ease;
+}
+
+.spacious-upload-dropzone:hover .upload-icon-circle {
+    transform: scale(1.08);
+}
+
+.file-selected-card {
+    background: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.spin-me {
+    display: inline-block;
+    animation: spin 1s linear infinite;
+}
+
+
+
+

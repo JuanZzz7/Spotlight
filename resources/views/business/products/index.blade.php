@@ -196,7 +196,13 @@
                     @endif
                     <h6 class="fw-bold text-dark text-truncate mb-1" style="font-size: 0.92rem;" title="{{ $product->name }}">{{ $product->name }}</h6>
                     <div class="fw-bold mb-3 text-dark" style="font-size: 1.25rem; letter-spacing: -0.5px;">
-                        ${{ number_format($product->price, 0, ',', '.') }}
+                        ${{ number_format($product->price, ($product->effective_currency === 'MXN' || floor($product->price) != $product->price) ? 2 : 0, ',', '.') }}
+                        <small class="text-muted fw-semibold" style="font-size: 0.72rem;">{{ $product->effective_currency }}</small>
+                        @if($product->effective_currency === 'MXN')
+                            <div class="text-muted fw-semibold mt-0.5" style="font-size: 0.7rem; letter-spacing: 0;">
+                                🇨🇴 ≈ ${{ number_format($product->price_in_cop, 0, ',', '.') }} COP
+                            </div>
+                        @endif
                     </div>
                     
                     <div class="d-flex flex-wrap align-items-center gap-2 mt-auto">
@@ -292,7 +298,13 @@
                             {{ $product->sku ?: '—' }}
                         </td>
                         <td class="py-3 fw-bold text-dark">
-                            ${{ number_format($product->price, 0, ',', '.') }}
+                            ${{ number_format($product->price, ($product->effective_currency === 'MXN' || floor($product->price) != $product->price) ? 2 : 0, ',', '.') }}
+                            <small class="text-muted">{{ $product->effective_currency }}</small>
+                            @if($product->effective_currency === 'MXN')
+                                <div class="text-muted fw-normal" style="font-size: 0.72rem;">
+                                    🇨🇴 ≈ ${{ number_format($product->price_in_cop, 0, ',', '.') }} COP
+                                </div>
+                            @endif
                         </td>
                         <td class="py-3 text-center">
                             @if($product->stock <= 0)
@@ -350,40 +362,7 @@
 @endif
 
 @push('styles')
-<style>
-    .active-filter-pill {
-        background: var(--sl-primary, #7F1D3F) !important;
-        color: #ffffff !important;
-        border: 1px solid var(--sl-primary, #7F1D3F) !important;
-        box-shadow: 0 4px 10px rgba(127, 29, 63, 0.2) !important;
-    }
-    .inactive-filter-pill {
-        background: #f8fafc;
-        color: #475569;
-        border: 1px solid #e2e8f0;
-    }
-    .inactive-filter-pill:hover {
-        background: #f1f5f9;
-        color: #0f172a;
-    }
-    .view-btn {
-        border: none;
-        background: transparent;
-        transition: all 0.2s ease;
-    }
-    .active-view-btn {
-        background: var(--sl-primary, #7F1D3F) !important;
-        color: #ffffff !important;
-        box-shadow: 0 2px 6px rgba(127, 29, 63, 0.3) !important;
-    }
-    .hover-lift {
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    .hover-lift:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 22px rgba(0,0,0,0.08) !important;
-    }
-</style>
+<link href="{{ asset('css/business.css') }}" rel="stylesheet">
 @endpush
 
 @push('scripts')

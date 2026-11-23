@@ -1,20 +1,4 @@
 @extends('layouts.app')
-@push('styles')
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<style>
-    body {
-        font-family: var(--sl-font-body) !important;
-        background-color: var(--sl-bg) !important;
-        color: var(--sl-text-body) !important;
-    }
-    .active-dropdown-item {
-        background-color: #F6E7EB !important;
-        color: #7F1D3F !important;
-        font-weight: 700 !important;
-        border-radius: 8px;
-    }
-</style>
-@endpush
 @section('content')
 @php
     $isUser = auth()->check() && auth()->user()->role === 'user';
@@ -28,14 +12,14 @@
 
     {{-- Sidebar (Azul Noche) --}}
     <div class="vs-sidebar d-flex flex-column p-0" id="sidebar">
-        <div class="p-4 border-bottom" style="border-color: rgba(255, 255, 255, 0.08) !important;">
+        <div class="p-4 border-bottom vs-sidebar-header">
             <div class="d-flex align-items-center justify-content-between mb-3">
                 <a href="{{ route('home') }}" class="text-decoration-none">
                     <div class="d-flex align-items-center gap-2">
-                        <img src="{{ asset('images/logo.png') }}" alt="Spotlight" style="height: 32px; object-fit: contain;">
+                        <img src="{{ asset('images/logo.png') }}" alt="Spotlight" class="vs-sidebar-logo-img">
                         <div class="text-start lh-1">
-                            <div class="fw-bold fs-5 text-white" style="font-family: 'Outfit', sans-serif; letter-spacing: -0.5px;">SPOTLIGHT</div>
-                            <div style="font-size: 0.6rem; color: var(--sl-accent); font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;">
+                            <div class="fw-bold fs-5 text-white vs-sidebar-brand-title">SPOTLIGHT</div>
+                            <div class="vs-sidebar-brand-subtitle">
                                 @if(auth()->user()->role === 'business')
                                     EMPRESAS & COMERCIO
                                 @elseif(auth()->user()->role === 'admin')
@@ -53,13 +37,13 @@
             </div>
             
             {{-- User card inside navy sidebar --}}
-            <div class="mt-3 p-3 rounded-3 d-flex align-items-center gap-3" style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.08);">
-                <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style="width: 36px; height: 36px; background-color: var(--sl-primary); font-size: 0.9rem; flex-shrink: 0;">
-                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+            <div class="mt-3 p-3 rounded-3 d-flex align-items-center gap-3 vs-sidebar-user-card">
+                <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold vs-sidebar-user-avatar">
+                    {{ auth()->user()->display_initial }}
                 </div>
                 <div class="overflow-hidden">
-                    <div class="fw-semibold text-white text-truncate lh-sm" style="font-size: 0.85rem;">{{ auth()->user()->name }}</div>
-                    <div style="font-size: 0.7rem; color: var(--sl-text-on-dark-muted);">
+                    <div class="fw-semibold text-white text-truncate lh-sm vs-sidebar-user-name">{{ auth()->user()->display_name }}</div>
+                    <div class="vs-sidebar-user-role">
                         @if(auth()->user()->role === 'business')
                             Comercio Verificado
                         @elseif(auth()->user()->role === 'admin')
@@ -76,10 +60,10 @@
             @include('partials.sidebar')
         </nav>
 
-        <div class="p-4 border-top" style="border-color: rgba(255, 255, 255, 0.08) !important;">
+        <div class="p-4 border-top vs-sidebar-header">
             <form action="{{ route('logout') }}" method="POST">
                 @csrf
-                <button class="btn btn-sm w-100 d-flex justify-content-center align-items-center gap-2 text-white border-0" style="background: rgba(255, 255, 255, 0.08); font-size: 0.85rem;">
+                <button class="btn btn-sm w-100 d-flex justify-content-center align-items-center gap-2 text-white border-0 vs-sidebar-logout-btn">
                     <i class="bi bi-box-arrow-left"></i> Cerrar sesión
                 </button>
             </form>
@@ -88,28 +72,34 @@
     @endif
 
     {{-- Main Content Area --}}
-    <div class="flex-fill" style="min-height: 100vh; width: 100%; overflow-y: auto; background-color: var(--sl-bg);">
+    <div class="flex-fill vs-main-content">
         @if($useDropdownNav)
         {{-- Barra de Menú Desplegable para todos los paneles de Usuario y Empresa --}}
-        <nav class="vs-topbar px-3 px-md-4 py-3 d-flex align-items-center justify-content-between shadow-xs border-bottom bg-white sticky-top" style="z-index: 1000; min-height: 70px;">
+        <nav class="vs-topbar vs-topbar-dropdown px-3 px-md-4 py-3 d-flex align-items-center justify-content-between shadow-xs border-bottom bg-white sticky-top">
             <div class="d-flex align-items-center gap-2 gap-md-3">
                 <!-- Nombre de la página y Logo -->
                 <a href="{{ route('home') }}" class="d-flex align-items-center gap-2 text-decoration-none">
-                    <img src="{{ asset('images/logo-symbol-burgundy.png') }}" alt="Spotlight" style="height: 38px; width: 38px; object-fit: contain;">
-                    <span class="fw-bold fs-4 text-dark mb-0 d-none d-sm-inline" style="font-family: 'Outfit', sans-serif; letter-spacing: -0.5px;">SPOTLIGHT</span>
+                    <img src="{{ asset('images/logo-symbol-burgundy.png') }}" alt="Spotlight" class="vs-topbar-logo-symbol">
+                    <span class="fw-bold fs-4 text-dark mb-0 d-none d-sm-inline vs-topbar-brand-title">SPOTLIGHT</span>
                 </a>
 
-                <div class="vr mx-1 d-none d-sm-block text-muted" style="height: 24px; opacity: 0.25;"></div>
+                <div class="vr mx-1 d-none d-sm-block text-muted vs-topbar-vr"></div>
 
                 <!-- Barra de menú como Menú Desplegable -->
                 <div class="dropdown">
-                    <button class="btn btn-sm rounded-pill d-flex align-items-center gap-2 px-3 py-2 fw-bold shadow-xs border-0 dropdown-toggle text-decoration-none" type="button" id="dropdownNavMenu" data-bs-toggle="dropdown" aria-expanded="false" style="background: #F6E7EB; color: #7F1D3F; font-size: 0.85rem; transition: all 0.2s ease;">
+                    <button class="btn btn-sm rounded-pill d-flex align-items-center gap-2 px-3 py-2 fw-bold shadow-xs border-0 dropdown-toggle text-decoration-none vs-dropdown-toggle-btn" type="button" id="dropdownNavMenu" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="bi bi-grid-fill"></i>
                         <span>Menú</span>
                     </button>
-                    <ul class="dropdown-menu shadow-lg border-0 rounded-4 py-2 mt-2" aria-labelledby="dropdownNavMenu" style="min-width: 250px; box-shadow: 0 10px 30px rgba(127,29,63,0.12) !important;">
+                    <ul class="dropdown-menu shadow-lg border-0 rounded-4 py-2 mt-2 vs-dropdown-menu" aria-labelledby="dropdownNavMenu">
                         @if($isBusiness)
-                            <li><h6 class="dropdown-header text-uppercase fw-bold" style="color: #7F1D3F; font-size: 0.68rem; letter-spacing: 0.5px;">Panel de Empresa</h6></li>
+                            <li><h6 class="dropdown-header text-uppercase fw-bold vs-dropdown-header">Panel de Empresa</h6></li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center gap-2 py-2 fw-semibold {{ request()->routeIs('business.dashboard*') ? 'active-dropdown-item' : 'text-dark' }}" href="{{ route('business.dashboard') }}">
+                                    <i class="bi bi-grid fs-5"></i>
+                                    <span>Mi Panel</span>
+                                </a>
+                            </li>
                             <li>
                                 <a class="dropdown-item d-flex align-items-center gap-2 py-2 fw-semibold {{ request()->routeIs('business.company*') ? 'active-dropdown-item' : 'text-dark' }}" href="{{ route('business.company.edit') }}">
                                     <i class="bi bi-building fs-5"></i>
@@ -157,7 +147,7 @@
                                 </a>
                             </li>
                         @else
-                            <li><h6 class="dropdown-header text-uppercase fw-bold" style="color: #7F1D3F; font-size: 0.68rem; letter-spacing: 0.5px;">Navegación</h6></li>
+                            <li><h6 class="dropdown-header text-uppercase fw-bold vs-dropdown-header">Navegación</h6></li>
                             <li>
                                 <a class="dropdown-item d-flex align-items-center gap-2 py-2 fw-semibold {{ request()->routeIs('user.dashboard') ? 'active-dropdown-item' : 'text-dark' }}" href="{{ route('user.dashboard') }}">
                                     <i class="bi bi-shop fs-5"></i>
@@ -181,7 +171,7 @@
                                     <i class="bi bi-cart3 fs-5 text-muted"></i>
                                     <span>Carrito de Compras</span>
                                     @if(session('cart') && count(session('cart')) > 0)
-                                        <span class="badge rounded-pill ms-auto" style="background: #7F1D3F; color: #fff;">{{ count(session('cart')) }}</span>
+                                        <span class="badge rounded-pill ms-auto bg-sl-primary text-white">{{ count(session('cart')) }}</span>
                                     @endif
                                 </a>
                             </li>
@@ -206,21 +196,35 @@
                 </div>
             </div>
 
-            <!-- Derecha: Menú de Cuenta y Carrito si es User -->
+            <!-- Derecha: Selector de Idioma, Menú de Cuenta y Carrito si es User -->
             <div class="d-flex align-items-center gap-2 gap-sm-3">
+                <button id="btnSwitchLang" type="button" class="btn btn-sm rounded-pill d-flex align-items-center gap-1 px-3 py-2 shadow-xs fw-bold js-switch-lang vs-lang-switch-btn">
+                    <i class="bi bi-translate me-1"></i>
+                    <span>ES / EN</span>
+                </button>
+
                 @if($isBusiness)
                     <div class="dropdown">
-                        <button class="btn btn-sm btn-white border rounded-pill d-flex align-items-center gap-2 px-3 py-2 shadow-xs fw-semibold dropdown-toggle" type="button" id="businessAccountMenu" data-bs-toggle="dropdown" aria-expanded="false" style="color: #29252A; font-size: 0.85rem; border-color: #e2e8f0;">
-                            <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-xs" style="width: 28px; height: 28px; background: #7F1D3F; font-size: 0.78rem;">
-                                {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-                            </div>
-                            <span class="d-none d-sm-inline">{{ auth()->user()->name }}</span>
+                        <button class="btn btn-sm btn-white border rounded-pill d-flex align-items-center gap-2 px-3 py-2 shadow-xs fw-semibold dropdown-toggle vs-account-toggle-btn" type="button" id="businessAccountMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                            @if(auth()->user()->display_logo)
+                                <img src="{{ auth()->user()->display_logo }}" alt="{{ auth()->user()->display_name }}" class="rounded-circle shadow-xs flex-shrink-0" style="width: 26px; height: 26px; object-fit: cover;">
+                            @else
+                                <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-xs vs-account-avatar">
+                                    {{ auth()->user()->display_initial }}
+                                </div>
+                            @endif
+                            <span class="d-none d-sm-inline">{{ auth()->user()->display_name }}</span>
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 py-2 mt-2" aria-labelledby="businessAccountMenu" style="min-width: 220px; box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important;">
+                        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 py-2 mt-2 vs-account-dropdown-menu" aria-labelledby="businessAccountMenu">
                             <li class="px-3 py-2 border-bottom mb-1">
-                                <div class="fw-bold text-dark text-truncate">{{ auth()->user()->name }}</div>
+                                <div class="fw-bold text-dark text-truncate">{{ auth()->user()->display_name }}</div>
                                 <div class="text-muted small text-truncate">{{ auth()->user()->email }}</div>
-                                <span class="badge rounded-pill mt-1" style="background: #F6E7EB; color: #7F1D3F; font-size: 0.65rem;">COMERCIO</span>
+                                <span class="badge rounded-pill mt-1 vs-role-badge">COMERCIO</span>
+                            </li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center gap-2 py-2 {{ request()->routeIs('business.dashboard*') ? 'active-dropdown-item' : 'text-dark' }}" href="{{ route('business.dashboard') }}">
+                                    <i class="bi bi-grid"></i> Mi Panel
+                                </a>
                             </li>
                             <li>
                                 <a class="dropdown-item d-flex align-items-center gap-2 py-2 {{ request()->routeIs('business.company*') ? 'active-dropdown-item' : 'text-dark' }}" href="{{ route('business.company.edit') }}">
@@ -245,13 +249,13 @@
                     </div>
                 @else
                     <div class="dropdown">
-                        <button class="btn btn-sm btn-white border rounded-pill d-flex align-items-center gap-2 px-3 py-2 shadow-xs fw-semibold dropdown-toggle" type="button" id="userAccountMenu" data-bs-toggle="dropdown" aria-expanded="false" style="color: #29252A; font-size: 0.85rem; border-color: #e2e8f0;">
-                            <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-xs" style="width: 28px; height: 28px; background: #7F1D3F; font-size: 0.78rem;">
+                        <button class="btn btn-sm btn-white border rounded-pill d-flex align-items-center gap-2 px-3 py-2 shadow-xs fw-semibold dropdown-toggle vs-account-toggle-btn" type="button" id="userAccountMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-xs vs-account-avatar">
                                 {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                             </div>
                             <span class="d-none d-sm-inline">{{ auth()->user()->name }}</span>
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 py-2 mt-2" aria-labelledby="userAccountMenu" style="min-width: 200px; box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important;">
+                        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 py-2 mt-2 vs-account-dropdown-menu" aria-labelledby="userAccountMenu">
                             <li class="px-3 py-2 border-bottom mb-1">
                                 <div class="fw-bold text-dark text-truncate">{{ auth()->user()->name }}</div>
                                 <div class="text-muted small text-truncate">{{ auth()->user()->email }}</div>
@@ -267,12 +271,14 @@
                         </ul>
                     </div>
 
+                    <div class="vr mx-1 d-none d-sm-block text-muted vs-topbar-vr"></div>
+
                     <!-- Botón del Carrito -->
-                    <a href="{{ route('user.cart.index') }}" class="btn btn-sm rounded-pill d-flex align-items-center gap-2 px-3 py-2 shadow-xs fw-bold text-decoration-none" style="background: #ffffff; border: 1.5px solid #D98C9A; color: #7F1D3F; font-size: 0.85rem; transition: all 0.2s ease;">
-                        <i class="bi bi-cart3 fs-5" style="color: #7F1D3F;"></i>
+                    <a href="{{ route('user.cart.index') }}" class="btn btn-sm rounded-pill d-flex align-items-center gap-2 px-3 py-2 shadow-xs fw-bold text-decoration-none vs-cart-topbar-btn">
+                        <i class="bi bi-cart3 fs-5 text-sl-primary"></i>
                         <span class="d-none d-md-inline">Carrito</span>
                         @php $cartCount = session('cart') ? count(session('cart')) : 0; @endphp
-                        <span class="badge rounded-pill cart-counter-badge" style="background: #7F1D3F; color: #ffffff; font-size: 0.72rem; padding: 4px 7px;">
+                        <span class="badge rounded-pill cart-counter-badge vs-cart-counter-badge">
                             {{ $cartCount }}
                         </span>
                     </a>
@@ -286,12 +292,16 @@
                 <i class="bi bi-list fs-3"></i>
             </button>
             <div class="d-none d-md-flex align-items-center gap-2">
-                <span class="text-muted fw-medium" style="font-size: 0.85rem;">Spotlight Admin</span>
+                <span class="text-muted fw-medium vs-admin-topbar-label">Spotlight Admin</span>
                 <span class="text-muted">/</span>
-                <h6 class="mb-0 fw-bold text-dark text-truncate" style="font-size: 0.95rem;">@yield('page-title', 'Panel')</h6>
+                <h6 class="mb-0 fw-bold text-dark text-truncate vs-admin-topbar-title">@yield('page-title', 'Panel')</h6>
             </div>
             
             <div class="ms-auto d-flex align-items-center gap-3">
+                <button type="button" class="btn btn-sm rounded-pill d-flex align-items-center gap-1 px-3 py-1 shadow-xs fw-bold js-switch-lang vs-lang-switch-btn">
+                    <i class="bi bi-translate me-1"></i>
+                    <span>ES / EN</span>
+                </button>
                 <span class="text-muted small d-none d-sm-inline fw-medium bg-white px-3 py-1 rounded-pill border">{{ auth()->user()->email }}</span>
             </div>
         </nav>

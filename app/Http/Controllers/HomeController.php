@@ -14,7 +14,7 @@ class HomeController extends Controller
                         ->whereHas('company', function ($query) {
                             $query->where('status', 'active');
                         })
-                        ->with('company')->latest()->take(8)->get();
+                        ->with('company')->latest()->get();
         return view('home.index', compact('companies', 'products'));
     }
 }

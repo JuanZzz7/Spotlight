@@ -216,7 +216,7 @@
                 <td class="border-top border-bottom p-3" style="border-color: #f1f5f9 !important;">
                     <div class="d-flex align-items-center gap-2">
                         <span class="rounded-circle" style="width: 6px; height: 6px; background: {{ $expense->type === 'income' ? '#10b981' : '#ef4444' }};"></span>
-                        <span class="fw-bold {{ $expense->type === 'income' ? 'text-success' : 'text-danger' }}" style="font-size: 0.95rem;">${{ number_format($expense->amount,0,',','.') }} <span style="font-size: 0.65rem;">COP</span></span>
+                        <span class="fw-bold {{ $expense->type === 'income' ? 'text-success' : 'text-danger' }}" style="font-size: 0.95rem;">${{ number_format($expense->amount, floor($expense->amount) != $expense->amount ? 2 : 0, ',', '.') }} <span style="font-size: 0.65rem;">COP</span></span>
                     </div>
                 </td>
                 <td class="border-top border-bottom p-3 text-muted" style="border-color: #f1f5f9 !important;">
@@ -369,8 +369,7 @@
         a.click();
     }
 </script>
-<style>
-    .cursor-pointer { cursor: pointer; }
-    tr:hover { transform: translateY(-1px); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important; }
-</style>
+@push('styles')
+<link href="{{ asset('css/business.css') }}" rel="stylesheet">
+@endpush
 @endsection

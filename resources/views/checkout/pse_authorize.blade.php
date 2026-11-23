@@ -3,65 +3,7 @@
 
 @push('styles')
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-    :root {
-        --sl-burgundy: #7F1D3F;
-        --sl-dusty-rose: #D98C9A;
-        --sl-soft-rose: #F6E7EB;
-        --sl-ivory: #FFFCF7;
-        --sl-charcoal: #29252A;
-        --pse-blue: #0A3A60;
-    }
-    body {
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        background: linear-gradient(180deg, #F0F4F8 0%, #FFFFFF 100%);
-        color: var(--sl-charcoal);
-    }
-    .font-outfit {
-        font-family: 'Outfit', sans-serif;
-    }
-    .pse-header-card {
-        background: linear-gradient(135deg, #0A3A60 0%, #155E95 100%);
-        color: #ffffff;
-        border-radius: 20px 20px 0 0;
-    }
-    .pse-body-card {
-        background: #ffffff;
-        border: 1px solid #E2E8F0;
-        border-top: none;
-        border-radius: 0 0 20px 20px;
-    }
-    .btn-approve {
-        background: linear-gradient(135deg, #10B981 0%, #059669 100%);
-        color: white;
-        font-weight: 700;
-        border: none;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    .btn-approve:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(16, 185, 129, 0.35);
-        color: white;
-    }
-    .btn-cancel {
-        background: #F1F5F9;
-        color: #64748B;
-        font-weight: 600;
-        border: 1px solid #CBD5E1;
-        transition: all 0.2s ease;
-    }
-    .btn-cancel:hover {
-        background: #E2E8F0;
-        color: #334155;
-    }
-    .bank-badge {
-        background: rgba(255, 255, 255, 0.15);
-        backdrop-filter: blur(8px);
-        border: 1px solid rgba(255, 255, 255, 0.25);
-        border-radius: 12px;
-        padding: 6px 16px;
-    }
-</style>
+<link href="{{ asset('css/checkout.css') }}" rel="stylesheet">
 @endpush
 
 @section('content')

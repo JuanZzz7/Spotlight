@@ -3,6 +3,10 @@
 @section('title', 'Tutoriales de Formalización - Spotlight')
 @section('page-title', 'Ruta de Formalización Empresarial')
 
+@push('styles')
+<link href="{{ asset('css/business.css') }}" rel="stylesheet">
+@endpush
+
 @section('dashboard-content')
 <div class="container-fluid px-0">
     <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
@@ -14,7 +18,7 @@
                 </ol>
             </nav>
             <h4 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
-                <i class="bi bi-mortarboard-fill" style="color: #7F1D3F;"></i>
+                <i class="bi bi-mortarboard-fill text-sl-primary"></i>
                 <span>Centro de Tutoriales: Cómo Formalizar tu Negocio</span>
             </h4>
             <p class="text-muted small mb-0 mt-1">

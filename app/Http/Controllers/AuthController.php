@@ -46,10 +46,11 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $rules = [
-            'name'     => ['required', 'string', 'max:255', 'regex:/^[\pL\s]+$/u'],
-            'email'    => 'required|email|unique:users',
-            'password' => 'required|confirmed|min:8',
-            'role'     => 'required|in:user,business',
+            'name'      => ['required', 'string', 'max:255', 'regex:/^[\pL\s\.\'\-]+$/u'],
+            'email'     => 'required|email|unique:users',
+            'password'  => 'required|confirmed|min:8',
+            'role'      => 'required|in:user,business',
+            'birthdate' => ['nullable', 'date'],
         ];
 
         $country = strtoupper((string) $request->input('country', 'CO'));
@@ -62,14 +63,14 @@ class AuthController extends Controller
             $businessFormRequest = \App\Http\Requests\BusinessRegisterRequest::createFrom($request);
             $businessRules = $businessFormRequest->rules();
             $customMessages = array_merge($businessFormRequest->messages(), [
-                'name.regex' => 'El nombre completo solo puede contener caracteres alfabéticos (A-Z, a-z).',
+                'name.regex' => 'El nombre personal solo puede contener letras y espacios (no se permiten números).',
             ]);
             $businessRulesToMerge = array_intersect_key($businessRules, array_flip([
                 'country', 'state', 'city', 'postal_code', 'tax_id', 'currency', 'phone_prefix', 'phone',
                 'tipo_negocio', 'habeas_data_accepted', 'address',
                 'razon_social', 'nit', 'camara_comercio_file', 'rut_file',
                 'nombre_comercial', 'cedula_propietario', 'rut_personal_file',
-                'nombre_representante', 'email_representante',
+                'nombre_representante', 'email_representante', 'birthdate',
                 'latitude', 'longitude', 'category', 'description', 'logo'
             ]));
             $rules = array_merge($rules, $businessRulesToMerge);
@@ -82,7 +83,7 @@ class AuthController extends Controller
             $rules['postal_code'] = ['nullable', 'string', 'max:20'];
             $rules['address'] = ['nullable', 'string', 'max:255'];
             $customMessages = [
-                'name.regex' => 'El nombre completo solo puede contener caracteres alfabéticos (A-Z, a-z).',
+                'name.regex' => 'El nombre personal solo puede contener letras y espacios (no se permiten números).',
             ];
         }
 
@@ -98,6 +99,7 @@ class AuthController extends Controller
             'email'        => $request->email,
             'password'     => Hash::make($request->password),
             'role'         => $request->role,
+            'birthdate'    => $request->input('birthdate'),
             'country'      => $country,
             'state'        => $request->input('state', $country === 'MX' ? 'Puebla' : 'Cundinamarca'),
             'city'         => $request->input('city', $country === 'MX' ? 'Puebla' : 'Ubaté'),

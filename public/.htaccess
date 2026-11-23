@@ -5,6 +5,10 @@
 
     RewriteEngine On
 
+    # Bloquear vectores de inyección de argumentos PHP-CGI en el query string (-d, -n, etc.)
+    RewriteCond %{QUERY_STRING} ^(%2d|\-)[^=]+$ [NC]
+    RewriteRule ^ - [F,L]
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
@@ -22,4 +26,18 @@
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
+</IfModule>
+
+# Rechaza en Apache cuerpos de petición > 16 MB antes de que PHP los procese
+# (LimitRequestBody sí está permitido en .htaccess; LimitRequestFields no)
+LimitRequestBody 16777216
+
+# Endurecimiento de límites de entrada de PHP (solo aplica con mod_php)
+<IfModule mod_php.c>
+    php_value memory_limit 256M
+    php_value post_max_size 16M
+    php_value upload_max_filesize 10M
+    php_value max_file_uploads 10
+    php_value max_input_vars 1000
+    php_value max_input_nesting_level 32
 </IfModule>

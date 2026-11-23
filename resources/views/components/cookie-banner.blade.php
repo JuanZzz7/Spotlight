@@ -1,6 +1,6 @@
-<div id="vs-cookie-banner" class="position-fixed bottom-0 start-0 w-100 p-3 p-md-4" style="z-index: 1050; display: none; opacity: 0; transform: translateY(100%);">
+<div id="vs-cookie-banner" class="position-fixed bottom-0 start-0 w-100 p-3 p-md-4 vs-cookie-banner">
     <div class="container-fluid max-w-7xl mx-auto">
-        <div class="vs-card border-0 p-4" style="border-radius: var(--vs-radius-lg); background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); box-shadow: 0 -10px 40px rgba(0,0,0,0.1);">
+        <div class="vs-card border-0 p-4 vs-cookie-card">
             <div class="row align-items-center">
                 <div class="col-md-8 mb-3 mb-md-0">
                     <div class="d-flex align-items-center mb-2">

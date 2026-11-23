@@ -130,3 +130,286 @@
     width: auto;
     object-fit: contain;
 }
+
+/* --------------------------------------------------------------------------
+   Dashboard Layout & Dropdown Navigation
+   -------------------------------------------------------------------------- */
+.active-dropdown-item {
+    background-color: var(--sl-primary-soft, #F6E7EB) !important;
+    color: var(--sl-primary, #7F1D3F) !important;
+    font-weight: 700 !important;
+    border-radius: 8px;
+}
+
+.vs-main-content {
+    min-height: 100vh;
+    width: 100%;
+    overflow-y: auto;
+    background-color: var(--sl-bg);
+}
+
+.vs-topbar-dropdown {
+    z-index: 1000;
+    min-height: 70px;
+}
+
+.vs-topbar-logo-symbol {
+    height: 38px;
+    width: 38px;
+    object-fit: contain;
+}
+
+.vs-topbar-brand-title {
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: -0.5px;
+}
+
+.vs-topbar-vr {
+    height: 24px;
+    opacity: 0.25;
+}
+
+.vs-dropdown-toggle-btn {
+    background: var(--sl-primary-soft, #F6E7EB);
+    color: var(--sl-primary, #7F1D3F);
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+}
+
+.vs-dropdown-toggle-btn:hover,
+.vs-dropdown-toggle-btn:focus {
+    background: #ECD3DA;
+    color: var(--sl-primary-dark, #5E122C);
+}
+
+.vs-dropdown-menu {
+    min-width: 250px;
+    box-shadow: 0 10px 30px rgba(127, 29, 63, 0.12) !important;
+}
+
+.vs-dropdown-header {
+    color: var(--sl-primary, #7F1D3F);
+    font-size: 0.68rem;
+    letter-spacing: 0.5px;
+}
+
+.vs-account-toggle-btn {
+    color: #29252A;
+    font-size: 0.85rem;
+    border-color: #e2e8f0;
+}
+
+.vs-account-avatar {
+    width: 28px;
+    height: 28px;
+    background: var(--sl-primary, #7F1D3F);
+    font-size: 0.78rem;
+}
+
+.vs-account-dropdown-menu {
+    min-width: 220px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+}
+
+.vs-role-badge {
+    background: var(--sl-primary-soft, #F6E7EB);
+    color: var(--sl-primary, #7F1D3F);
+    font-size: 0.65rem;
+}
+
+.vs-cart-topbar-btn {
+    background: #ffffff;
+    border: 1.5px solid var(--sl-accent, #D98C9A);
+    color: var(--sl-primary, #7F1D3F);
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+}
+
+.vs-cart-topbar-btn:hover {
+    background: var(--sl-primary-soft, #F6E7EB);
+    color: var(--sl-primary-dark, #5E122C);
+}
+
+.vs-cart-counter-badge {
+    background: var(--sl-primary, #7F1D3F);
+    color: #ffffff;
+    font-size: 0.72rem;
+    padding: 4px 7px;
+}
+
+/* --------------------------------------------------------------------------
+   Sidebar User Card & Toast Notification
+   -------------------------------------------------------------------------- */
+.vs-sidebar-header {
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.vs-sidebar-logo-img {
+    height: 32px;
+    object-fit: contain;
+}
+
+.vs-sidebar-brand-title {
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: -0.5px;
+}
+
+.vs-sidebar-brand-subtitle {
+    font-size: 0.6rem;
+    color: var(--sl-accent);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.vs-sidebar-user-card {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.vs-sidebar-user-avatar {
+    width: 36px;
+    height: 36px;
+    background-color: var(--sl-primary);
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.vs-sidebar-user-name {
+    font-size: 0.85rem;
+}
+
+.vs-sidebar-user-role {
+    font-size: 0.7rem;
+    color: var(--sl-text-on-dark-muted);
+}
+
+.vs-sidebar-logout-btn {
+    background: rgba(255, 255, 255, 0.08);
+    font-size: 0.85rem;
+}
+
+.vs-sidebar-network-card {
+    background: rgba(255, 255, 255, 0.06);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.vs-sidebar-network-title {
+    font-size: 0.8rem;
+    color: var(--sl-accent);
+    letter-spacing: 0.5px;
+}
+
+.vs-sidebar-network-desc {
+    font-size: 0.75rem;
+    color: var(--sl-text-on-dark-muted);
+    line-height: 1.4;
+    margin-bottom: 10px;
+}
+
+.vs-sidebar-network-meta {
+    font-size: 0.65rem;
+    color: var(--sl-text-on-dark-muted);
+}
+
+.vs-sidebar-unread-badge {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+}
+
+.vs-sidebar-unread-admin {
+    font-size: 0.65rem;
+    min-width: 18px;
+    border-radius: 9px;
+}
+
+.vs-admin-topbar-label {
+    font-size: 0.85rem;
+}
+
+.vs-admin-topbar-title {
+    font-size: 0.95rem;
+}
+
+.vs-cookie-banner {
+    z-index: 1050;
+    display: none;
+    opacity: 0;
+    transform: translateY(100%);
+}
+
+.vs-cookie-card {
+    border-radius: var(--sl-radius-lg, 16px);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.vs-msg-toast {
+    display: none;
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 9999;
+    background: var(--sl-navy);
+    color: #fff;
+    padding: 14px 20px;
+    border-radius: 14px;
+    box-shadow: 0 8px 32px rgba(41, 37, 42, 0.4);
+    min-width: 280px;
+    max-width: 340px;
+    cursor: pointer;
+    border-left: 4px solid var(--sl-primary);
+    backdrop-filter: blur(8px);
+    transition: all 0.3s ease;
+}
+
+.vs-msg-toast-icon {
+    background: rgba(127, 29, 63, 0.3);
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.vs-msg-toast-close {
+    background: none;
+    border: none;
+    color: #64748b;
+    margin-left: auto;
+    font-size: 1.1rem;
+    line-height: 1;
+    padding: 0;
+}
+
+@keyframes pulse-badge {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
+    50%       { transform: scale(1.15); box-shadow: 0 0 0 5px rgba(239, 68, 68, 0); }
+}
+
+/* --------------------------------------------------------------------------
+   Global Language Switcher Pill Button (.vs-lang-switch-btn)
+   -------------------------------------------------------------------------- */
+.vs-lang-switch-btn {
+    background: var(--sl-primary-soft, #F6E7EB);
+    border: 1.5px solid rgba(127, 29, 63, 0.18);
+    color: var(--sl-primary, #7F1D3F);
+    font-size: 0.8rem;
+    letter-spacing: 0.02em;
+    transition: all 0.2s ease;
+}
+
+.vs-lang-switch-btn:hover,
+.vs-lang-switch-btn:focus {
+    background: var(--sl-primary, #7F1D3F);
+    border-color: var(--sl-primary, #7F1D3F);
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+

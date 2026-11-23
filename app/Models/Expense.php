@@ -16,8 +16,8 @@ class Expense extends Model
 
     public function getInvoiceUrlAttribute()
     {
-        if ($this->invoice_path && \Illuminate\Support\Facades\Storage::disk('public')->exists($this->invoice_path)) {
-            return asset('storage/' . $this->invoice_path);
+        if ($this->invoice_path) {
+            return route('business.expenses.invoice', $this->id);
         }
         return null;
     }
@@ -25,5 +25,16 @@ class Expense extends Model
     public function isPdf(): bool
     {
         return $this->invoice_path && strtolower(pathinfo($this->invoice_path, PATHINFO_EXTENSION)) === 'pdf';
+    }
+
+    public function getFormattedAmountAttribute(): string
+    {
+        $val = (float) $this->amount;
+        $hasDecimals = floor($val) != $val;
+        $currency = $this->company?->effective_currency ?? 'COP';
+        if ($currency === 'MXN') {
+            return '$ ' . number_format($val, 2, '.', ',') . ' MXN';
+        }
+        return '$ ' . number_format($val, $hasDecimals ? 2 : 0, ',', '.') . ' COP';
     }
 }

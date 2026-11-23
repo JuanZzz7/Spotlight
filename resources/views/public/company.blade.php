@@ -13,6 +13,9 @@
             </div>
         </a>
         <div class="d-flex gap-2 align-items-center">
+            <button id="btnSwitchLang" type="button" class="btn btn-sm btn-pill-light fw-bold px-3 js-switch-lang">
+                <i class="bi bi-translate me-1"></i> EN / ES
+            </button>
             @auth
                 @php $dash = match(auth()->user()->role) { 'admin'=>'admin.dashboard','business'=>'business.dashboard',default=>'user.dashboard'}; @endphp
                 <a href="{{ route($dash) }}" class="btn btn-sm btn-outline-primary px-3 rounded-pill">Mi Panel</a>
@@ -149,8 +152,19 @@
                             @if($product->description)
                                 <p class="text-muted text-sm mb-3" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">{{ $product->description }}</p>
                             @endif
-                            <div class="fw-bold fs-4 mt-auto mb-3" style="color:var(--sl-primary);">
-                                ${{ number_format($product->price, 0, ',', '.') }}
+                            <div class="mt-auto mb-3">
+                                @if($product->effective_currency === 'MXN')
+                                    <div class="fw-bold fs-4 lh-1" style="color:var(--sl-primary);">
+                                        ${{ number_format($product->price_in_cop, 0, ',', '.') }} <small class="fs-6 text-muted">COP</small>
+                                    </div>
+                                    <small class="text-muted fw-semibold d-block mt-1" style="font-size: 0.75rem;">
+                                        🇲🇽 Precio origen: ${{ number_format($product->price, 2, ',', '.') }} MXN
+                                    </small>
+                                @else
+                                    <div class="fw-bold fs-4" style="color:var(--sl-primary);">
+                                        ${{ number_format($product->price, (floor($product->price) != $product->price ? 2 : 0), ',', '.') }} <small class="fs-6 text-muted">COP</small>
+                                    </div>
+                                @endif
                             </div>
                             @if($product->stock > 0)
                                 <span class="badge bg-success-subtle text-success rounded-pill mb-3" style="font-size:0.75rem;">
@@ -195,6 +209,38 @@
         @endif
     </div>
 </section>
+
+{{-- ══════ Galería de Fotos del Establecimiento / Local Comercial ══════ --}}
+@if(!empty($company->establishment_photo_urls))
+<section class="py-5 bg-white border-top">
+    <div class="container">
+        <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+            <div>
+                <h3 class="fw-bold mb-1" style="color:var(--sl-text-heading);">
+                    <i class="bi bi-shop me-2" style="color:var(--sl-primary);"></i>Nuestro Establecimiento
+                </h3>
+                <p class="text-muted small mb-0">Conoce nuestras instalaciones, vitrina física y punto de atención en Ubaté.</p>
+            </div>
+            <span class="badge bg-light text-primary border rounded-pill px-3 py-1.5 text-xs fw-semibold">
+                {{ count($company->establishment_photo_urls) }} {{ count($company->establishment_photo_urls) === 1 ? 'foto del local' : 'fotos del local' }}
+            </span>
+        </div>
+
+        <div class="row g-3">
+            @foreach($company->establishment_photo_urls as $photoUrl)
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="rounded-4 overflow-hidden border shadow-xs" style="height: 190px; transition: transform 0.2s;"
+                         onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+                        <a href="{{ $photoUrl }}" target="_blank" title="Ver foto ampliada">
+                            <img src="{{ $photoUrl }}" class="w-100 h-100" style="object-fit: cover;" alt="Establecimiento {{ $company->name }}">
+                        </a>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
 
 {{-- ══════ Sección del Mapa Interactivo ══════ --}}
 @if($company->latitude && $company->longitude)
@@ -286,27 +332,7 @@
 
 @push('styles')
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<style>
-    #company-map .leaflet-popup-content-wrapper {
-        border-radius: 14px;
-        box-shadow: 0 8px 28px rgba(0,35,111,0.2);
-    }
-    #company-map .leaflet-tile-container img {
-        border-radius: 0 !important;
-    }
-    /* Dots animados del skeleton */
-    @@keyframes dot-pulse {
-        0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
-        40%            { transform: scale(1);   opacity: 1;   }
-    }
-    .map-dot {
-        width: 10px; height: 10px;
-        border-radius: 50%;
-        background: rgba(255,255,255,0.9);
-        display: inline-block;
-        animation: dot-pulse 1.4s ease-in-out infinite;
-    }
-</style>
+<link href="{{ asset('css/public.css') }}" rel="stylesheet">
 @endpush
 
 @push('scripts')

@@ -123,4 +123,16 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Tasa de Cambio Referencial MXN ⇄ COP
+    |--------------------------------------------------------------------------
+    |
+    | Tasa utilizada para mostrar automáticamente a usuarios en Colombia
+    | el equivalente en Pesos Colombianos (COP) de productos publicados en
+    | Pesos Mexicanos (MXN) sin necesidad de conversores externos.
+    |
+    */
+    'mxn_to_cop_rate' => (float) env('MXN_TO_COP_RATE', 215.0),
+
 ];

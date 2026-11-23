@@ -4,16 +4,20 @@ namespace App\Http\Controllers\Business;
 
 use App\Http\Controllers\Controller;
 use App\Models\Company;
+use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class CompanyController extends Controller
 {
     public function edit()
     {
         $company = Auth::user()->company ?? new Company();
-        return view('business.company.edit', compact('company'));
+        $tags = Tag::availableForCompany($company?->id)->orderBy('label')->get();
+        $myCustomTags = $company->exists ? $company->customTags()->latest()->get() : collect();
+        return view('business.company.edit', compact('company', 'tags', 'myCustomTags'));
     }
 
     public function requestDocumentUpdate(Request $request)
@@ -45,75 +49,105 @@ class CompanyController extends Controller
 
         // ─── Validación por sección ────────────────────────────
         if ($section === 'general') {
+            // Manejo preventivo de fallos de subida a nivel PHP antes de que Laravel tire el mensaje en inglés
+            if ($request->hasFile('logo') && !$request->file('logo')->isValid()) {
+                return back()->withInput()->withErrors(['logo' => 'El logo seleccionado no pudo procesarse o supera el límite del servidor. Por favor selecciona una imagen de hasta 5 MB.']);
+            }
+            if ($request->hasFile('banner') && !$request->file('banner')->isValid()) {
+                return back()->withInput()->withErrors(['banner' => 'El banner seleccionado no pudo procesarse o supera el límite del servidor. Por favor selecciona una imagen de hasta 10 MB.']);
+            }
+
             $request->validate([
-                'name'        => 'required|string|max:255',
-                'description' => 'nullable|string',
-                'category'    => 'nullable|string|max:100',
-                'logo'        => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,bmp|max:2048',
-                'banner'      => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,bmp|max:2048',
+                'name'                  => 'required|string|max:255',
+                'description'           => 'nullable|string',
+                'category'              => 'nullable|string|max:100',
+                'logo'                  => 'nullable|file|mimes:jpeg,png,jpg,gif,webp,bmp,svg,avif,jfif,heic,heif|max:5120',
+                'banner'                => 'nullable|file|mimes:jpeg,png,jpg,gif,webp,bmp,svg,avif,jfif,heic,heif|max:10240',
+                'establishment_photos.*'=> 'nullable|file|mimes:jpeg,png,jpg,webp,svg,avif|max:5120',
             ], [
                 'name.required'   => 'El nombre de la empresa es obligatorio.',
-                'banner.image'    => 'El banner debe ser una imagen.',
-                'banner.mimes'    => 'El banner debe ser JPG, PNG, GIF, WebP o BMP.',
-                'banner.max'      => 'El banner no puede superar los 2 MB por límite del servidor.',
-                'logo.max'        => 'El logo no puede superar los 2 MB.',
+                'banner.file'     => 'El banner debe ser un archivo de imagen.',
+                'banner.mimes'    => 'El banner admite formatos JPG, PNG, WebP, SVG, GIF, AVIF o BMP.',
+                'banner.max'      => 'El banner no puede superar los 10 MB.',
+                'banner.uploaded' => 'No se pudo subir el banner. Verifica que el archivo no supere el tamaño permitido.',
+                'logo.file'       => 'El logo debe ser un archivo de imagen.',
+                'logo.mimes'      => 'El logo admite formatos JPG, PNG, WebP, SVG, GIF, AVIF o BMP.',
+                'logo.max'        => 'El logo no puede superar los 5 MB.',
+                'logo.uploaded'   => 'No se pudo subir el logo. Verifica que el archivo no supere el tamaño permitido.',
             ]);
         } elseif ($section === 'legal') {
             $isMexico = ($user->company && $user->company->isMexican()) || $request->input('country') === 'MX';
             if ($isMexico) {
                 $request->validate([
-                    'country'             => 'nullable|in:CO,MX',
-                    'tipo_negocio'        => 'required|in:formal,informal',
-                    'habeas_data_accepted'=> 'accepted',
-                    'direccion_fisica'    => 'required|string|max:255',
-                    'state'               => 'nullable|string|max:100',
-                    'city'                => 'nullable|string|max:100',
-                    'postal_code'         => 'nullable|string|max:20',
-                    'tax_id'              => 'nullable|string|max:50',
-                    'razon_social'        => 'nullable|string|max:255',
-                    'nombre_comercial'    => 'nullable|string|max:255',
+                    'country'              => 'nullable|in:CO,MX',
+                    'tipo_negocio'         => 'required|in:formal,informal',
+                    'habeas_data_accepted' => 'accepted',
+                    'direccion_fisica'     => 'required|string|max:255',
+                    'state'                => 'nullable|string|max:100',
+                    'city'                 => 'nullable|string|max:100',
+                    'postal_code'          => 'nullable|string|max:20',
+                    'tax_id'               => 'nullable|string|max:50',
+                    'razon_social'         => ['nullable', 'string', 'max:255', 'regex:/^[\pL\pN\s\.\,\&\'\-\#\/]+$/u'],
+                    'nombre_comercial'     => ['nullable', 'string', 'max:255', 'regex:/^[\pL\pN\s\.\,\&\'\-\#\/]+$/u'],
+                    'nombre_representante' => ['nullable', 'string', 'max:255', 'regex:/^[\pL\s\.\'\-]+$/u'],
+                    'birthdate'            => ['nullable', 'date', 'before_or_equal:' . now()->subYears(18)->format('Y-m-d')],
                 ], [
                     'tipo_negocio.required'         => 'Debe seleccionar el tipo de negocio.',
                     'habeas_data_accepted.accepted' => 'Debe aceptar la política de privacidad.',
                     'direccion_fisica.required'     => 'La dirección física es obligatoria.',
+                    'nombre_representante.regex'    => 'El nombre del representante legal solo puede contener letras y espacios (sin números).',
+                    'birthdate.before_or_equal'     => 'El representante o propietario de la empresa debe ser mayor de 18 años.',
                 ]);
             } else {
                 $request->validate([
-                    'tipo_negocio'        => 'required|in:formal,informal',
-                    'habeas_data_accepted'=> 'accepted',
-                    'direccion_fisica'    => 'required|string|max:255',
-                    'razon_social'        => 'required_if:tipo_negocio,formal|nullable|string|max:255',
-                    'nit'                 => ['required_if:tipo_negocio,formal', 'nullable', 'string', 'regex:/^[0-9]+-[0-9]$/'],
-                    'nombre_comercial'    => 'required_if:tipo_negocio,informal|nullable|string|max:255',
-                    'cedula_propietario'  => 'required_if:tipo_negocio,informal|nullable|string|max:20',
-                    'camara_comercio_file'=> 'nullable|file|mimes:pdf|max:5120',
-                    'rut_file'            => 'nullable|file|mimes:pdf|max:5120',
-                    'rut_personal_file'   => 'nullable|file|mimes:pdf|max:5120',
+                    'tipo_negocio'         => 'required|in:formal,informal',
+                    'habeas_data_accepted' => 'accepted',
+                    'direccion_fisica'     => 'required|string|max:255',
+                    'razon_social'         => ['required_if:tipo_negocio,formal', 'nullable', 'string', 'max:255', 'regex:/^[\pL\pN\s\.\,\&\'\-\#\/]+$/u'],
+                    'nit'                  => ['required_if:tipo_negocio,formal', 'nullable', 'string', 'regex:/^[0-9]+(-[0-9])?$/'],
+                    'nombre_comercial'     => ['required_if:tipo_negocio,informal', 'nullable', 'string', 'max:255', 'regex:/^[\pL\pN\s\.\,\&\'\-\#\/]+$/u'],
+                    'nombre_representante' => ['required_if:tipo_negocio,formal', 'nullable', 'string', 'max:255', 'regex:/^[\pL\s\.\'\-]+$/u'],
+                    'cedula_propietario'   => ['required', 'string', 'min:5', 'max:20', 'regex:/^[0-9]+$/'],
+                    'birthdate'            => ['nullable', 'date', 'before_or_equal:' . now()->subYears(18)->format('Y-m-d')],
+                    'camara_comercio_file' => 'nullable|file|mimes:pdf|max:5120',
+                    'rut_file'             => 'nullable|file|mimes:pdf|max:5120',
+                    'rut_personal_file'    => 'nullable|file|mimes:pdf|max:5120',
                 ], [
                     'tipo_negocio.required'          => 'Debe seleccionar el tipo de negocio.',
                     'habeas_data_accepted.accepted'  => 'Debe aceptar la politica de datos.',
                     'direccion_fisica.required'      => 'La direccion fisica es obligatoria.',
                     'razon_social.required_if'       => 'La razon social es obligatoria para empresas formales.',
+                    'razon_social.regex'             => 'La razón social puede contener letras, números y signos comerciales.',
                     'nit.required_if'                => 'El NIT es obligatorio para empresas formales.',
-                    'nit.regex'                      => 'El NIT debe tener el formato valido (ej. 123456789-1).',
+                    'nit.regex'                      => 'El NIT solo puede contener números y opcionalmente guion con dígito de verificación (ej. 123456789-1).',
                     'nombre_comercial.required_if'   => 'El nombre comercial es obligatorio.',
-                    'cedula_propietario.required_if' => 'La cedula es obligatoria.',
+                    'nombre_comercial.regex'         => 'El nombre comercial puede contener letras, números y signos comerciales.',
+                    'nombre_representante.regex'     => 'El nombre del representante legal solo puede contener letras y espacios (sin números).',
+                    'cedula_propietario.required'    => 'La cédula es obligatoria.',
+                    'cedula_propietario.regex'       => 'La cédula solo puede contener números (0-9).',
+                    'cedula_propietario.min'         => 'La cédula debe tener al menos 5 dígitos numéricos.',
+                    'birthdate.before_or_equal'      => 'El representante o propietario de la empresa debe ser mayor de 18 años.',
                 ]);
             }
         } elseif ($section === 'contact') {
             $request->validate([
-                'phone'          => 'nullable|string|max:20',
-                'phone_prefix'   => 'nullable|string|max:10',
-                'email'          => 'nullable|email',
-                'instagram'      => 'nullable|string|max:100',
-                'facebook'       => 'nullable|string|max:100',
-                'website'        => 'nullable|url',
-                'opening_time'   => 'nullable|string|max:10',
-                'closing_time'   => 'nullable|string|max:10',
-                'operating_days' => 'nullable|array',
-                'latitude'       => 'nullable|numeric',
-                'longitude'      => 'nullable|numeric',
-                'address'        => 'nullable|string|max:500',
+                'phone'                 => 'nullable|string|max:20',
+                'phone_prefix'          => 'nullable|string|max:10',
+                'email'                 => 'nullable|email',
+                'instagram'             => 'nullable|string|max:100',
+                'facebook'              => 'nullable|string|max:100',
+                'website'               => 'nullable|url',
+                'opening_time'          => 'nullable|string|max:10',
+                'closing_time'          => 'nullable|string|max:10',
+                'operating_days'        => 'nullable|array',
+                'has_weekend_schedule'  => 'nullable|boolean',
+                'weekend_opening_time'  => 'nullable|string|max:10',
+                'weekend_closing_time'  => 'nullable|string|max:10',
+                'latitude'              => 'nullable|numeric',
+                'longitude'             => 'nullable|numeric',
+                'address'               => 'nullable|string|max:500',
+                'state'                 => 'nullable|string|max:100',
+                'city'                  => 'nullable|string|max:100',
             ]);
         }
 
@@ -122,6 +156,27 @@ class CompanyController extends Controller
 
         if ($section === 'general') {
             $data = $request->only(['name', 'description', 'category', 'country', 'currency', 'state', 'city', 'postal_code']);
+
+            // Crear categoría personalizada al guardar si se llenó el campo
+            if ($request->filled('new_category_label')) {
+                $company = $user->company;
+                $label = trim($request->input('new_category_label'));
+                $slugBase = Str::slug($label);
+                $slug = $slugBase;
+                $counter = 1;
+                while (Tag::where('name', $slug)->exists()) {
+                    $slug = $slugBase . '-' . ($company ? $company->id : '0') . ($counter > 1 ? "-{$counter}" : '');
+                    $counter++;
+                }
+                $newTag = Tag::create([
+                    'company_id' => $company?->id,
+                    'name'       => $slug,
+                    'label'      => $label,
+                    'icon'       => $request->input('new_category_icon', 'bi-tag-fill'),
+                    'theme'      => ['accent' => $request->input('new_category_color', '#7F1D3F')],
+                ]);
+                $data['category'] = $newTag->label;
+            }
 
             if ($request->hasFile('logo') && $request->file('logo')->isValid()) {
                 $data['logo'] = $request->file('logo')->store('logos', 'public');
@@ -135,13 +190,40 @@ class CompanyController extends Controller
                 Log::warning("Banner no encontrado en request. hasFile=" . ($request->hasFile('banner') ? 'true' : 'false'));
             }
 
+            // Gestión de fotos del establecimiento comercial
+            $company = $user->company;
+            $currentPhotos = ($company && is_array($company->establishment_photos)) ? $company->establishment_photos : [];
+
+            // Eliminar fotos marcadas
+            if ($request->has('delete_establishment_photos')) {
+                $toDelete = $request->input('delete_establishment_photos');
+                if (is_array($toDelete)) {
+                    $currentPhotos = array_values(array_diff($currentPhotos, $toDelete));
+                }
+            }
+
+            // Agregar nuevas fotos subidas
+            if ($request->hasFile('establishment_photos')) {
+                foreach ($request->file('establishment_photos') as $photoFile) {
+                    if ($photoFile && $photoFile->isValid()) {
+                        $currentPhotos[] = $photoFile->store('establishments', 'public');
+                    }
+                }
+            }
+            $data['establishment_photos'] = $currentPhotos;
+
         } elseif ($section === 'legal') {
             $company = $user->company;
             $data = $request->only([
                 'tipo_negocio', 'razon_social', 'nit', 'nombre_comercial',
+                'nombre_representante', 'email_representante',
                 'cedula_propietario', 'habeas_data_accepted', 'direccion_fisica',
                 'country', 'state', 'city', 'postal_code', 'tax_id', 'currency', 'phone_prefix'
             ]);
+
+            if ($request->filled('birthdate')) {
+                $user->update(['birthdate' => $request->birthdate]);
+            }
             
             $canUpdateDocuments = (!$company || $company->status !== 'active' || $company->document_update_status === 'granted');
             
@@ -171,8 +253,10 @@ class CompanyController extends Controller
             $data = $request->only([
                 'phone', 'email', 'instagram', 'facebook', 'website',
                 'opening_time', 'closing_time', 'operating_days',
-                'latitude', 'longitude', 'address'
+                'has_weekend_schedule', 'weekend_opening_time', 'weekend_closing_time',
+                'latitude', 'longitude', 'address', 'state', 'city'
             ]);
+            $data['has_weekend_schedule'] = $request->has('has_weekend_schedule');
             if ($request->has('operating_days')) {
                 $data['operating_days'] = is_array($request->operating_days) ? $request->operating_days : json_decode($request->operating_days, true);
             }

@@ -5,124 +5,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
-<style>
-    body, h1, h2, h3, h4, h5, h6, p, a, button, input, label { font-family: 'Plus Jakarta Sans', sans-serif; }
-    
-    /* Interactive Map Styles */
-    #company_reg_map {
-        width: 100%;
-        height: 100%;
-        min-height: 230px;
-        z-index: 1;
-    }
-    .leaflet-pane { z-index: 10 !important; }
-    .leaflet-top, .leaflet-bottom { z-index: 20 !important; }
-    
-    .btn-spotlight {
-        background: var(--sl-primary);
-        color: var(--sl-text-on-dark) !important;
-        border: none;
-        border-radius: var(--sl-radius-pill, 9999px);
-        transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
-        box-shadow: 0 4px 15px rgba(127, 29, 63, 0.25);
-    }
-    .btn-spotlight:hover { 
-        background: var(--sl-primary-dark);
-        transform: translateY(-2px); 
-        box-shadow: 0 8px 25px rgba(127, 29, 63, 0.35);
-        color: var(--sl-text-on-dark) !important;
-    }
-    .text-spotlight-magenta { color: var(--sl-primary) !important; }
-    .btn-outline-spotlight {
-        border: 2px solid var(--sl-primary);
-        color: var(--sl-primary) !important;
-        border-radius: var(--sl-radius-pill, 9999px);
-        background: transparent;
-        transition: all 0.2s;
-    }
-    .btn-outline-spotlight:hover {
-        background: var(--sl-primary-soft);
-        color: var(--sl-primary-dark);
-        transform: translateY(-1px);
-    }
-    
-    /* Mockup specifics */
-    .register-glass-card {
-        background: rgba(255, 255, 255, 0.9);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border: 1px solid var(--sl-border);
-        border-radius: 16px;
-        padding: 1.5rem;
-    }
-
-    /* Translation Logic */
-    html[lang="es"] .lang-en { display: none !important; }
-    html[lang="en"] .lang-es { display: none !important; }
-    
-    .role-circle-label {
-        width: 80px; height: 80px;
-        border: 2px solid var(--sl-border);
-        background: var(--sl-primary-soft);
-        color: var(--sl-text-muted);
-        border-radius: 50%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .role-circle-label:hover {
-        border-color: var(--sl-accent);
-        transform: translateY(-2px);
-    }
-    .btn-check:checked + .role-circle-label {
-        border-color: var(--sl-primary);
-        background: #ffffff;
-        color: var(--sl-primary);
-        box-shadow: 0 4px 14px rgba(127, 29, 63, 0.2);
-    }
-    .role-text { font-size: 0.75rem; font-weight: 700; color: var(--sl-text-heading); margin-top: 8px; text-align: center; }
-
-    /* Country Selection Cards */
-    .country-select-card {
-        border: 2px solid var(--sl-border, #e2e8f0);
-        background: #ffffff;
-        border-radius: 14px;
-        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-        color: var(--sl-text-body, #475569);
-    }
-    .country-select-card:hover {
-        border-color: var(--sl-accent, #D98C9A);
-        background: #FFFCF7;
-        transform: translateY(-2px);
-    }
-    .btn-check:checked + .country-select-card {
-        border-color: var(--sl-primary, #7F1D3F) !important;
-        background-color: #FFFCF7 !important;
-        color: var(--sl-primary, #7F1D3F) !important;
-        box-shadow: 0 4px 14px rgba(127, 29, 63, 0.15);
-    }
-    .btn-check:checked + .country-select-card .fw-bold {
-        color: var(--sl-primary, #7F1D3F) !important;
-    }
-
-    /* Moving background blobs */
-    .blob {
-        position: absolute;
-        filter: blur(80px);
-        z-index: 0;
-        opacity: 0.9;
-        border-radius: 50%;
-        animation: floatBlob 15s infinite alternate ease-in-out;
-    }
-    @keyframes floatBlob {
-        0% { transform: translate(0, 0) scale(1); }
-        50% { transform: translate(100px, 50px) scale(1.1); }
-        100% { transform: translate(-50px, 100px) scale(0.9); }
-    }
-</style>
+<link href="{{ asset('css/auth.css') }}" rel="stylesheet">
 @endpush
 @section('content')
 <div class="min-vh-100 d-flex align-items-center justify-content-center position-relative py-5" style="background-color: var(--sl-bg); min-height: 100vh;">
@@ -241,7 +124,8 @@
                             <label class="form-label text-sm fw-semibold text-dark mb-1">
                                 <span class="lang-en">Full Name</span><span class="lang-es">Nombre completo</span>
                             </label>
-                            <input type="text" name="name" class="form-control text-sm rounded-pill px-3 py-2" style="background-color: #f8fafc; border: 1px solid #e2e8f0;" placeholder="Tu nombre completo" value="{{ old('name') }}" required>
+                            <input type="text" name="name" class="form-control text-sm rounded-pill px-3 py-2" style="background-color: #f8fafc; border: 1px solid #e2e8f0;" placeholder="Tu nombre completo" value="{{ old('name') }}" pattern="^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\.\'\-]+$" oninput="this.value = this.value.replace(/[0-9]/g, '').replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\.\'\-]/g, '')" required>
+                            <small class="text-muted" style="font-size: 0.72rem;">Solo letras y espacios (sin números)</small>
                         </div>
                         <div class="mb-3">
                             <label class="form-label text-sm fw-semibold text-dark mb-1">
@@ -351,6 +235,7 @@
 
 @push('scripts')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="{{ asset('js/colombia-geo.js') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
@@ -509,16 +394,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.switchRegistrationCountry(selectedCountry);
             }
 
-            // Initialize / recalculate map size once step-2 is visible (if Colombia)
-            if (selectedCountry === 'CO') {
-                setTimeout(() => {
-                    if (typeof window.initCompanyRegMap === 'function') {
-                        window.initCompanyRegMap();
-                    } else if (window._regMapInstance) {
-                        window._regMapInstance.invalidateSize();
-                    }
-                }, 300);
-            }
+            // Initialize / recalculate map size once step-2 is visible
+            setTimeout(() => {
+                if (typeof window.initCompanyRegMap === 'function') {
+                    window.initCompanyRegMap();
+                } else if (window._regMapInstance) {
+                    window._regMapInstance.invalidateSize();
+                }
+            }, 300);
         }});
     }
 
@@ -572,15 +455,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (typeof window.switchRegistrationCountry === 'function') {
             window.switchRegistrationCountry(getSelectedCountry());
         }
-        if (getSelectedCountry() === 'CO') {
-            setTimeout(() => {
-                if (typeof window.initCompanyRegMap === 'function') {
-                    window.initCompanyRegMap();
-                } else if (window._regMapInstance) {
-                    window._regMapInstance.invalidateSize();
-                }
-            }, 300);
-        }
+        setTimeout(() => {
+            if (typeof window.initCompanyRegMap === 'function') {
+                window.initCompanyRegMap();
+            } else if (window._regMapInstance) {
+                window._regMapInstance.invalidateSize();
+            }
+        }, 300);
     } else {
         // Disable business fields initially
         if (businessFieldsContainer) {

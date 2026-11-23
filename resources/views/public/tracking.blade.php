@@ -2,59 +2,7 @@
 @section('title', 'Rastreo de Envíos en Tiempo Real - Spotlight')
 
 @push('styles')
-<style>
-    .pulse-live {
-        display: inline-block;
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        background-color: #10b981;
-        box-shadow: 0 0 0 rgba(16, 185, 129, 0.4);
-        animation: pulseAnimation 1.6s infinite;
-    }
-    @keyframes pulseAnimation {
-        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-        70% { transform: scale(1.1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
-        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-    }
-    .timeline-log {
-        position: relative;
-        padding-left: 32px;
-    }
-    .timeline-log::before {
-        content: '';
-        position: absolute;
-        top: 10px;
-        bottom: 10px;
-        left: 11px;
-        width: 2px;
-        background: #e2e8f0;
-    }
-    .timeline-item {
-        position: relative;
-        margin-bottom: 24px;
-    }
-    .timeline-dot {
-        position: absolute;
-        left: -32px;
-        top: 4px;
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        background: #ffffff;
-        border: 2px solid var(--sl-primary, #7F1D3F);
-        color: var(--sl-primary, #7F1D3F);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.75rem;
-    }
-    .timeline-item:first-child .timeline-dot {
-        background: var(--sl-primary, #7F1D3F);
-        color: #ffffff;
-        box-shadow: 0 0 10px rgba(127, 29, 63, 0.35);
-    }
-</style>
+<link href="{{ asset('css/public.css') }}" rel="stylesheet">
 @endpush
 
 @section('content')
@@ -66,7 +14,10 @@
             <span class="fw-bold fs-4" style="color: var(--sl-primary, #7F1D3F); font-family: 'Outfit', sans-serif;">SPOTLIGHT</span>
             <span class="badge badge-purple ms-2 d-none d-sm-inline-block">PORTAL LOGÍSTICO</span>
         </a>
-        <div class="d-flex gap-2">
+        <div class="d-flex gap-2 align-items-center">
+            <button id="btnSwitchLang" type="button" class="btn btn-sm btn-light border rounded-pill px-3 fw-bold js-switch-lang">
+                <i class="bi bi-translate me-1"></i> EN / ES
+            </button>
             @auth
                 <a href="{{ route('user.orders.index') }}" class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-semibold">
                     <i class="bi bi-bag-check me-1"></i> Mis Compras

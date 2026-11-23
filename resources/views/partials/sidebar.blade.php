@@ -52,22 +52,22 @@
     </a>
     <a href="{{ route('chat.index') }}" class="vs-nav-link {{ request()->is('chat*') ? 'active' : '' }}" id="sidebar-messages-link">
         <i class="bi bi-chat-dots fs-5"></i> Mensajes
-        <span id="unread-badge" class="badge badge-warning ms-auto d-none" style="font-size: 0.75rem; padding: 4px 8px;">0</span>
+        <span id="unread-badge" class="badge badge-warning ms-auto d-none vs-sidebar-unread-badge">0</span>
     </a>
     <a href="{{ route('business.company.edit') }}" class="vs-nav-link">
         <i class="bi bi-gear fs-5"></i> Configuración
     </a>
 
     <div class="mt-auto pt-4">
-        <div class="p-3 rounded-4" style="background: rgba(255, 255, 255, 0.06); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.08);">
+        <div class="p-3 rounded-4 vs-sidebar-network-card">
             <div class="d-flex align-items-center gap-2 mb-2">
-                <i class="bi bi-geo-alt" style="color: var(--sl-accent);"></i>
-                <span class="fw-bold" style="font-size: 0.8rem; color: var(--sl-accent); letter-spacing: 0.5px;">RED SPOTLIGHT</span>
+                <i class="bi bi-geo-alt text-sl-accent"></i>
+                <span class="fw-bold vs-sidebar-network-title">RED SPOTLIGHT</span>
             </div>
-            <p style="font-size: 0.75rem; color: var(--sl-text-on-dark-muted); line-height: 1.4; margin-bottom: 10px;">Comercio artesanal e independiente conectado (🇨🇴 CO • 🇲🇽 MX).</p>
+            <p class="vs-sidebar-network-desc">Comercio artesanal e independiente conectado (🇨🇴 CO • 🇲🇽 MX).</p>
             <div class="d-flex justify-content-between align-items-center">
-                <span style="font-size: 0.65rem; color: var(--sl-text-on-dark-muted);">Plataforma activa</span>
-                <span class="badge badge-warning" style="font-size: 0.65rem;">En línea</span>
+                <span class="vs-sidebar-network-meta">Plataforma activa</span>
+                <span class="badge badge-warning vs-sidebar-network-meta">En línea</span>
             </div>
         </div>
     </div>
@@ -95,47 +95,23 @@
 @if($role === 'admin')
 <a href="{{ route('chat.index') }}" class="vs-nav-link {{ request()->is('chat*') ? 'active' : '' }}" id="sidebar-messages-link">
     <i class="bi bi-chat-dots fs-5"></i> Mensajes
-    <span id="unread-badge" class="badge badge-danger ms-auto d-none" style="font-size: 0.65rem; min-width: 18px; border-radius: 9px;"></span>
+    <span id="unread-badge" class="badge badge-danger ms-auto d-none vs-sidebar-unread-admin"></span>
 </a>
 @endif
 
 {{-- Toast de nuevo mensaje --}}
-<div id="new-msg-toast" style="
-    display: none;
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    z-index: 9999;
-    background: var(--sl-navy);
-    color: #fff;
-    padding: 14px 20px;
-    border-radius: 14px;
-    box-shadow: 0 8px 32px rgba(41,37,42,0.4);
-    min-width: 280px;
-    max-width: 340px;
-    cursor: pointer;
-    border-left: 4px solid var(--sl-primary);
-    backdrop-filter: blur(8px);
-    transition: all 0.3s ease;
-">
+<div id="new-msg-toast" class="vs-msg-toast">
     <div class="d-flex align-items-center gap-3">
-        <div style="background: rgba(127, 29, 63, 0.3); border-radius: 50%; width: 42px; height: 42px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-            <i class="bi bi-chat-dots-fill" style="color: var(--sl-accent); font-size:1.2rem;"></i>
+        <div class="vs-msg-toast-icon">
+            <i class="bi bi-chat-dots-fill fs-5 text-sl-accent"></i>
         </div>
         <div>
-            <div style="font-weight:700; font-size:0.85rem; margin-bottom:2px;">💬 Nuevos mensajes</div>
-            <div id="toast-msg-text" style="font-size:0.78rem; color:#D8CBD0; line-height:1.3;">Tienes mensajes sin leer</div>
+            <div class="fw-bold small mb-1">💬 Nuevos mensajes</div>
+            <div id="toast-msg-text" class="small text-white-50 lh-sm">Tienes mensajes sin leer</div>
         </div>
-        <button onclick="document.getElementById('new-msg-toast').style.display='none'" style="background:none;border:none;color:#64748b;margin-left:auto;font-size:1.1rem;line-height:1;padding:0;" title="Cerrar">✕</button>
+        <button onclick="document.getElementById('new-msg-toast').style.display='none'" class="vs-msg-toast-close" title="Cerrar">✕</button>
     </div>
 </div>
-
-<style>
-@keyframes pulse-badge {
-    0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239,68,68,0.5); }
-    50%       { transform: scale(1.15); box-shadow: 0 0 0 5px rgba(239,68,68,0); }
-}
-</style>
 
 <script>
 (function() {

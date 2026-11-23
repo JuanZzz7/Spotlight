@@ -107,5 +107,6 @@ class DatabaseSeeder extends Seeder
 
         // Seeder especializado para Facturación Electrónica DIAN y usuario de empresa formal
         $this->call(FormalBusinessBillingSeeder::class);
+        $this->call(TagSeeder::class);
     }
 }

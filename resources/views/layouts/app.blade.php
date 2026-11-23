@@ -19,15 +19,31 @@
     <link href="{{ asset('css/components.css') }}" rel="stylesheet">
     <link href="{{ asset('css/layout.css') }}" rel="stylesheet">
     <link href="{{ asset('css/utilities.css') }}" rel="stylesheet">
+    @auth
+        @if(in_array(auth()->user()->role, ['user', 'business']))
+        {{-- El widget de IA se renderiza en el <body>, después de @stack('styles'),
+             habilitado exclusivamente para consumidores y emprendedores registrados --}}
+        <link href="{{ asset('css/chatbot.css') }}" rel="stylesheet">
+        @endif
+    @endauth
     @stack('styles')
+    <script>
+        (function(){
+            var l = localStorage.getItem('spotlight-lang') || 'es';
+            document.documentElement.setAttribute('lang', l);
+        })();
+    </script>
 </head>
 <body>
 @yield('content')
 <x-cookie-banner />
 @auth
-<x-chatbot-widget />
+    @if(in_array(auth()->user()->role, ['user', 'business']))
+        <x-chatbot-widget />
+    @endif
 @endauth
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ asset('js/i18n.js') }}"></script>
 @stack('scripts')
 </body>
 </html>

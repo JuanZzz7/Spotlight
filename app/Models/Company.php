@@ -11,7 +11,7 @@ class Company extends Model
         // Operación multinacional (Colombia / México)
         'country', 'state', 'city', 'postal_code', 'currency', 'phone_prefix', 'tax_id',
         // Vista general
-        'name', 'description', 'category', 'logo', 'banner',
+        'name', 'description', 'category', 'logo', 'banner', 'establishment_photos',
         // Aspecto legal
         'tipo_negocio', 'razon_social', 'nit', 'nombre_comercial',
         'cedula_propietario', 'habeas_data_accepted', 'direccion_fisica',
@@ -19,20 +19,26 @@ class Company extends Model
         // Redes y contacto
         'address', 'phone', 'email', 'instagram', 'facebook', 'website',
         'opening_time', 'closing_time', 'operating_days',
+        'has_weekend_schedule', 'weekend_opening_time', 'weekend_closing_time',
         'latitude', 'longitude',
         // Datos bancarios y dispersión Wompi
         'bank_name', 'account_type', 'account_number', 'account_holder_name',
         'account_holder_doc_type', 'account_holder_doc_number', 'wompi_merchant_id', 'split_rule_id',
-        // Estado
-        'status',
+        // Estado y Configuración de Chat
+        'status', 'chat_status', 'chat_visibility', 'chat_quick_replies',
     ];
 
     protected $casts = [
-        'operating_days' => 'array',
+        'operating_days'       => 'array',
+        'has_weekend_schedule' => 'boolean',
+        'establishment_photos' => 'array',
+        'chat_visibility'      => 'boolean',
+        'chat_quick_replies'   => 'array',
     ];
 
     public function user()     { return $this->belongsTo(User::class); }
     public function products() { return $this->hasMany(Product::class); }
+    public function customTags() { return $this->hasMany(Tag::class); }
     public function expenses() { return $this->hasMany(Expense::class); }
     public function orders()   { return $this->hasMany(Order::class); }
     public function settlements() { return $this->hasMany(CompanySettlement::class); }
@@ -73,8 +79,14 @@ class Company extends Model
             return false;
         }
 
-        $open = $this->opening_time ? substr($this->opening_time, 0, 5) : '08:00';
-        $close = $this->closing_time ? substr($this->closing_time, 0, 5) : '19:00';
+        $isWeekend = in_array($currentDay, ['saturday', 'sunday']);
+        if ($isWeekend && $this->has_weekend_schedule && $this->weekend_opening_time && $this->weekend_closing_time) {
+            $open = substr($this->weekend_opening_time, 0, 5);
+            $close = substr($this->weekend_closing_time, 0, 5);
+        } else {
+            $open = $this->opening_time ? substr($this->opening_time, 0, 5) : '08:00';
+            $close = $this->closing_time ? substr($this->closing_time, 0, 5) : '19:00';
+        }
 
         return ($currentTime >= $open && $currentTime <= $close);
     }
@@ -82,8 +94,17 @@ class Company extends Model
     public function getScheduleStatusAttribute(): array
     {
         $isOpen = $this->isOpenNow();
-        $open = $this->opening_time ? substr($this->opening_time, 0, 5) : '08:00';
-        $close = $this->closing_time ? substr($this->closing_time, 0, 5) : '19:00';
+        $now = now()->setTimezone('America/Bogota');
+        $currentDay = strtolower($now->format('l'));
+        $isWeekend = in_array($currentDay, ['saturday', 'sunday']);
+
+        if ($isWeekend && $this->has_weekend_schedule && $this->weekend_opening_time && $this->weekend_closing_time) {
+            $open = substr($this->weekend_opening_time, 0, 5);
+            $close = substr($this->weekend_closing_time, 0, 5);
+        } else {
+            $open = $this->opening_time ? substr($this->opening_time, 0, 5) : '08:00';
+            $close = $this->closing_time ? substr($this->closing_time, 0, 5) : '19:00';
+        }
 
         $openFormatted = date('g:i A', strtotime($open));
         $closeFormatted = date('g:i A', strtotime($close));
@@ -102,6 +123,22 @@ class Company extends Model
             return asset('storage/' . $this->logo);
         }
         return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&background=7F1D3F&color=fff';
+    }
+
+    public function getBannerUrlAttribute(): ?string
+    {
+        if ($this->banner) {
+            return asset('storage/' . $this->banner);
+        }
+        return null;
+    }
+
+    public function getEstablishmentPhotoUrlsAttribute(): array
+    {
+        if (!is_array($this->establishment_photos) || empty($this->establishment_photos)) {
+            return [];
+        }
+        return array_map(fn($photo) => asset('storage/' . $photo), $this->establishment_photos);
     }
 
     public function fiscalProfile()

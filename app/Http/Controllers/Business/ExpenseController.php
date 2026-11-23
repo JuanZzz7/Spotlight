@@ -225,6 +225,28 @@ class ExpenseController extends Controller
             ->with('success', 'Egreso eliminado exitosamente.');
     }
 
+    public function invoice(Expense $expense)
+    {
+        $company = Auth::user()->company;
+        if (!$company || $expense->company_id !== $company->id) {
+            abort(403, 'No autorizado para ver este soporte contable.');
+        }
+
+        if (!$expense->invoice_path || !Storage::disk('public')->exists($expense->invoice_path)) {
+            return redirect()->route('business.expenses.index')
+                ->with('error', 'El archivo de soporte o factura no fue encontrado en el servidor. Es posible que se haya movido o eliminado.');
+        }
+
+        $fullPath = Storage::disk('public')->path($expense->invoice_path);
+        $mime = Storage::disk('public')->mimeType($expense->invoice_path) ?: 'application/octet-stream';
+        $filename = $expense->invoice_filename ?: basename($expense->invoice_path);
+
+        return response()->file($fullPath, [
+            'Content-Type' => $mime,
+            'Content-Disposition' => 'inline; filename="' . addslashes($filename) . '"',
+        ]);
+    }
+
     public function exportPdf(Request $request)
     {
         $company = Auth::user()->company;

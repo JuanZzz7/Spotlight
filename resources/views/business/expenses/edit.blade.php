@@ -61,7 +61,7 @@
                             <label class="form-label text-sm fw-semibold text-dark">Monto en Pesos (COP) *</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light text-muted fw-bold">$</span>
-                                <input type="number" name="amount" class="form-control rounded-end-3" value="{{ old('amount', (float)$expense->amount) }}" min="0" step="50" placeholder="0" required>
+                                <input type="number" name="amount" class="form-control rounded-end-3" value="{{ old('amount', (float)$expense->amount) }}" min="0" step="0.01" placeholder="0.00" required>
                             </div>
                         </div>
                         <div class="col-md-6">

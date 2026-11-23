@@ -3,28 +3,7 @@
 
 @push('styles')
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-    :root {
-        --sl-burgundy: #7F1D3F;
-        --sl-dusty-rose: #D98C9A;
-        --sl-soft-rose: #F6E7EB;
-        --sl-ivory: #FFFCF7;
-        --sl-charcoal: #29252A;
-    }
-    body {
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        background-color: #F8F9FA;
-        color: var(--sl-charcoal);
-    }
-    .font-outfit {
-        font-family: 'Outfit', sans-serif;
-    }
-    .result-card {
-        background-color: var(--sl-ivory);
-        border: 1px solid #ECE7E1;
-        border-radius: 20px;
-    }
-</style>
+<link href="{{ asset('css/checkout.css') }}" rel="stylesheet">
 @endpush
 
 @section('content')

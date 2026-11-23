@@ -137,4 +137,39 @@ class PublicController extends Controller
 
         return view('public.tracking', compact('trackingNumber', 'shipment', 'error'));
     }
+
+    /**
+     * Centro Público de Soporte y Legal (Política de Privacidad, Términos, Cookies, Devoluciones, PQRS).
+     */
+    public function legal(string $section = 'privacidad')
+    {
+        $validSections = ['privacidad', 'terminos', 'cookies', 'devoluciones', 'pqrs'];
+        if (!in_array($section, $validSections, true)) {
+            $section = 'privacidad';
+        }
+
+        return view('public.legal', compact('section'));
+    }
+
+    /**
+     * Procesa la radicación de una solicitud de PQRS & Garantías.
+     */
+    public function submitPqrs(\Illuminate\Http\Request $request)
+    {
+        $validated = $request->validate([
+            'type'         => 'required|string|in:peticion,queja,reclamo,sugerencia,garantia',
+            'name'         => 'required|string|max:120',
+            'email'        => 'required|email|max:150',
+            'phone'        => 'nullable|string|max:30',
+            'order_number' => 'nullable|string|max:50',
+            'subject'      => 'required|string|max:180',
+            'message'      => 'required|string|min:10|max:2500',
+        ]);
+
+        $ticketCode = 'PQRS-' . date('Y') . '-' . strtoupper(substr(md5(uniqid((string) mt_rand(), true)), 0, 6));
+
+        return redirect()
+            ->route('public.legal', ['section' => 'pqrs'])
+            ->with('pqrs_success', "Tu solicitud ({$validated['subject']}) ha sido radicada exitosamente con el número {$ticketCode}. Nuestro equipo de Soporte & Legal te responderá al correo {$validated['email']} dentro de los plazos de ley.");
+    }
 }

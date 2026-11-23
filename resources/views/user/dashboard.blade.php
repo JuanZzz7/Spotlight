@@ -1,446 +1,561 @@
 @extends('layouts.dashboard')
-@section('title','Mercado de Tiendas - Spotlight')
+@section('title', 'Mercado de Tiendas - Spotlight')
 
 @section('dashboard-content')
-{{-- Area de Filtros y Búsqueda Compacta --}}
-<div class="market-hero-search p-3 p-md-3 mb-4 rounded-4 position-relative overflow-hidden shadow-xs" style="background: linear-gradient(135deg, #ffffff 0%, #FFFCF7 60%, #F6E7EB 100%); border: 1px solid #D98C9A;">
-    <div class="position-relative z-1">
-        <!-- Formulario de Búsqueda y Filtros Compacto -->
-        <form action="{{ route('user.dashboard') }}" method="GET" class="row g-2 align-items-end">
-            <div class="col-lg-5 col-md-6">
-                <label class="form-label text-xs mb-1 text-uppercase fw-bold" style="letter-spacing: 0.5px; font-size: 0.7rem; color: #7F1D3F;">
-                    <i class="bi bi-search me-1"></i> BUSCAR PRODUCTO
-                </label>
-                <div class="input-group shadow-xs rounded-pill overflow-hidden border" style="border-color: #D98C9A !important;">
-                    <span class="input-group-text bg-white border-0 text-muted ps-3 py-1">
-                        <i class="bi bi-search" style="color: #7F1D3F;"></i>
+@php
+    $activeCategory = request('category');
+    $activeCompanyId = request('company_id');
+    $activeCompany = $activeCompanyId ? $companies->firstWhere('id', $activeCompanyId) : null;
+    $activeQuery = request('q');
+    $activeSort = request('sort', 'latest');
+    $hasActiveFilters = !empty($activeQuery) || !empty($activeCategory) || !empty($activeCompanyId) || !empty($market) || ($activeSort !== 'latest');
+
+    // Mapeo temático para animación de categorías
+    $themeAccent = $activeTag?->accent_color ?? '#7F1D3F';
+    $tagColorMap = isset($allTags) ? $allTags->pluck('accent_color', 'label')->toArray() : [];
+@endphp
+
+<div class="consumer-split-wrapper">
+    {{-- =======================================================================
+         COLUMNA IZQUIERDA: VITRINA DE PRODUCTOS (3 COLUMNAS SEGÚN WIREFRAME)
+         ======================================================================= --}}
+    <div class="consumer-products-canvas">
+        
+        {{-- Cabecera compacta y original del lienzo de productos --}}
+        <div class="consumer-canvas-header d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4 pb-3">
+            <div>
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <span class="consumer-section-kicker">
+                        <i class="bi bi-compass-fill me-1"></i> VITRINA LOCAL
                     </span>
-                    <input type="text" name="q" class="form-control bg-white border-0 ps-2 py-1 fw-medium" style="box-shadow: none; font-size: 0.88rem; height: 38px;" placeholder="¿Qué deseas buscar? Ej: Café, Queso, Ruana..." value="{{ request('q') }}">
+                    @if($market === 'CO')
+                        <span class="badge rounded-pill consumer-market-tag">🇨🇴 Mercado Colombia</span>
+                    @elseif($market === 'MX')
+                        <span class="badge rounded-pill consumer-market-tag">🇲🇽 Mercado México</span>
+                    @endif
+                </div>
+                <h3 class="consumer-canvas-title mb-0 mt-1">
+                    @if($activeCompany)
+                        {{ $activeCompany->name }}
+                    @elseif($activeCategory)
+                        {{ $activeCategory }}
+                    @elseif($activeQuery)
+                        Resultados para “{{ $activeQuery }}”
+                    @else
+                        Productos Destacados
+                    @endif
+                </h3>
+            </div>
+
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <span class="consumer-count-pill">
+                    <strong>{{ $products->total() }}</strong> {{ $products->total() === 1 ? 'producto' : 'productos' }}
+                </span>
+
+                {{-- Botones de vista (Cuadrícula 3 col vs Lista) --}}
+                <div class="consumer-view-switcher d-flex align-items-center p-1 rounded-pill">
+                    <button type="button" id="btnViewGrid" onclick="setProductView('grid')" class="view-btn active-view-btn rounded-circle d-flex align-items-center justify-content-center" title="Vista de 3 columnas">
+                        <i class="bi bi-grid-3x3-gap-fill"></i>
+                    </button>
+                    <button type="button" id="btnViewList" onclick="setProductView('list')" class="view-btn rounded-circle d-flex align-items-center justify-content-center" title="Vista detallada en lista">
+                        <i class="bi bi-view-stacked"></i>
+                    </button>
                 </div>
             </div>
-
-            <div class="col-lg-3 col-md-6">
-                <label class="form-label text-xs mb-1 text-uppercase fw-bold" style="letter-spacing: 0.5px; font-size: 0.7rem; color: #7F1D3F;">
-                    <i class="bi bi-tag-fill me-1"></i> CATEGORÍA
-                </label>
-                <div class="shadow-xs rounded-pill overflow-hidden border" style="border-color: #D98C9A !important;">
-                    <select name="category" class="form-select bg-white border-0 py-1 fw-medium" style="box-shadow: none; font-size: 0.88rem; height: 38px; padding-left: 14px;">
-                        <option value="">Todas las categorías</option>
-                        @foreach($categories as $cat)
-                            <option value="{{ $cat }}" {{ request('category')===$cat?'selected':'' }}>{{ $cat }}</option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
-
-            <div class="col-lg-3 col-md-8">
-                <label class="form-label text-xs mb-1 text-uppercase fw-bold" style="letter-spacing: 0.5px; font-size: 0.7rem; color: #7F1D3F;">
-                    <i class="bi bi-shop me-1"></i> COMERCIO O TIENDA
-                </label>
-                <div class="shadow-xs rounded-pill overflow-hidden border" style="border-color: #D98C9A !important;">
-                    <select name="company_id" class="form-select bg-white border-0 py-1 fw-medium" style="box-shadow: none; font-size: 0.88rem; height: 38px; padding-left: 14px;">
-                        <option value="">Todos los comercios</option>
-                        @foreach($companies as $company)
-                            <option value="{{ $company->id }}" {{ request('company_id')==$company->id?'selected':'' }}>{{ $company->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
-
-            <div class="col-lg-1 col-md-4 d-flex">
-                <button type="submit" class="btn text-white w-100 rounded-pill d-flex align-items-center justify-content-center shadow-xs btn-filter-spotlight" style="background: linear-gradient(135deg, #7F1D3F 0%, #5E122C 100%); height: 38px; border: none; font-weight: 700; transition: transform 0.2s, box-shadow 0.2s;" title="Filtrar">
-                    <i class="bi bi-funnel-fill me-md-0 me-1"></i>
-                    <span class="d-inline d-lg-none ms-1">Filtrar</span>
-                </button>
-            </div>
-        </form>
-
-        <!-- Selector Multinacional de Mercados (Colombia y México) -->
-        <div class="d-flex align-items-center gap-2 mb-2 pb-2 border-bottom flex-wrap" style="border-color: rgba(217, 140, 154, 0.25) !important;">
-            <span class="text-uppercase fw-bold me-1" style="font-size: 0.68rem; letter-spacing: 0.5px; color: #7F1D3F;">
-                <i class="bi bi-globe2 me-1"></i> MERCADO:
-            </span>
-            <a href="{{ route('user.dashboard', array_merge(request()->except('country', 'page'), [])) }}" class="badge rounded-pill px-3 py-2 text-decoration-none shadow-xs {{ empty($market) ? 'bg-dark text-white' : 'bg-white text-dark border' }}" style="font-size: 0.76rem;">
-                🌐 Todos los mercados
-            </a>
-            <a href="{{ route('user.dashboard', array_merge(request()->except('page'), ['country' => 'CO'])) }}" class="badge rounded-pill px-3 py-2 text-decoration-none shadow-xs {{ $market === 'CO' ? 'bg-dark text-white' : 'bg-white text-dark border' }}" style="font-size: 0.76rem;">
-                🇨🇴 Colombia (Ubaté y Nacional)
-            </a>
-            <a href="{{ route('user.dashboard', array_merge(request()->except('page'), ['country' => 'MX'])) }}" class="badge rounded-pill px-3 py-2 text-decoration-none shadow-xs {{ $market === 'MX' ? 'bg-dark text-white' : 'bg-white text-dark border' }}" style="font-size: 0.76rem;">
-                🇲🇽 México
-            </a>
         </div>
 
-        <!-- Filtros Rápidos Compactos -->
-        <div class="d-flex align-items-center gap-2 mt-2 pt-1 border-top flex-wrap" style="border-color: rgba(217, 140, 154, 0.25) !important;">
-            <span class="text-uppercase fw-bold me-1" style="font-size: 0.65rem; letter-spacing: 0.5px; color: #7F1D3F;">
-                <i class="bi bi-stars me-1"></i> CATEGORÍAS:
+        {{-- Chips de filtros activos (si el usuario filtró algo desde la columna derecha) --}}
+        @if($hasActiveFilters)
+        <div class="consumer-active-filters d-flex align-items-center flex-wrap gap-2 mb-4">
+            <span class="text-xs fw-bold text-uppercase consumer-filter-label">
+                <i class="bi bi-sliders2 me-1"></i> Activos:
             </span>
-            @foreach($categories->take(5) as $cat)
-                <a href="{{ route('user.dashboard', array_merge(request()->except('page'), ['category' => $cat])) }}" class="badge rounded-pill px-2 py-1 text-decoration-none shadow-xs category-quick-pill {{ request('category') === $cat ? 'active-pill' : '' }}" style="font-size: 0.72rem;">
-                    {{ $cat }}
-                </a>
-            @endforeach
-            @if(request()->hasAny(['q', 'category', 'company_id', 'country']))
-                <a href="{{ route('user.dashboard') }}" class="badge rounded-pill px-2 py-1 text-decoration-none bg-white text-danger border shadow-xs ms-auto" style="border-color: #fca5a5 !important; font-size: 0.72rem;">
-                    <i class="bi bi-x-circle me-1"></i> Limpiar filtros
+
+            @if($activeQuery)
+                <a href="{{ route('user.dashboard', request()->except(['q', 'page'])) }}" class="consumer-active-chip text-decoration-none">
+                    <span>Búsqueda: “{{ $activeQuery }}”</span>
+                    <i class="bi bi-x-lg"></i>
                 </a>
             @endif
+
+            @if($activeCategory)
+                <a href="{{ route('user.dashboard', request()->except(['category', 'page'])) }}" class="consumer-active-chip text-decoration-none">
+                    <span>Categoría: {{ $activeCategory }}</span>
+                    <i class="bi bi-x-lg"></i>
+                </a>
+            @endif
+
+            @if($activeCompany)
+                <a href="{{ route('user.dashboard', request()->except(['company_id', 'page'])) }}" class="consumer-active-chip text-decoration-none">
+                    <span>Comercio: {{ $activeCompany->name }}</span>
+                    <i class="bi bi-x-lg"></i>
+                </a>
+            @endif
+
+            @if($market)
+                <a href="{{ route('user.dashboard', request()->except(['country', 'page'])) }}" class="consumer-active-chip text-decoration-none">
+                    <span>País: {{ $market === 'MX' ? '🇲🇽 México' : '🇨🇴 Colombia' }}</span>
+                    <i class="bi bi-x-lg"></i>
+                </a>
+            @endif
+
+            <a href="{{ route('user.dashboard') }}" class="consumer-clear-all ms-auto text-decoration-none">
+                <i class="bi bi-arrow-counterclockwise me-1"></i> Restablecer todo
+            </a>
         </div>
-    </div>
-</div>
+        @endif
 
-{{-- Encabezado del Catálogo y Controles de Vista --}}
-<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
-    <div class="d-flex align-items-baseline gap-2">
-        <h4 class="fw-bold text-dark mb-0" style="letter-spacing: -0.5px; font-family: 'Outfit', sans-serif;">Catálogo de Productos</h4>
-        <span class="text-muted d-none d-sm-inline" style="font-size: 0.82rem;">
-            ({{ $products->total() }} productos disponibles en {{ $companies->count() }} comercios)
-        </span>
-    </div>
-    
-    <div class="d-flex align-items-center gap-3">
-        <!-- Selector de Orden -->
-        <div class="d-flex align-items-center gap-1">
-            <span class="text-muted fw-semibold d-none d-sm-inline" style="font-size: 0.8rem;">Ordenar:</span>
-            <select class="form-select form-select-sm border rounded-pill bg-white fw-bold text-dark shadow-xs px-3 py-1" style="width: auto; font-size: 0.8rem; border-color: #e2e8f0;">
-                <option>Más populares</option>
-                <option>Menor Precio</option>
-                <option>Mayor Precio</option>
-                <option>Recientes</option>
-            </select>
+        {{-- Banner Temático Dinámico con Animación de Entrada --}}
+        @if($activeCategory)
+        <div class="category-theme-banner mb-4 p-3 rounded-4 text-white shadow-sm d-flex align-items-center justify-content-between"
+             style="background: linear-gradient(135deg, {{ $themeAccent }} 0%, color-mix(in srgb, {{ $themeAccent }} 65%, #1f1d24) 100%); border-left: 6px solid #ffffff;">
+            <div class="d-flex align-items-center gap-3 min-w-0">
+                <div class="rounded-circle p-2.5 bg-white bg-opacity-20 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 44px; height: 44px; font-size: 1.25rem;">
+                    <i class="bi {{ $activeTag?->icon ?: 'bi-tag-fill' }} text-white"></i>
+                </div>
+                <div class="min-w-0">
+                    <span class="badge bg-white bg-opacity-20 text-white rounded-pill px-2.5 py-0.5 text-2xs fw-bold text-uppercase mb-1 d-inline-block">
+                        Categoría Seleccionada
+                    </span>
+                    <h5 class="fw-bold mb-0 text-white text-truncate">{{ $activeTag?->label ?: $activeCategory }}</h5>
+                    <small class="text-white text-opacity-80 text-xs">
+                        Vitrina temática con productos filtrados para esta sección
+                    </small>
+                </div>
+            </div>
+            <a href="{{ route('user.dashboard', request()->except(['category', 'page'])) }}" class="btn btn-sm btn-light rounded-pill px-3 py-1 fw-bold text-xs shadow-xs text-nowrap flex-shrink-0 ms-2" title="Quitar filtro">
+                <i class="bi bi-x-circle me-1"></i> Ver todas
+            </a>
         </div>
+        @endif
 
-        <!-- Botones de Cambio de Vista (Bloque vs Lista) FUNCIONAL -->
-        <div class="d-flex gap-1 bg-white rounded-pill p-1 shadow-xs border" style="border-color: #D98C9A;">
-            <button type="button" id="btnViewGrid" onclick="setProductView('grid')" class="btn btn-sm rounded-circle d-flex align-items-center justify-content-center view-btn active-view-btn" style="width: 32px; height: 32px;" title="Ver en bloque (cuadrícula)">
-                <i class="bi bi-grid-fill"></i>
-            </button>
-            <button type="button" id="btnViewList" onclick="setProductView('list')" class="btn btn-sm rounded-circle d-flex align-items-center justify-content-center view-btn" style="width: 32px; height: 32px;" title="Ver en lista">
-                <i class="bi bi-list-ul"></i>
-            </button>
-        </div>
-    </div>
-</div>
+        {{-- Cuadrícula de Productos (3 por fila en escritorio como en el boceto) --}}
+        <div id="productsContainer" class="row g-4 view-mode-grid" style="--theme-accent: {{ $themeAccent }};">
+            @forelse($products as $product)
+                @php
+                    $tagText = 'ARTESANAL / LOCAL';
+                    $tagStyle = 'tag-local';
+                    if ($product->id % 4 == 0) {
+                        $tagText = '🔥 TOP VENTAS';
+                        $tagStyle = 'tag-hot';
+                    } elseif ($product->id % 3 == 0) {
+                        $tagText = '✨ NUEVO';
+                        $tagStyle = 'tag-new';
+                    } elseif ($product->id % 5 == 0) {
+                        $tagText = '⚡ ENVÍO HOY';
+                        $tagStyle = 'tag-fast';
+                    }
+                @endphp
 
-{{-- Contenedor de Productos (Soporta Cuadrícula y Lista) --}}
-<div id="productsContainer" class="row g-4 view-mode-grid">
-@forelse($products as $product)
-    @php
-        $tagClass = ''; $tagText = ''; $tagIcon = '';
-        if($product->id % 4 == 0) { $tagClass = 'bg-danger text-white'; $tagText = 'TOP VENTAS'; }
-        elseif($product->id % 3 == 0) { $tagClass = 'bg-primary text-white'; $tagText = 'NUEVO'; }
-        elseif($product->id % 5 == 0) { $tagClass = 'text-dark'; $tagText = 'ENVÍO HOY'; $tagIcon = '<i class="bi bi-lightning-fill text-warning me-1"></i>'; }
-        else { $tagClass = 'text-dark'; $tagText = 'LOCAL'; }
-    @endphp
+                <div class="product-item-col col-12 col-sm-6 col-xl-4 category-animated-card" style="--item-index: {{ $loop->index }};">
+                    <article class="product-card editorial-product-card h-100 d-flex flex-column">
+                        {{-- Lienzo de Imagen con marco cálido --}}
+                        <div class="product-image-container position-relative">
+                            <div class="editorial-img-frame position-relative overflow-hidden">
+                                <a href="{{ route('public.product', $product) }}" class="d-block text-center product-img-link">
+                                    @if($product->hasCustomImage())
+                                        <img src="{{ $product->image_url }}" class="product-img" alt="{{ $product->name }}">
+                                    @else
+                                        <div class="editorial-placeholder-showcase">
+                                            <div class="editorial-placeholder-halo">
+                                                <div class="editorial-placeholder-medallion">
+                                                    <i class="bi {{ $product->placeholder_icon }}"></i>
+                                                </div>
+                                            </div>
+                                            <span class="editorial-placeholder-caption">
+                                                <img src="{{ asset('images/logo-symbol-burgundy.png') }}" alt="" class="editorial-placeholder-mini-logo">
+                                                <span>Spotlight</span>
+                                            </span>
+                                        </div>
+                                    @endif
+                                </a>
 
-    <div class="product-item-col col-sm-6 col-lg-4 col-xl-3">
-        <div class="product-card vs-card h-100 overflow-hidden d-flex flex-column border-0 bg-white rounded-4 shadow-sm hover-lift" style="border: 1px solid #f1f5f9;">
-            <!-- Contenedor de Imagen -->
-            <div class="product-image-container position-relative" style="padding: 10px;">
-                <div class="overflow-hidden position-relative rounded-4" style="background: #f8fafc;">
-                    <a href="{{ route('public.product', $product) }}" class="d-block text-center">
-                        <img src="{{ $product->image_url }}" class="w-100 product-img" style="height: 200px; object-fit: contain; padding: 1rem; mix-blend-mode: multiply;" alt="{{ $product->name }}">
-                    </a>
-                    
-                    <!-- Badges superiores -->
-                    <div class="position-absolute top-0 start-0 m-2 d-flex flex-column gap-1">
-                        @if($product->isMexican() || ($product->company && $product->company->isMexican()))
-                            <span class="badge shadow-xs rounded-pill px-2 py-1 fw-bold" style="background: #006847; color: #fff; font-size: 0.65rem;">
-                                🇲🇽 México
-                            </span>
-                        @else
-                            <span class="badge shadow-xs rounded-pill px-2 py-1 fw-bold" style="background: #003893; color: #fff; font-size: 0.65rem;">
-                                🇨🇴 Colombia
-                            </span>
-                        @endif
+                                {{-- Etiquetas flotantes superiores --}}
+                                <div class="position-absolute top-0 start-0 m-2 d-flex flex-column gap-1 z-2">
+                                    @if($product->primary_tag)
+                                        <span class="badge rounded-pill editorial-badge shadow-xs" style="background-color: {{ $product->primary_tag->accent_color }}; color: #ffffff;">
+                                            <i class="bi {{ $product->primary_tag->icon ?: 'bi-tag-fill' }} me-1"></i> {{ $product->primary_tag->label }}
+                                        </span>
+                                    @else
+                                        <span class="badge rounded-pill editorial-badge {{ $tagStyle }}">
+                                            {{ $tagText }}
+                                        </span>
+                                    @endif
+                                </div>
 
-                        @if($tagClass == 'text-dark')
-                            <span class="badge shadow-xs rounded-pill px-2 py-1 fw-bold d-flex align-items-center" style="background: #F6E7EB; color: #7F1D3F; font-size: 0.65rem;">
-                                {!! $tagIcon !!} {{ $tagText }}
-                            </span>
-                        @else
-                            <span class="badge {{ $tagClass }} shadow-xs rounded-pill px-2 py-1 fw-bold" style="font-size: 0.65rem;">{{ $tagText }}</span>
-                        @endif
+                                {{-- Bandera de origen y stock --}}
+                                <div class="position-absolute top-0 end-0 m-2 d-flex align-items-center gap-1 z-2">
+                                    @if($product->isMexican() || ($product->company && $product->company->isMexican()))
+                                        <span class="editorial-origin-pill" title="Comercio de México">🇲🇽 MX</span>
+                                    @else
+                                        <span class="editorial-origin-pill" title="Comercio de Colombia">🇨🇴 CO</span>
+                                    @endif
+                                </div>
+
+                                {{-- Píldora flotante del comercio sobre la esquina inferior de la imagen --}}
+                                <div class="position-absolute bottom-0 start-0 end-0 p-2 d-flex justify-content-between align-items-end z-2 editorial-img-footer">
+                                    <a href="{{ route('user.dashboard', array_merge(request()->except('page'), ['company_id' => $product->company_id])) }}" class="editorial-store-chip text-decoration-none text-truncate" title="Filtrar productos de {{ $product->company->name }}">
+                                        <i class="bi bi-shop-window me-1"></i>
+                                        <span class="text-truncate">{{ $product->company->name }}</span>
+                                        <i class="bi bi-patch-check-fill ms-1 verified-icon"></i>
+                                    </a>
+
+                                    <span class="editorial-stock-chip {{ $product->stock <= 5 ? 'low-stock' : '' }}">
+                                        {{ $product->stock > 0 ? $product->stock . ' disp.' : 'Agotado' }}
+                                    </span>
+                                </div>
+
+                                @if($product->stock <= 0)
+                                    <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center editorial-soldout-overlay z-3">
+                                        <span class="badge bg-danger px-3 py-2 rounded-pill shadow">Agotado</span>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+
+                        {{-- Cuerpo Editorial del Producto --}}
+                        <div class="product-card-body d-flex flex-column flex-fill">
+                            <div class="product-info-section">
+                                {{-- Categoría + Calificación --}}
+                                <div class="d-flex align-items-center justify-content-between gap-2 mb-1">
+                                    <span class="editorial-cat-label text-truncate" style="{{ $product->primary_tag ? 'color: ' . $product->primary_tag->accent_color . ' !important; font-weight: 700;' : '' }}">
+                                        @if($product->primary_tag)
+                                            <i class="bi {{ $product->primary_tag->icon ?: 'bi-tag-fill' }} me-1"></i>{{ $product->primary_tag->label }}
+                                        @else
+                                            {{ $product->company?->category ?: 'General' }}
+                                        @endif
+                                    </span>
+                                    <a href="{{ route('public.product', $product) }}#reviews-section" class="editorial-rating-pill text-decoration-none" title="Ver reseñas">
+                                        <i class="bi bi-star-fill"></i>
+                                        <span>{{ $product->average_rating > 0 ? number_format($product->average_rating, 1) : '5.0' }}</span>
+                                        <small>({{ $product->reviews_count }})</small>
+                                    </a>
+                                </div>
+
+                                {{-- Nombre del Producto --}}
+                                <h5 class="product-title mb-1">
+                                    <a href="{{ route('public.product', $product) }}" class="text-decoration-none">
+                                        {{ $product->name }}
+                                    </a>
+                                </h5>
+
+                                {{-- Descripción breve --}}
+                                <p class="product-desc mb-3">
+                                    {{ $product->description ?? 'Producto elaborado y distribuido por comercios locales verificados en Spotlight.' }}
+                                </p>
+                            </div>
+
+                            {{-- Barra inferior de Precio + Acción de Compra --}}
+                            <div class="product-action-section mt-auto pt-3">
+                                <div class="d-flex align-items-baseline justify-content-between mb-2">
+                                    <div>
+                                        <span class="editorial-price-label d-block">Precio unitario</span>
+                                        @if($product->effective_currency === 'MXN')
+                                            <div class="product-price-tag"
+                                                 data-cop="${{ number_format($product->price_in_cop, 0, ',', '.') }}"
+                                                 data-mxn="${{ number_format($product->price, 2, ',', '.') }}"
+                                                 data-mode="COP">
+                                                <span class="js-card-price-val">${{ number_format($product->price_in_cop, 0, ',', '.') }}</span>
+                                                <small class="js-card-price-cur">COP</small>
+                                            </div>
+                                            <button type="button"
+                                                    class="btn btn-sm p-0 border-0 bg-transparent text-start d-inline-flex align-items-center gap-1 mt-0.5"
+                                                    style="font-size: 0.7rem; color: #7F1D3F; font-weight: 600;"
+                                                    onclick="const tag = this.previousElementSibling; const isCop = tag.dataset.mode === 'COP'; tag.dataset.mode = isCop ? 'MXN' : 'COP'; tag.querySelector('.js-card-price-val').textContent = isCop ? tag.dataset.mxn : tag.dataset.cop; tag.querySelector('.js-card-price-cur').textContent = isCop ? 'MXN' : 'COP'; this.querySelector('.js-alt-currency-label').textContent = isCop ? ('🇨🇴 ≈ ' + tag.dataset.cop + ' COP') : ('🇲🇽 ' + tag.dataset.mxn + ' MXN');"
+                                                    title="Haz clic para alternar entre Pesos Colombianos (COP) y Pesos Mexicanos (MXN)">
+                                                <i class="bi bi-currency-exchange"></i>
+                                                <span class="js-alt-currency-label">🇲🇽 ${{ number_format($product->price, 2, ',', '.') }} MXN</span>
+                                            </button>
+                                        @else
+                                            <div class="product-price-tag">
+                                                ${{ number_format($product->price, (floor($product->price) != $product->price ? 2 : 0), ',', '.') }}
+                                                <small>COP</small>
+                                            </div>
+                                        @endif
+                                    </div>
+                                    <span class="editorial-city-tag">
+                                        <i class="bi bi-geo-alt-fill me-1"></i>{{ $product->company->city ?? 'Ubaté' }}
+                                    </span>
+                                </div>
+
+                                <div class="product-buttons-wrap">
+                                    @if($product->stock > 0)
+                                        <form action="{{ route('user.cart.add', $product) }}" method="POST" class="d-flex gap-2 align-items-center">
+                                            @csrf
+                                            <div class="editorial-qty-stepper d-flex align-items-center">
+                                                <button type="button" class="qty-btn" onclick="this.parentNode.querySelector('input[type=number]').stepDown()" aria-label="Disminuir cantidad">−</button>
+                                                <input type="number" name="quantity" value="1" min="1" max="{{ $product->stock }}" class="qty-input" readonly>
+                                                <button type="button" class="qty-btn" onclick="this.parentNode.querySelector('input[type=number]').stepUp()" aria-label="Aumentar cantidad">+</button>
+                                            </div>
+                                            <button type="submit" class="btn btn-burgundy-add flex-fill rounded-pill fw-bold d-flex align-items-center justify-content-center gap-2">
+                                                <i class="bi bi-bag-plus-fill"></i>
+                                                <span>Añadir</span>
+                                            </button>
+                                        </form>
+                                    @else
+                                        <button class="btn btn-light w-100 text-muted fw-bold rounded-pill border" disabled>
+                                            <i class="bi bi-slash-circle me-1"></i> Sin inventario
+                                        </button>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            @empty
+                <div class="col-12">
+                    <div class="consumer-empty-state text-center py-5 px-4">
+                        <div class="consumer-empty-icon mx-auto mb-3">
+                            <i class="bi bi-basket2"></i>
+                        </div>
+                        <h4 class="fw-bold text-dark mb-2">No encontramos productos con esos criterios</h4>
+                        <p class="text-muted mb-4 mx-auto consumer-empty-desc">
+                            Prueba buscando con otra palabra clave o explora todas las categorías y comercios desde el panel derecho.
+                        </p>
+                        <a href="{{ route('user.dashboard') }}" class="btn btn-burgundy-add rounded-pill px-4 py-2 fw-bold">
+                            <i class="bi bi-arrow-repeat me-1"></i> Ver todo el catálogo
+                        </a>
                     </div>
-                    
-                    <div class="position-absolute top-0 end-0 m-2">
-                        <span class="badge bg-white text-muted border shadow-xs rounded-pill px-2 py-1 fw-bold" style="font-size: 0.65rem;">
-                            Stock: {{ $product->stock }}
-                        </span>
+                </div>
+            @endforelse
+        </div>
+
+        {{-- Paginación --}}
+        <div class="mt-5 d-flex justify-content-center pagination-spotlight">
+            {{ $products->appends(request()->query())->links('pagination::bootstrap-5') }}
+        </div>
+    </div>
+
+    {{-- =======================================================================
+         COLUMNA DERECHA: PANEL CON LAS 3 CÁPSULAS OVALADAS DEL WIREFRAME
+         (1. Buscar | 2. Categoría | 3. Comercios)
+         ======================================================================= --}}
+    <aside class="consumer-sidebar-dock" aria-label="Controles de exploración del mercado">
+        <div class="consumer-dock-sticky">
+            
+            <div class="consumer-dock-header mb-3">
+                <span class="consumer-dock-subtitle">PANEL DE EXPLORACIÓN</span>
+                <h5 class="consumer-dock-title mb-0">Filtra a tu medida</h5>
+            </div>
+
+            <form action="{{ route('user.dashboard') }}" method="GET" id="consumerDockForm" class="d-flex flex-column gap-3">
+                @if(!empty($market))
+                    <input type="hidden" name="country" value="{{ $market }}">
+                @endif
+
+                {{-- ===========================================================
+                     OVAL 1: BUSCAR (Menú desplegable + estático)
+                     =========================================================== --}}
+                <div class="wireframe-oval-group">
+                    <label class="wireframe-oval-caption">
+                        <span>01 · Búsqueda directa</span>
+                        @if($activeQuery)
+                            <a href="{{ route('user.dashboard', request()->except(['q', 'page'])) }}" class="wireframe-caption-reset">Borrar</a>
+                        @endif
+                    </label>
+                    <div class="dropdown w-100">
+                        <button class="wireframe-oval-pill pill-buscar text-start w-100 d-flex align-items-center justify-content-between {{ $activeQuery ? 'is-filled' : '' }}" 
+                                type="button" 
+                                id="dropdownSearchBtn" 
+                                data-bs-toggle="dropdown" 
+                                data-bs-auto-close="outside" 
+                                aria-expanded="false">
+                            <div class="d-flex align-items-center gap-2 overflow-hidden flex-fill me-2">
+                                <i class="bi bi-search wireframe-pill-icon m-0"></i>
+                                <span class="text-truncate fw-bold wireframe-pill-text-label">
+                                    {{ $activeQuery ? $activeQuery : 'Buscar...' }}
+                                </span>
+                            </div>
+                            <i class="bi bi-chevron-down wireframe-pill-chevron position-static"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end shadow-lg border-sl rounded-4 p-3 mt-2 w-100 wireframe-dropdown-panel" aria-labelledby="dropdownSearchBtn">
+                            <div class="d-flex align-items-center gap-2">
+                                <input
+                                    type="text"
+                                    id="dockSearchInput"
+                                    name="q"
+                                    class="form-control rounded-pill border-sl px-3 py-2 fw-semibold"
+                                    placeholder="Buscar producto..."
+                                    value="{{ $activeQuery }}"
+                                    autocomplete="off"
+                                >
+                                <button type="submit" class="wireframe-pill-action m-0" title="Buscar ahora">
+                                    <i class="bi bi-arrow-right"></i>
+                                </button>
+                            </div>
+                            @if($activeQuery)
+                                <div class="mt-2 text-end">
+                                    <a href="{{ route('user.dashboard', request()->except(['q', 'page'])) }}" class="small text-danger fw-bold text-decoration-none">
+                                        <i class="bi bi-x-circle me-1"></i> Limpiar búsqueda
+                                    </a>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                {{-- ===========================================================
+                     OVAL 2: CATEGORÍA (Píldora ovalada + selector rápido)
+                     =========================================================== --}}
+                <div class="wireframe-oval-group">
+                    <label for="dockCategorySelect" class="wireframe-oval-caption">
+                        <span>02 · Categoría</span>
+                        <small>{{ $categories->count() }} disponibles</small>
+                    </label>
+                    <div class="wireframe-oval-pill pill-categoria {{ $activeCategory ? 'is-filled' : '' }}">
+                        <i class="bi bi-tag-fill wireframe-pill-icon"></i>
+                        <select
+                            id="dockCategorySelect"
+                            name="category"
+                            class="wireframe-pill-select"
+                            onchange="document.getElementById('consumerDockForm').submit()"
+                        >
+                            <option value="">Categoría (Todas)</option>
+                            @foreach($categories as $cat)
+                                <option value="{{ $cat }}" {{ $activeCategory === $cat ? 'selected' : '' }}>
+                                    {{ $cat }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <i class="bi bi-chevron-down wireframe-pill-chevron"></i>
                     </div>
 
-                    @if($product->stock <= 0)
-                        <div class="position-absolute top-0 start-0 w-100 h-100 bg-white bg-opacity-75 d-flex align-items-center justify-content-center backdrop-blur">
-                            <span class="badge bg-danger px-3 py-2 fs-6 rounded-pill shadow-sm">Agotado</span>
+                    {{-- Chips táctiles de categorías debajo de la píldora Categoría --}}
+                    @if($categories->count() > 0)
+                        <div class="dock-quick-chips mt-2">
+                            <a href="{{ route('user.dashboard', request()->except(['category', 'page'])) }}"
+                               class="dock-chip {{ empty($activeCategory) ? 'active' : '' }}">
+                                Todas
+                            </a>
+                            @foreach($categories->take(7) as $cat)
+                                @php
+                                    $chipAccent = $tagColorMap[$cat] ?? '#7F1D3F';
+                                @endphp
+                                <a href="{{ route('user.dashboard', array_merge(request()->except('page'), ['category' => $cat])) }}"
+                                   class="dock-chip themed-chip {{ $activeCategory === $cat ? 'active' : '' }}"
+                                   style="--chip-accent: {{ $chipAccent }};">
+                                    {{ $cat }}
+                                </a>
+                            @endforeach
                         </div>
                     @endif
                 </div>
-            </div>
-            
-            <!-- Cuerpo de Información del Producto -->
-            <div class="product-card-body card-body d-flex flex-column flex-fill px-4 pb-4 pt-2">
-                <div class="product-info-section">
-                    <div class="d-flex align-items-center text-muted mb-2" style="font-size: 0.72rem;">
-                        <i class="bi bi-shop me-1" style="color: #7F1D3F;"></i> 
-                        <span class="text-truncate fw-semibold">{{ $product->company->name }}</span>
-                        <span class="text-muted ms-1 text-xs">({{ $product->company->city ?? 'Ubaté' }})</span>
-                        <i class="bi bi-patch-check-fill ms-1" style="color: #7F1D3F; font-size: 0.65rem;"></i>
-                    </div>
-                    
-                    <h6 class="fw-bold mb-1 text-truncate product-title" title="{{ $product->name }}" style="font-size: 0.95rem;">
-                        <a href="{{ route('public.product', $product) }}" class="text-dark text-decoration-none">{{ $product->name }}</a>
-                    </h6>
 
-                    <!-- Rating Stars -->
-                    <div class="d-flex align-items-center gap-1 mb-2">
-                        <i class="bi bi-star-fill text-warning" style="font-size: 0.75rem;"></i>
-                        <span class="fw-bold text-dark text-xs">{{ $product->average_rating > 0 ? number_format($product->average_rating, 1) : '5.0' }}</span>
-                        <span class="text-muted text-xs">({{ $product->reviews_count }})</span>
-                        <a href="{{ route('public.product', $product) }}#reviews-section" class="text-xs text-decoration-none ms-1" style="color: #7F1D3F;">Ver reseñas</a>
+                {{-- ===========================================================
+                     OVAL 3: COMERCIOS (Píldora ovalada + directorio interactivo)
+                     =========================================================== --}}
+                <div class="wireframe-oval-group">
+                    <label for="dockCompanySelect" class="wireframe-oval-caption">
+                        <span>03 · Comercios</span>
+                        <small>{{ $companies->count() }} tiendas</small>
+                    </label>
+                    <div class="wireframe-oval-pill pill-comercios {{ $activeCompanyId ? 'is-filled' : '' }}">
+                        <i class="bi bi-shop wireframe-pill-icon"></i>
+                        <select
+                            id="dockCompanySelect"
+                            name="company_id"
+                            class="wireframe-pill-select"
+                            onchange="document.getElementById('consumerDockForm').submit()"
+                        >
+                            <option value="">Comercios (Todos)</option>
+                            @foreach($companies as $company)
+                                <option value="{{ $company->id }}" {{ (string)$activeCompanyId === (string)$company->id ? 'selected' : '' }}>
+                                    {{ $company->name }} ({{ $company->products_count ?? 0 }})
+                                </option>
+                            @endforeach
+                        </select>
+                        <i class="bi bi-chevron-down wireframe-pill-chevron"></i>
                     </div>
 
-                    <p class="text-muted mb-3 text-truncate product-desc" style="font-size: 0.76rem;">{{ $product->description ?? 'Sin descripción disponible.' }}</p>
-                </div>
-                
-                <!-- Sección de Precio y Botón de Añadir -->
-                <div class="product-action-section mt-auto pt-2 border-top border-light">
-                    <div class="fw-bold fs-4 mb-3 text-dark d-flex align-items-end gap-1 lh-1 product-price-tag">
-                        ${{ number_format($product->price, ($product->currency === 'MXN' ? 2 : 0), ',', '.') }} <span class="text-muted fw-bold" style="font-size: 0.7rem; margin-bottom: 2px;">{{ $product->currency ?? 'COP' }}</span>
-                    </div>
-                    
-                    <div class="product-buttons-wrap">
-                        @if($product->stock > 0)
-                        <form action="{{ route('user.cart.add', $product) }}" method="POST" class="d-flex gap-2">
-                            @csrf
-                            <div class="input-group border rounded-pill overflow-hidden shadow-xs" style="width: 95px; border-color: #D98C9A !important;">
-                                <button type="button" class="btn btn-light border-0 px-2 py-1 text-muted fw-bold" onclick="this.parentNode.querySelector('input[type=number]').stepDown()">-</button>
-                                <input type="number" name="quantity" value="1" min="1" max="{{ $product->stock }}" class="form-control text-center border-0 p-1 fw-bold bg-white" style="font-size: 0.85rem;" readonly>
-                                <button type="button" class="btn btn-light border-0 px-2 py-1 text-muted fw-bold" onclick="this.parentNode.querySelector('input[type=number]').stepUp()">+</button>
-                            </div>
-                            <!-- Botón de añadir en color borgoña oscuro -->
-                            <button type="submit" class="btn btn-burgundy-add flex-fill fw-bold rounded-pill shadow-xs d-flex align-items-center justify-content-center gap-1" style="font-size: 0.85rem; padding: 8px 14px;">
-                                <i class="bi bi-cart-plus fs-6 me-1"></i>
-                                <span>Añadir</span>
-                            </button>
-                        </form>
-                        @else
-                            <button class="btn btn-light w-100 text-muted fw-bold rounded-pill" disabled><i class="bi bi-x-circle me-1"></i>Sin inventario</button>
-                        @endif
+                    {{-- Mini lista interactiva de comercios locales para explorar con 1 clic --}}
+                    <div class="dock-stores-list mt-2">
+                        @foreach($companies->take(3) as $store)
+                            @php
+                                $isStoreSelected = (string)$activeCompanyId === (string)$store->id;
+                            @endphp
+                            <a href="{{ route('user.dashboard', array_merge(request()->except('page'), ['company_id' => $isStoreSelected ? null : $store->id])) }}"
+                               class="dock-store-item text-decoration-none {{ $isStoreSelected ? 'active' : '' }}">
+                                <div class="dock-store-avatar">
+                                    {{ strtoupper(substr($store->name, 0, 1)) }}
+                                </div>
+                                <div class="flex-fill text-truncate">
+                                    <div class="dock-store-name text-truncate">{{ $store->name }}</div>
+                                    <div class="dock-store-meta text-truncate">
+                                        {{ $store->city ?? 'Ubaté' }} · {{ $store->products_count ?? 0 }} prod.
+                                    </div>
+                                </div>
+                                <i class="bi {{ $isStoreSelected ? 'bi-check-circle-fill' : 'bi-arrow-up-right' }} dock-store-arrow"></i>
+                            </a>
+                        @endforeach
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-@empty
-    <div class="col-12 py-5 text-center mt-4">
-        <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-4 bg-light shadow-sm" style="width: 100px; height: 100px;">
-            <i class="bi bi-search fs-1" style="color: #7F1D3F;"></i>
-        </div>
-        <h4 class="fw-bold text-dark">No se encontraron productos</h4>
-        <p class="text-muted fs-6">Intenta cambiar los términos de búsqueda o explorar otras categorías del mercado.</p>
-        <a href="{{ route('user.dashboard') }}" class="btn text-white rounded-pill mt-3 px-4 fw-bold shadow-xs" style="background: #7F1D3F;">Limpiar filtros</a>
-    </div>
-@endforelse
-</div>
 
-<div class="mt-4 d-flex justify-content-center pagination-spotlight">
-    {{ $products->appends(request()->query())->links('pagination::bootstrap-5') }}
+                {{-- ===========================================================
+                     CONTROLES COMPLEMENTARIOS DEL PANEL DERECHO (ORDEN Y PAÍS)
+                     =========================================================== --}}
+                <div class="consumer-dock-divider my-1"></div>
+
+                {{-- Ordenamiento funcional --}}
+                <div class="wireframe-oval-group">
+                    <label for="dockSortSelect" class="wireframe-oval-caption">
+                        <span>Ordenar vitrina</span>
+                    </label>
+                    <div class="wireframe-oval-pill pill-secondary">
+                        <i class="bi bi-sort-down wireframe-pill-icon"></i>
+                        <select
+                            id="dockSortSelect"
+                            name="sort"
+                            class="wireframe-pill-select"
+                            onchange="document.getElementById('consumerDockForm').submit()"
+                        >
+                            <option value="latest" {{ $activeSort === 'latest' ? 'selected' : '' }}>Más recientes primero</option>
+                            <option value="price_asc" {{ $activeSort === 'price_asc' ? 'selected' : '' }}>Menor a mayor precio</option>
+                            <option value="price_desc" {{ $activeSort === 'price_desc' ? 'selected' : '' }}>Mayor a menor precio</option>
+                            <option value="name_asc" {{ $activeSort === 'name_asc' ? 'selected' : '' }}>Nombre (A - Z)</option>
+                        </select>
+                        <i class="bi bi-chevron-down wireframe-pill-chevron"></i>
+                    </div>
+                </div>
+
+                {{-- Selector de Mercado (Todos / Colombia / México) --}}
+                <div class="wireframe-oval-group">
+                    <span class="wireframe-oval-caption d-block mb-1">
+                        <span>Mercado regional</span>
+                    </span>
+                    <div class="dock-market-grid">
+                        <a href="{{ route('user.dashboard', request()->except(['country', 'page'])) }}"
+                           class="dock-market-btn {{ empty($market) ? 'active' : '' }}">
+                            🌐 Todos
+                        </a>
+                        <a href="{{ route('user.dashboard', array_merge(request()->except('page'), ['country' => 'CO'])) }}"
+                           class="dock-market-btn {{ $market === 'CO' ? 'active' : '' }}">
+                            🇨🇴 CO
+                        </a>
+                        <a href="{{ route('user.dashboard', array_merge(request()->except('page'), ['country' => 'MX'])) }}"
+                           class="dock-market-btn {{ $market === 'MX' ? 'active' : '' }}">
+                            🇲🇽 MX
+                        </a>
+                    </div>
+                </div>
+
+                {{-- Acceso directo al Mapa Geo-Comercial --}}
+                <a href="{{ route('user.map') }}" class="dock-map-banner text-decoration-none mt-1">
+                    <div class="dock-map-icon">
+                        <i class="bi bi-geo-alt-fill"></i>
+                    </div>
+                    <div class="flex-fill">
+                        <div class="fw-bold text-dark dock-map-title">Explorar en el Mapa</div>
+                        <div class="text-muted dock-map-sub">Ubica comercios cerca de ti</div>
+                    </div>
+                    <i class="bi bi-chevron-right text-muted"></i>
+                </a>
+            </form>
+        </div>
+    </aside>
 </div>
 
 @push('styles')
-<style>
-    /* Estilos de Paginación Compacta y Elegante Spotlight */
-    .pagination-spotlight .pagination {
-        margin-bottom: 0;
-        gap: 6px;
-        align-items: center;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-    .pagination-spotlight .page-link {
-        color: #7F1D3F;
-        border-radius: 10px !important;
-        border: 1px solid #D98C9A;
-        padding: 6px 14px;
-        font-size: 0.85rem;
-        font-weight: 600;
-        background-color: #ffffff;
-        transition: all 0.2s ease;
-        line-height: 1.4;
-    }
-    .pagination-spotlight .page-link:hover {
-        background-color: #F6E7EB;
-        color: #7F1D3F;
-        border-color: #7F1D3F;
-    }
-    .pagination-spotlight .page-item.active .page-link {
-        background: linear-gradient(135deg, #7F1D3F, #5E122C) !important;
-        border-color: #7F1D3F !important;
-        color: #ffffff !important;
-        box-shadow: 0 4px 10px rgba(127, 29, 63, 0.25);
-    }
-    .pagination-spotlight .page-item.disabled .page-link {
-        color: #94a3b8;
-        border-color: #e2e8f0;
-        background-color: #f8fafc;
-    }
-    /* Eliminar cualquier SVG gigante desbordado de paginación */
-    .pagination-spotlight svg,
-    nav[role="navigation"] svg {
-        display: none !important;
-        max-width: 14px !important;
-        max-height: 14px !important;
-    }
-
-    /* Estilos del botón de añadir en color borgoña oscuro */
-    .btn-burgundy-add {
-        background-color: #7F1D3F !important;
-        color: #ffffff !important;
-        border: none !important;
-        transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
-    }
-    .btn-burgundy-add:hover {
-        background-color: #5E122C !important;
-        color: #ffffff !important;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 18px rgba(127, 29, 63, 0.35) !important;
-    }
-
-    /* Chips de categorías */
-    .category-quick-pill {
-        background: #ffffff;
-        color: #7F1D3F;
-        border: 1px solid #D98C9A;
-        transition: all 0.2s ease;
-    }
-    .category-quick-pill:hover, .category-quick-pill.active-pill {
-        background: #7F1D3F !important;
-        color: #ffffff !important;
-        border-color: #7F1D3F !important;
-        transform: translateY(-1px);
-    }
-
-    /* Botones de cambio de vista (Grid vs Lista) */
-    .view-btn {
-        color: #64748b;
-        background: transparent;
-        border: none;
-        transition: all 0.2s ease;
-    }
-    .view-btn.active-view-btn {
-        background-color: #7F1D3F !important;
-        color: #ffffff !important;
-        box-shadow: 0 2px 6px rgba(127, 29, 63, 0.3) !important;
-    }
-
-    /* Tarjetas hover */
-    .hover-lift {
-        transition: transform 0.22s ease, box-shadow 0.22s ease;
-    }
-    .hover-lift:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 12px 28px rgba(127, 29, 63, 0.08) !important;
-        border-color: #D98C9A !important;
-    }
-
-    /* Vista en Lista (Layout dinámico activado con botón) */
-    .view-mode-list .product-item-col {
-        width: 100% !important;
-        max-width: 100% !important;
-        flex: 0 0 100% !important;
-    }
-    .view-mode-list .product-card {
-        flex-direction: row !important;
-        align-items: center !important;
-        padding: 1rem 1.25rem !important;
-        border-radius: 20px !important;
-    }
-    .view-mode-list .product-image-container {
-        width: 200px !important;
-        min-width: 200px !important;
-        height: 155px !important;
-        padding: 0 !important;
-    }
-    .view-mode-list .product-image-container .overflow-hidden {
-        height: 100% !important;
-        border-radius: 16px !important;
-    }
-    .view-mode-list .product-img {
-        height: 140px !important;
-        padding: 0.5rem !important;
-    }
-    .view-mode-list .product-card-body {
-        flex-direction: row !important;
-        align-items: center !important;
-        justify-content: space-between !important;
-        padding: 0.5rem 1.5rem !important;
-        width: 100% !important;
-    }
-    .view-mode-list .product-info-section {
-        flex: 1 !important;
-        max-width: 60% !important;
-        padding-right: 1.5rem;
-    }
-    .view-mode-list .product-info-section .product-desc {
-        white-space: normal !important;
-        display: -webkit-box !important;
-        -webkit-line-clamp: 2 !important;
-        -webkit-box-orient: vertical !important;
-        overflow: hidden !important;
-    }
-    .view-mode-list .product-action-section {
-        min-width: 250px !important;
-        border-top: none !important;
-        border-left: 1px solid #f1f5f9 !important;
-        padding-left: 1.5rem !important;
-        margin-top: 0 !important;
-        padding-top: 0 !important;
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: flex-end !important;
-    }
-    .view-mode-list .product-buttons-wrap {
-        width: 100%;
-    }
-
-    @media (max-width: 768px) {
-        .view-mode-list .product-card {
-            flex-direction: column !important;
-        }
-        .view-mode-list .product-image-container {
-            width: 100% !important;
-            height: 190px !important;
-        }
-        .view-mode-list .product-img {
-            height: 180px !important;
-        }
-        .view-mode-list .product-card-body {
-            flex-direction: column !important;
-            align-items: stretch !important;
-            padding: 1rem 0 0 0 !important;
-        }
-        .view-mode-list .product-info-section {
-            max-width: 100% !important;
-            padding-right: 0;
-        }
-        .view-mode-list .product-action-section {
-            width: 100% !important;
-            align-items: stretch !important;
-            border-left: none !important;
-            border-top: 1px solid #f1f5f9 !important;
-            margin-top: 0.75rem !important;
-            padding-top: 0.75rem !important;
-            padding-left: 0 !important;
-        }
-    }
-
-    input[type=number]::-webkit-inner-spin-button, 
-    input[type=number]::-webkit-outer-spin-button { 
-        -webkit-appearance: none; 
-        margin: 0; 
-    }
-</style>
+<link href="{{ asset('css/user.css') }}" rel="stylesheet">
 @endpush
 
 @push('scripts')
@@ -459,7 +574,7 @@ window.setProductView = function (mode) {
         if (btnList) btnList.classList.add('active-view-btn');
         if (btnGrid) btnGrid.classList.remove('active-view-btn');
         productCols.forEach(col => {
-            col.classList.remove('col-sm-6', 'col-lg-4', 'col-xl-3');
+            col.classList.remove('col-sm-6', 'col-xl-4');
             col.classList.add('col-12');
         });
         localStorage.setItem('spotlight_product_view', 'list');
@@ -469,7 +584,7 @@ window.setProductView = function (mode) {
         if (btnGrid) btnGrid.classList.add('active-view-btn');
         if (btnList) btnList.classList.remove('active-view-btn');
         productCols.forEach(col => {
-            col.classList.add('col-sm-6', 'col-lg-4', 'col-xl-3');
+            col.classList.add('col-sm-6', 'col-xl-4');
             col.classList.remove('col-12');
         });
         localStorage.setItem('spotlight_product_view', 'grid');

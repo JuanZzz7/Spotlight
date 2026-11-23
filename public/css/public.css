@@ -1,0 +1,371 @@
+/* ==========================================================================
+   PUBLIC.CSS - Vistas Públicas de Producto, Empresa y Rastreo
+   ========================================================================== */
+
+/* 1. Detalle Público de Producto (public/product.blade.php) */
+.star-rating-select {
+    display: inline-flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    gap: 6px;
+}
+.star-rating-select input {
+    display: none;
+}
+.star-rating-select label {
+    font-size: 2rem;
+    color: #d1d5db;
+    cursor: pointer;
+    transition: color 0.15s ease, transform 0.15s ease;
+}
+.star-rating-select label:hover,
+.star-rating-select label:hover ~ label,
+.star-rating-select input:checked ~ label {
+    color: #f59e0b;
+    transform: scale(1.1);
+}
+.product-hero-card {
+    border-radius: 24px;
+    background: #ffffff;
+    border: 1px solid var(--sl-border);
+    box-shadow: var(--sl-shadow-sm);
+}
+.product-img-stage {
+    background: linear-gradient(135deg, #FFFCF7 0%, #F6E7EB 100%);
+    border-radius: 20px;
+    min-height: 380px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(238, 221, 220, 0.4);
+}
+.product-img-stage img {
+    max-height: 340px;
+    width: 100%;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+}
+.product-img-stage:hover img {
+    transform: scale(1.05);
+}
+.review-bubble {
+    border-radius: 18px;
+    background: #ffffff;
+    border: 1px solid var(--sl-border);
+    box-shadow: var(--sl-shadow-xs);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.review-bubble:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--sl-shadow-hover);
+    border-color: var(--sl-accent);
+}
+.star-filled { color: #f59e0b; }
+.star-empty  { color: #e2e8f0; }
+
+.nav-pill-custom {
+    background: #ffffff;
+    border: 1px solid var(--sl-border);
+    color: var(--sl-text-body);
+    border-radius: 50px;
+    padding: 6px 16px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+.nav-pill-custom:hover {
+    background: var(--sl-primary-soft);
+    color: var(--sl-primary);
+    border-color: var(--sl-accent);
+}
+
+.btn-return-products {
+    background-color: #ffffff;
+    color: #7F1D3F;
+    border: 1.5px solid #D98C9A;
+    font-size: 0.88rem;
+    transition: all 0.22s ease;
+    text-decoration: none;
+}
+.btn-return-products:hover {
+    background: #7F1D3F;
+    color: #ffffff;
+    border-color: #7F1D3F;
+    transform: translateX(-4px);
+    box-shadow: 0 4px 14px rgba(127, 29, 63, 0.25);
+}
+.btn-return-products i {
+    transition: transform 0.2s ease;
+}
+.btn-return-products:hover i {
+    transform: translateX(-3px);
+}
+.btn-return-secondary {
+    background: #FFFCF7;
+    color: #7F1D3F;
+    border: 1.5px solid #D98C9A;
+    font-size: 0.88rem;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+.btn-return-secondary:hover {
+    background: #F6E7EB;
+    color: #5E122C;
+    border-color: #7F1D3F;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(127, 29, 63, 0.12);
+}
+
+/* 2. Perfil Público de Empresa (public/company.blade.php) */
+#company-map .leaflet-popup-content-wrapper {
+    border-radius: 14px;
+    box-shadow: 0 8px 28px rgba(0, 35, 111, 0.2);
+}
+#company-map .leaflet-tile-container img {
+    border-radius: 0 !important;
+}
+@keyframes dot-pulse {
+    0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+    40%           { transform: scale(1);   opacity: 1;   }
+}
+.map-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    display: inline-block;
+    animation: dot-pulse 1.4s ease-in-out infinite;
+}
+
+/* 3. Rastreo de Envíos Público (public/tracking.blade.php) */
+.pulse-live {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #10b981;
+    box-shadow: 0 0 0 rgba(16, 185, 129, 0.4);
+    animation: pulseAnimation 1.6s infinite;
+}
+@keyframes pulseAnimation {
+    0%   { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+    70%  { transform: scale(1.1);  box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+.timeline-log {
+    position: relative;
+    padding-left: 32px;
+}
+.timeline-log::before {
+    content: '';
+    position: absolute;
+    top: 10px;
+    bottom: 10px;
+    left: 11px;
+    width: 2px;
+    background: #e2e8f0;
+}
+.timeline-item {
+    position: relative;
+    margin-bottom: 24px;
+}
+.timeline-dot {
+    position: absolute;
+    left: -32px;
+    top: 4px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 2px solid var(--sl-primary, #7F1D3F);
+    color: var(--sl-primary, #7F1D3F);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+}
+.timeline-item:first-child .timeline-dot {
+    background: var(--sl-primary, #7F1D3F);
+    color: #ffffff;
+    box-shadow: 0 0 10px rgba(127, 29, 63, 0.35);
+}
+
+/* 4. Centro de Soporte & Legal (public/legal.blade.php) */
+.sl-legal-header {
+    background: rgba(255, 252, 247, 0.94);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--sl-border, #EEDDDC);
+    z-index: 1020;
+}
+
+.sl-legal-logo {
+    height: 38px;
+    object-fit: contain;
+}
+
+.sl-legal-brand-title {
+    color: var(--sl-text-heading, #29252A);
+    font-family: var(--sl-font-display, 'Outfit', sans-serif);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+}
+
+.sl-legal-brand-badge {
+    font-size: 0.65rem;
+}
+
+.sl-legal-main {
+    background-color: var(--sl-bg, #FFFCF7);
+    min-height: 85vh;
+}
+
+.sl-legal-hero-pill {
+    background: var(--sl-primary-soft, #F6E7EB);
+    color: var(--sl-primary, #7F1D3F);
+    border: 1px solid rgba(127, 29, 63, 0.18);
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.sl-legal-nav-card {
+    background: #ffffff;
+    border: 1px solid var(--sl-border, #EEDDDC);
+    border-radius: 20px;
+    padding: 1.25rem;
+    box-shadow: var(--sl-shadow-sm);
+    position: sticky;
+    top: 96px;
+}
+
+.sl-legal-nav-title {
+    font-family: var(--sl-font-display, 'Outfit', sans-serif);
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--sl-text-muted, #736B75);
+    margin-bottom: 0.85rem;
+    padding: 0 0.5rem;
+}
+
+.sl-legal-nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    text-align: left;
+    padding: 0.75rem 1rem;
+    border-radius: 14px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--sl-text-body, #4A444C);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    margin-bottom: 0.35rem;
+}
+
+.sl-legal-nav-btn i {
+    font-size: 1.1rem;
+    color: var(--sl-primary, #7F1D3F);
+    transition: color 0.2s ease;
+}
+
+.sl-legal-nav-btn:hover {
+    background: var(--sl-primary-soft, #F6E7EB);
+    color: var(--sl-primary, #7F1D3F);
+}
+
+.sl-legal-nav-btn.active {
+    background: var(--sl-primary, #7F1D3F);
+    color: #ffffff;
+    box-shadow: 0 6px 16px rgba(127, 29, 63, 0.22);
+}
+
+.sl-legal-nav-btn.active i {
+    color: #ffffff;
+}
+
+.sl-legal-content-card {
+    background: #ffffff;
+    border: 1px solid var(--sl-border, #EEDDDC);
+    border-radius: 24px;
+    padding: 2rem 2.25rem;
+    box-shadow: var(--sl-shadow-sm);
+}
+
+.sl-legal-icon-box {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: var(--sl-primary-soft, #F6E7EB);
+    color: var(--sl-primary, #7F1D3F);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+    flex-shrink: 0;
+}
+
+.sl-legal-block {
+    background: var(--sl-bg, #FFFCF7);
+    border: 1px solid var(--sl-border, #EEDDDC);
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.25rem;
+}
+
+.sl-legal-block h5 {
+    font-family: var(--sl-font-display, 'Outfit', sans-serif);
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--sl-text-heading, #29252A);
+    margin-bottom: 0.5rem;
+}
+
+.sl-legal-block p,
+.sl-legal-block li {
+    color: var(--sl-text-body, #4A444C);
+    font-size: 0.92rem;
+    line-height: 1.65;
+}
+
+.sl-legal-step-num {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--sl-primary, #7F1D3F);
+    color: #ffffff;
+    font-weight: 800;
+    font-size: 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* Badge / Label de cabecera en secciones legales */
+.sl-legal-pill-badge {
+    border-radius: 50px !important;
+    padding: 0.38rem 0.95rem !important;
+    font-size: 0.72rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.04em !important;
+    line-height: 1.2 !important;
+    border: 1px solid rgba(127, 29, 63, 0.22) !important;
+    background-color: var(--sl-primary-soft, #F6E7EB) !important;
+    color: var(--sl-primary, #7F1D3F) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+
+

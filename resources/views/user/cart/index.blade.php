@@ -81,8 +81,13 @@
 
                 <!-- Price -->
                 <div class="col-4 col-md-2 text-md-center mb-2 mb-md-0">
-                    <div class="fw-bold text-dark fs-6 lh-1">${{ number_format($item['product']->price,0,',','.') }}</div>
-                    <div class="text-muted fw-bold" style="font-size: 0.6rem;">COP</div>
+                    @if($item['product']->effective_currency === 'MXN')
+                        <div class="fw-bold text-dark fs-6 lh-1">${{ number_format($item['product']->price_in_cop, 0, ',', '.') }}</div>
+                        <div class="text-muted fw-bold" style="font-size: 0.6rem;">COP (🇲🇽 ${{ number_format($item['product']->price, 2, ',', '.') }} MXN)</div>
+                    @else
+                        <div class="fw-bold text-dark fs-6 lh-1">${{ number_format($item['product']->price, 0, ',', '.') }}</div>
+                        <div class="text-muted fw-bold" style="font-size: 0.6rem;">COP</div>
+                    @endif
                 </div>
 
                 <!-- Quantity -->
@@ -100,8 +105,13 @@
                 <!-- Subtotal / Remove -->
                 <div class="col-4 col-md-2 d-flex align-items-center justify-content-end gap-3">
                     <div class="text-end">
-                        <div class="fw-bold fs-5 lh-1" style="color: var(--sl-primary, #7F1D3F);">${{ number_format($item['subtotal'],0,',','.') }}</div>
-                        <div class="text-muted fw-bold" style="font-size: 0.6rem;">COP</div>
+                        @if($item['product']->effective_currency === 'MXN')
+                            <div class="fw-bold fs-5 lh-1" style="color: var(--sl-primary, #7F1D3F);">${{ number_format($item['product']->price_in_cop * $item['quantity'], 0, ',', '.') }}</div>
+                            <div class="text-muted fw-bold" style="font-size: 0.6rem;">COP (🇲🇽 ${{ number_format($item['subtotal'], 2, ',', '.') }} MXN)</div>
+                        @else
+                            <div class="fw-bold fs-5 lh-1" style="color: var(--sl-primary, #7F1D3F);">${{ number_format($item['subtotal'], 0, ',', '.') }}</div>
+                            <div class="text-muted fw-bold" style="font-size: 0.6rem;">COP</div>
+                        @endif
                     </div>
                     <form action="{{ route('user.cart.remove', $item['product']) }}" method="POST" class="m-0 ms-2">
                         @csrf @method('DELETE')
@@ -253,26 +263,7 @@
 </div>
 @endif
 
-<style>
-    input[type=number]::-webkit-inner-spin-button, 
-    input[type=number]::-webkit-outer-spin-button { 
-        -webkit-appearance: none; 
-        margin: 0; 
-    }
-    
-    .form-check-input:checked {
-        background-color: var(--sl-primary, #7F1D3F);
-        border-color: var(--sl-primary, #7F1D3F);
-    }
-    .form-check-input:focus {
-        border-color: var(--sl-primary, #7F1D3F);
-        box-shadow: 0 0 0 0.25rem rgba(127, 29, 63, 0.2);
-    }
-    
-    .hover-danger { transition: all 0.2s ease; }
-    .hover-danger:hover { background-color: #ef4444 !important; color: white !important; }
-    
-    .hover-bg { transition: all 0.2s ease; }
-    .hover-bg:hover { filter: brightness(0.95); }
-</style>
+@push('styles')
+<link href="{{ asset('css/user.css') }}" rel="stylesheet">
+@endpush
 @endsection

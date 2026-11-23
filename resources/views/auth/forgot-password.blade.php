@@ -4,63 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<style>
-    body, h1, h2, h3, h4, h5, h6, p, a, button, input, label { font-family: var(--sl-font-body) !important; }
-    
-    .btn-spotlight {
-        background: var(--sl-primary);
-        color: var(--sl-text-on-dark) !important;
-        border: none;
-        border-radius: var(--sl-radius-pill);
-        transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
-        box-shadow: 0 4px 14px rgba(127, 29, 63, 0.25);
-    }
-    .btn-spotlight:hover { 
-        background: var(--sl-primary-dark);
-        transform: translateY(-2px); 
-        box-shadow: 0 8px 22px rgba(127, 29, 63, 0.35);
-        color: var(--sl-text-on-dark) !important;
-    }
-    .text-spotlight-magenta { color: var(--sl-primary) !important; }
-    .btn-outline-spotlight {
-        border: 2px solid var(--sl-primary);
-        color: var(--sl-primary);
-        border-radius: var(--sl-radius-pill);
-    }
-    .btn-outline-spotlight:hover {
-        background: var(--sl-primary-soft);
-        color: var(--sl-primary-dark);
-    }
-
-    /* Translation Logic */
-    html[lang="es"] .lang-en { display: none !important; }
-    html[lang="en"] .lang-es { display: none !important; }
-
-    .lang-btn-auth {
-        position: absolute;
-        top: 24px;
-        right: 24px;
-        z-index: 100;
-        border: 1px solid var(--sl-border);
-        background: #ffffff;
-        color: var(--sl-text-main);
-        font-size: 13px;
-        font-weight: 600;
-        border-radius: 9999px;
-        padding: 6px 14px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-    }
-    .lang-btn-auth:hover {
-        background: var(--sl-primary-soft);
-        color: var(--sl-primary);
-        border-color: var(--sl-primary);
-    }
-</style>
+<link href="{{ asset('css/auth.css') }}" rel="stylesheet">
 @endpush
 
 @section('content')

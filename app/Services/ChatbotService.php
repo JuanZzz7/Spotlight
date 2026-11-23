@@ -265,4 +265,96 @@ class ChatbotService
             ? "Gracias por tu mensaje. 😊 Soy el **Asistente de Spotlight** y me especializo en temas que potencian el desarrollo humano.\n\n**Puedo ayudarte con:**\n• 🧠 **Gestión del conocimiento** — cómo capturar, organizar y aplicar el saber\n• 🌱 **Crecimiento personal** — herramientas para tu desarrollo\n• ⚖️ **Ética y autonomía** — reflexiones sobre valores y libertad\n• 🤝 **Diálogo y comunicación** — habilidades para conectar mejor\n• 🏪 **Spotlight** — la plataforma marketplace de Ubaté\n\n¿Sobre cuál de estos temas te gustaría profundizar?"
             : "Thank you for your message. 😊 I'm the **Spotlight Assistant** and I specialize in topics that enhance human development.\n\n**I can help you with:**\n• 🧠 **Knowledge management** — how to capture, organize, and apply wisdom\n• 🌱 **Personal growth** — tools for your development\n• ⚖️ **Ethics and autonomy** — reflections on values and freedom\n• 🤝 **Dialogue and communication** — skills to connect better\n• 🏪 **Spotlight** — Ubaté's marketplace platform\n\nWhich of these topics would you like to explore?";
     }
+
+    /* ══════════════════════════════════════════════════════════
+     * MERCHANT QUICK REPLIES GENERATOR (SPOTLIGHT IA)
+     * ══════════════════════════════════════════════════════════ */
+    public function generateMerchantQuickReply(string $input, ?\App\Models\Company $company = null, string $category = 'general'): string
+    {
+        $bizName    = $company?->name ?: 'nuestra tienda';
+        $bizAddress = $company?->address ?: 'Ubaté';
+        $bizPhone   = $company?->phone ?: '';
+        $schedule   = $company ? ($company->opening_time ? substr($company->opening_time, 0, 5) . ' a ' . substr($company->closing_time, 0, 5) : 'horario habitual') : 'horario comercial';
+
+        $prompt = "Eres un redactor experto en atención al cliente para la plataforma de comercio local Spotlight en Ubaté.\n"
+            . "Tu tarea es redactar una respuesta rápida, cálida, concisa (máximo 2 o 3 oraciones cortas, directa y lista para ser enviada por el comerciante de \"{$bizName}\" a un cliente).\n"
+            . "Datos del negocio:\n"
+            . "- Nombre del comercio: {$bizName}\n"
+            . "- Ubicación: {$bizAddress}\n"
+            . "- Horario de atención: {$schedule}\n"
+            . "- Teléfono/Contacto: {$bizPhone}\n"
+            . "- Contexto/Categoría: {$category}\n\n"
+            . "Instrucción o mensaje del cliente:\n\"{$input}\"\n\n"
+            . "Reglas críticas:\n"
+            . "1. Redacta en primera persona como el comercio (ej: '¡Hola! En {$bizName}...', 'Con gusto te confirmamos...').\n"
+            . "2. Sé muy empático, claro y amigable.\n"
+            . "3. NO incluyas introducciones como 'Aquí tienes la respuesta:', devuelve DIRECTAMENTE el texto exacto que el comerciante enviará al cliente.\n"
+            . "4. Si el comerciante solicita información de horarios, envíos o pagos, incluye los datos pertinentes.";
+
+        if (!empty($this->apiKey)) {
+            $contents = [
+                ['role' => 'user', 'parts' => [['text' => $prompt]]]
+            ];
+            $payload = json_encode([
+                'contents'         => $contents,
+                'generationConfig' => [
+                    'temperature'     => 0.7,
+                    'maxOutputTokens' => 300,
+                ],
+            ]);
+            $url = "{$this->apiUrl}?key={$this->apiKey}";
+            $ch  = curl_init($url);
+            curl_setopt_array($ch, [
+                CURLOPT_POST           => true,
+                CURLOPT_POSTFIELDS     => $payload,
+                CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_SSL_VERIFYPEER => false,
+                CURLOPT_SSL_VERIFYHOST => false,
+                CURLOPT_TIMEOUT        => 15,
+            ]);
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+
+            if ($httpCode === 200 && $response) {
+                $json = json_decode($response, true);
+                if (isset($json['candidates'][0]['content']['parts'][0]['text'])) {
+                    $clean = trim($json['candidates'][0]['content']['parts'][0]['text']);
+                    $clean = trim($clean, '"\'');
+                    if (!empty($clean)) {
+                        return $clean;
+                    }
+                }
+            }
+        }
+
+        // Respaldo inteligente local si no hay API key o no hay conexión
+        return $this->localMerchantQuickReplyFallback($input, $bizName, $bizAddress, $schedule, $category);
+    }
+
+    private function localMerchantQuickReplyFallback(string $input, string $bizName, string $bizAddress, string $schedule, string $category): string
+    {
+        $lower = mb_strtolower($input);
+        if (str_contains($lower, 'horario') || str_contains($lower, 'hora') || str_contains($lower, 'abre') || str_contains($lower, 'abierto')) {
+            return "¡Hola! En {$bizName} te atendemos con gusto de {$schedule} en nuestro punto de atención en {$bizAddress}. ¡Estaremos encantados de recibirte!";
+        }
+        if (str_contains($lower, 'envio') || str_contains($lower, 'domicilio') || str_contains($lower, 'entrega') || str_contains($lower, 'despacho')) {
+            return "¡Hola! Sí realizamos envíos y domicilios en Ubaté y la región. Por favor facilítanos tu dirección exacta y con gusto coordinamos la entrega de tu pedido.";
+        }
+        if (str_contains($lower, 'pago') || str_contains($lower, 'transferencia') || str_contains($lower, 'nequi') || str_contains($lower, 'daviplata') || str_contains($lower, 'tarjeta') || str_contains($lower, 'wompi')) {
+            return "¡Hola! En {$bizName} aceptamos pagos seguros con tarjetas débito/crédito, transferencias y pagos contra entrega. ¿Cuál medio de pago te resulta más cómodo?";
+        }
+        if (str_contains($lower, 'garantia') || str_contains($lower, 'garantía') || str_contains($lower, 'cambio') || str_contains($lower, 'reclamo')) {
+            return "¡Hola! En {$bizName} todos nuestros productos cuentan con garantía directa y respaldo de calidad. Indícanos los detalles de tu compra y con gusto te asistiremos de inmediato.";
+        }
+        if (str_contains($lower, 'demora') || str_contains($lower, 'retraso') || str_contains($lower, 'ocupado') || str_contains($lower, 'espera')) {
+            return "Hola, muchas gracias por tu paciencia. En este momento estamos atendiendo en tienda física, pero ya revisamos tu mensaje y te brindaremos respuesta completa en unos minutos.";
+        }
+        if (str_contains($lower, 'precio') || str_contains($lower, 'costo') || str_contains($lower, 'cuanto') || str_contains($lower, 'cuánto') || str_contains($lower, 'stock') || str_contains($lower, 'tienes') || str_contains($lower, 'disponible')) {
+            return "¡Hola! Con mucho gusto te confirmamos disponibilidad y cotización en {$bizName}. ¿Cuál producto o referencia específica te gustaría adquirir?";
+        }
+
+        return "¡Hola! Gracias por comunicarte con {$bizName}. Estamos a tu entera disposición para resolver cualquier duda sobre nuestros productos y servicios. ¿En qué te podemos asesorar hoy?";
+    }
 }

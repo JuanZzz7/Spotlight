@@ -25,6 +25,8 @@ Route::get('/empresas/{company}/tooltip', [PublicController::class, 'companyTool
 Route::get('/productos/{product}',        [PublicController::class, 'product'])->name('public.product');
 Route::post('/productos/{product}/reseñas', [PublicController::class, 'storeReview'])->name('public.product.review')->middleware('auth');
 Route::get('/rastreo',                    [PublicController::class, 'trackingPortal'])->name('public.tracking');
+Route::get('/soporte-legal/{section?}',   [PublicController::class, 'legal'])->name('public.legal');
+Route::post('/soporte-legal/pqrs',        [PublicController::class, 'submitPqrs'])->name('public.legal.pqrs');
 
 // Auth
 Route::get('/login',    [AuthController::class, 'showLogin'])->name('login');
@@ -90,9 +92,11 @@ Route::prefix('business')->name('business.')->middleware(['auth', 'role:business
     Route::post('company/request-document-update', [BizCompany::class, 'requestDocumentUpdate'])->name('company.request_document_update');
 
     Route::get('products/export/pdf', [BizProduct::class, 'exportPdf'])->name('products.export_pdf');
+    Route::post('products/tags/quick-create', [BizProduct::class, 'storeQuickTag'])->name('products.tags.quick_create');
     Route::resource('products', BizProduct::class);
 
     Route::get('expenses/export/pdf',   [ExpenseController::class, 'exportPdf'])->name('expenses.export_pdf');
+    Route::get('expenses/{expense}/invoice', [ExpenseController::class, 'invoice'])->name('expenses.invoice');
     Route::get('expenses',              [ExpenseController::class, 'index'])->name('expenses.index');
     Route::get('expenses/create',       [ExpenseController::class, 'create'])->name('expenses.create');
     Route::post('expenses',             [ExpenseController::class, 'store'])->name('expenses.store');
@@ -212,13 +216,17 @@ Route::post('/payments/mercadopago/webhook',     [MercadoPagoWebhookController::
 Route::middleware(['auth'])->group(function () {
     Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
     Route::get('/chat/api/unread-count', [ChatController::class, 'unreadCount'])->name('chat.unread.count');
+    Route::post('/chat/status', [ChatController::class, 'updateStatus'])->name('chat.status.update');
+    Route::post('/chat/quick-replies/ai-generate', [ChatController::class, 'aiGenerateReply'])->name('chat.quick-replies.ai');
+    Route::post('/chat/quick-replies/save', [ChatController::class, 'saveQuickReply'])->name('chat.quick-replies.save');
+    Route::delete('/chat/quick-replies/{id}', [ChatController::class, 'deleteQuickReply'])->name('chat.quick-replies.delete');
     Route::get('/chat/{receiver}', [ChatController::class, 'show'])->name('chat.show');
     Route::post('/chat/{receiver}', [ChatController::class, 'send'])->name('chat.send');
     Route::get('/chat/api/{receiver}', [ChatController::class, 'getMessages'])->name('chat.messages');
 });
 
-// AI Chatbot Widget (available to all authenticated users)
-Route::middleware(['auth'])->group(function () {
+// AI Chatbot Widget (available to registered consumers and businesses)
+Route::middleware(['auth', 'role:user,business'])->group(function () {
     Route::get('/chatbot', [ChatbotController::class, 'index'])->name('chatbot.index');
     Route::post('/chatbot/message',     [ChatbotController::class, 'message'])->name('chatbot.message');
     Route::post('/chatbot/detect-lang', [ChatbotController::class, 'detectLang'])->name('chatbot.detect-lang');

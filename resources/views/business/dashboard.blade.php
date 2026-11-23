@@ -2,15 +2,19 @@
 @section('title','Empresario - Spotlight')
 @section('page-title','Panel Empresario')
 
+@push('styles')
+<link href="{{ asset('css/business.css') }}" rel="stylesheet">
+@endpush
+
 @section('dashboard-content')
 @if(!$company)
-    <div class="alert alert-warning border-0" style="background-color: rgba(217, 119, 6, 0.1); color: #d97706;">
+    <div class="alert alert-warning border-0">
         <i class="bi bi-exclamation-triangle me-2"></i>
-        Aún no has configurado tu empresa. <a href="{{ route('business.company.edit') }}" class="fw-semibold text-decoration-underline" style="color: #d97706;">Completa tu perfil empresarial</a> para empezar a vender.
+        Aún no has configurado tu empresa. <a href="{{ route('business.company.edit') }}" class="fw-semibold text-decoration-underline alert-link">Completa tu perfil empresarial</a> para empezar a vender.
     </div>
 @else
     @if($company->status === 'pending')
-    <div class="alert alert-warning border-0 d-flex align-items-center mb-4 shadow-sm" style="background-color: #fffbeb; color: #92400e;">
+    <div class="alert alert-warning border-0 d-flex align-items-center mb-4 shadow-sm">
         <i class="bi bi-clock-history fs-4 me-3 text-warning"></i>
         <div>
             <h6 class="mb-1 fw-bold">Cuenta pendiente de validación</h6>
@@ -18,7 +22,7 @@
         </div>
     </div>
     @elseif($company->status === 'inactive')
-    <div class="alert alert-danger border-0 d-flex align-items-center mb-4 shadow-sm" style="background-color: #fef2f2; color: #991b1b;">
+    <div class="alert alert-danger border-0 d-flex align-items-center mb-4 shadow-sm">
         <i class="bi bi-x-circle fs-4 me-3 text-danger"></i>
         <div>
             <h6 class="mb-1 fw-bold">Cuenta no aprobada o suspendida</h6>
@@ -27,32 +31,26 @@
     </div>
     @endif
     {{-- Branding Header --}}
-    <div class="vs-card overflow-hidden mb-4 p-0 shadow-sm border-0" style="border-radius: 20px;">
-        <div style="height: 140px; position: relative; background: linear-gradient(135deg, #29252A 0%, #3D1222 50%, #7F1D3F 100%);">
+    <div class="vs-card overflow-hidden mb-4 p-0 shadow-sm border-0 rounded-4">
+        <div class="dashboard-brand-banner">
             @if($company->banner)
-                <img src="{{ asset('storage/'.$company->banner) }}" class="w-100 h-100 position-absolute top-0 start-0" style="object-fit: cover; opacity: 0.5;">
+                <img src="{{ asset('storage/'.$company->banner) }}" class="w-100 h-100 position-absolute top-0 start-0 dashboard-brand-banner-img">
             @endif
             <!-- Tienda pública activa -->
-            <div class="position-absolute" style="top: 20px; left: 20px; z-index: 2;">
-                <span class="badge rounded-pill text-white d-flex align-items-center gap-2 px-3 py-2 fw-normal" style="background: rgba(0,0,0,0.5) !important; backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.1);">
-                    <div class="rounded-circle" style="width: 8px; height: 8px; background-color: #a3e635;"></div>
+            <div class="position-absolute top-0 start-0 m-3 z-2">
+                <span class="badge rounded-pill text-white d-flex align-items-center gap-2 px-3 py-2 fw-normal dashboard-active-store-badge">
+                    <div class="rounded-circle dashboard-status-dot"></div>
                     Tienda pública activa
                 </span>
             </div>
-            <!-- Cambiar portada -->
-            <div class="position-absolute" style="top: 20px; right: 20px; z-index: 2;">
-                <button class="btn btn-sm text-white rounded-pill px-3 py-2 d-flex align-items-center gap-2 fw-semibold shadow-sm" style="background: rgba(255,255,255,0.15); backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.2);">
-                    <i class="bi bi-camera"></i> Cambiar portada
-                </button>
-            </div>
             
-            <div class="position-absolute" style="bottom: -30px; left: 30px; z-index: 3;">
-                <div class="vs-card p-1 bg-white shadow-sm" style="width: 85px; height: 85px; border-radius: 18px; border: 1px solid #f1f5f9;">
-                    <div class="w-100 h-100 bg-light d-flex align-items-center justify-content-center" style="border-radius: 14px; overflow: hidden;">
+            <div class="position-absolute dashboard-logo-wrapper">
+                <div class="vs-card p-1 bg-white shadow-sm dashboard-logo-card">
+                    <div class="w-100 h-100 bg-light d-flex align-items-center justify-content-center dashboard-logo-inner">
                         @if($company->logo)
-                            <img src="{{ asset('storage/'.$company->logo) }}" class="w-100 h-100" style="object-fit: cover;">
+                            <img src="{{ asset('storage/'.$company->logo) }}" class="w-100 h-100 object-fit-cover">
                         @else
-                            <i class="bi bi-shop fs-2" style="color: var(--sl-primary, #7F1D3F);"></i>
+                            <i class="bi bi-shop fs-2 text-sl-primary"></i>
                         @endif
                     </div>
                 </div>
@@ -62,35 +60,35 @@
             <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 ms-2">
                 <div>
                     <div class="d-flex align-items-center flex-wrap gap-2 mb-1">
-                        <h4 class="fw-bold text-dark mb-0" style="font-family: 'Outfit', sans-serif; letter-spacing: -0.5px;">{{ $company->name }}</h4>
-                        <i class="bi bi-patch-check-fill fs-5" style="color: var(--sl-primary, #7F1D3F);"></i>
-                        <span class="badge badge-purple ms-1 fw-bold" style="font-size: 0.65rem;">
+                        <h4 class="fw-bold text-dark mb-0">{{ $company->name }}</h4>
+                        <i class="bi bi-patch-check-fill fs-5 text-sl-primary"></i>
+                        <span class="badge badge-purple ms-1 fw-bold">
                             {{ mb_strtoupper($company->category) }}
                         </span>
                         @if($company->isFormal())
-                            <span class="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-2 py-1 fw-bold" style="font-size: 0.68rem;">
+                            <span class="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-2 py-1 fw-bold">
                                 <i class="bi bi-shield-check me-1"></i>Empresa Formal • NIT {{ $company->nit }}
                             </span>
                             @if($company->canIssueElectronicInvoices())
-                                <span class="badge rounded-pill px-2 py-1 fw-bold" style="background: rgba(127, 29, 63, 0.1); color: var(--sl-primary, #7F1D3F); border: 1px solid rgba(127, 29, 63, 0.2); font-size: 0.68rem;">
+                                <span class="badge badge-primary rounded-pill px-2 py-1 fw-bold">
                                     <i class="bi bi-receipt me-1"></i>Facturación DIAN Activa
                                 </span>
                             @endif
                         @else
-                            <span class="badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning-subtle px-2 py-1 fw-semibold" style="font-size: 0.68rem;">
+                            <span class="badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning-subtle px-2 py-1 fw-semibold">
                                 <i class="bi bi-shop me-1"></i>Emprendimiento Local
                             </span>
                         @endif
                     </div>
-                    <div class="d-flex align-items-center text-muted gap-3 mt-2 fw-medium" style="font-size: 0.8rem;">
-                        <span><i class="bi bi-geo-alt me-1" style="color: #94a3b8;"></i>Aldea Digital</span>
+                    <div class="d-flex align-items-center text-muted gap-3 mt-2 fw-medium small">
+                        <span><i class="bi bi-geo-alt me-1 text-secondary"></i>Aldea Digital</span>
                         <span><i class="bi bi-star-fill text-warning me-1"></i>4.9 <span class="opacity-75">(42 calificaciones)</span></span>
-                        <span style="color: var(--sl-primary, #7F1D3F);"><i class="bi bi-truck me-1"></i>Envíos internacionales</span>
+                        <span class="text-sl-primary"><i class="bi bi-truck me-1"></i>Envíos internacionales</span>
                     </div>
                 </div>
                 <div class="d-flex gap-2">
                     <a href="{{ route('business.company.edit') }}" class="btn bg-white btn-sm rounded-pill px-4 py-2 fw-semibold d-flex align-items-center gap-2 border shadow-sm text-dark">
-                        <i class="bi bi-pencil" style="color: var(--sl-primary, #7F1D3F);"></i> Personalizar Perfil
+                        <i class="bi bi-pencil text-sl-primary"></i> Personalizar Perfil
                     </a>
                     <a href="{{ route('home') }}" class="btn btn-spotlight btn-sm rounded-pill px-4 py-2 fw-semibold d-flex align-items-center gap-2 text-white shadow-sm border-0">
                         <i class="bi bi-eye"></i> Ver Tienda
@@ -102,34 +100,34 @@
 @endif
 
 @if(isset($company) && $company && $company->isFormal() && $company->canIssueElectronicInvoices())
-<div class="card border-0 rounded-4 mb-4 shadow-sm overflow-hidden" style="background: #ffffff; border: 1px solid #bbf7d0 !important; border-left: 6px solid #10b981 !important;">
+<div class="card border-0 rounded-4 mb-4 shadow-sm overflow-hidden dashboard-formal-banner">
     <div class="card-body p-4 d-flex flex-wrap align-items-center justify-content-between gap-3">
         <div class="d-flex align-items-center gap-3">
-            <div class="rounded-circle d-flex align-items-center justify-content-center p-3 flex-shrink-0" style="background: #dcfce7; width: 56px; height: 56px; border: 1px solid #bbf7d0;">
-                <i class="bi bi-shield-check fs-3" style="color: #15803d;"></i>
+            <div class="rounded-circle d-flex align-items-center justify-content-center p-3 flex-shrink-0 dashboard-formal-icon">
+                <i class="bi bi-shield-check fs-3"></i>
             </div>
             <div>
                 <div class="d-flex align-items-center gap-2 mb-1">
-                    <span class="badge rounded-pill px-2 py-1 fw-bold text-dark" style="background: #dcfce7; border: 1px solid #bbf7d0; font-size: 0.72rem; color: #15803d !important;">
+                    <span class="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-2 py-1 fw-bold">
                         <i class="bi bi-patch-check-fill me-1 text-success"></i>Empresa Formal Certificada DIAN
                     </span>
-                    <span class="badge rounded-pill px-2 py-1 fw-semibold" style="background: #f1f5f9; color: #475569; font-size: 0.72rem; border: 1px solid #e2e8f0;">
+                    <span class="badge rounded-pill bg-light text-secondary border px-2 py-1 fw-semibold">
                         NIT: {{ $company->nit }}
                     </span>
                 </div>
-                <h5 class="fw-bold mb-1" style="color: #0f172a !important;">
+                <h5 class="fw-bold mb-1 text-dark">
                     Facturación Electrónica DIAN Operativa
                 </h5>
-                <p class="mb-0 small" style="max-width: 680px; line-height: 1.5; color: #334155 !important;">
+                <p class="mb-0 small text-secondary">
                     Tu empresa formal tiene habilitada la emisión de facturas y notas crédito con resolución DIAN, generación UBL 2.1 y firma digital CUFE/CUDE. Puedes emitir facturas legales en 1 clic para tus ventas.
                 </p>
             </div>
         </div>
         <div class="d-flex align-items-center gap-2">
-            <a href="{{ route('business.billing.index') }}" class="btn rounded-pill px-3 py-2 fw-bold shadow-sm d-flex align-items-center gap-2 text-white" style="background: var(--sl-primary, #7F1D3F); border: none; font-size: 0.85rem;">
+            <a href="{{ route('business.billing.index') }}" class="btn btn-spotlight btn-sm rounded-pill px-3 py-2 fw-bold shadow-sm d-flex align-items-center gap-2 text-white">
                 <i class="bi bi-receipt-cutoff"></i> Módulo DIAN
             </a>
-            <a href="{{ route('business.billing.sales') }}" class="btn btn-outline-secondary rounded-pill px-3 py-2 fw-semibold" style="font-size: 0.85rem;">
+            <a href="{{ route('business.billing.sales') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-2 fw-semibold">
                 Panel de Ventas
             </a>
         </div>
@@ -138,32 +136,32 @@
 @endif
 
 @if(isset($company) && $company && $company->isInformal())
-<div class="card border-0 rounded-4 mb-4 shadow-sm overflow-hidden" style="background: #ffffff; border: 1px solid #fed7aa !important; border-left: 6px solid #f59e0b !important;">
+<div class="card border-0 rounded-4 mb-4 shadow-sm overflow-hidden dashboard-informal-banner">
     <div class="card-body p-4 d-flex flex-wrap align-items-center justify-content-between gap-3">
         <div class="d-flex align-items-center gap-3">
-            <div class="rounded-circle d-flex align-items-center justify-content-center p-3 flex-shrink-0" style="background: #fef3c7; width: 56px; height: 56px; border: 1px solid #fde68a;">
-                <i class="bi bi-mortarboard-fill fs-3" style="color: #b45309;"></i>
+            <div class="rounded-circle d-flex align-items-center justify-content-center p-3 flex-shrink-0 dashboard-informal-icon">
+                <i class="bi bi-mortarboard-fill fs-3"></i>
             </div>
             <div>
                 <div class="d-flex align-items-center gap-2 mb-1">
-                    <span class="badge rounded-pill px-2 py-1 fw-bold text-dark" style="background: #fef3c7; border: 1px solid #fde68a; font-size: 0.72rem; color: #92400e !important;">
+                    <span class="badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning-subtle px-2 py-1 fw-bold">
                         <i class="bi bi-stars me-1 text-warning"></i>Guía para Emprendimientos
                     </span>
-                    <span class="badge rounded-pill px-2 py-1 fw-semibold" style="background: #f1f5f9; color: #475569; font-size: 0.72rem; border: 1px solid #e2e8f0;">
+                    <span class="badge rounded-pill bg-light text-secondary border px-2 py-1 fw-semibold">
                         Comercio Informal
                     </span>
                 </div>
-                <h5 class="fw-bold mb-1" style="color: #0f172a !important;">
+                <h5 class="fw-bold mb-1 text-dark">
                     ¿Deseas conocer el proceso para formalizar tu negocio?
                 </h5>
-                <p class="mb-0 small" style="max-width: 680px; line-height: 1.5; color: #334155 !important;">
+                <p class="mb-0 small text-secondary">
                     Accede a nuestros tutoriales en video y la ruta paso a paso (Cámara de Comercio y DIAN). 
-                    <strong style="color: #0f172a;">Aviso:</strong> Spotlight no realiza trámites mercantiles ni tributarios; te brindamos los recursos oficiales para que lo gestiones de forma directa y autónoma.
+                    <strong class="text-dark">Aviso:</strong> Spotlight no realiza trámites mercantiles ni tributarios; te brindamos los recursos oficiales para que lo gestiones de forma directa y autónoma.
                 </p>
             </div>
         </div>
         <div class="d-flex align-items-center gap-2">
-            <a href="{{ route('business.formalization.guide') }}" class="btn rounded-pill px-4 py-2 fw-bold shadow-sm d-flex align-items-center gap-2" style="background: #f59e0b; color: #000000; border: none; font-size: 0.9rem;">
+            <a href="{{ route('business.formalization.guide') }}" class="btn rounded-pill px-4 py-2 fw-bold shadow-sm d-flex align-items-center gap-2 dashboard-tutorials-btn">
                 <i class="bi bi-play-circle-fill fs-5"></i> Ver Tutoriales
             </a>
         </div>
