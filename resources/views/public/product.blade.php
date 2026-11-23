@@ -196,12 +196,12 @@
                         <!-- Badges Overlay -->
                         <div class="position-absolute top-0 start-0 m-3 d-flex flex-column gap-2">
                             @if($product->isMexican() || ($product->company && $product->company->isMexican()))
-                                <span class="badge shadow-sm" style="background: #006847; color: #fff; font-size: 0.72rem; font-weight: 700;">
-                                    🇲🇽 Hecho en México
+                                <span class="badge shadow-sm rounded-pill px-2.5 py-1.5" style="background: rgba(255,255,255,0.95); color: #29252A; border: 1px solid rgba(127,29,63,0.2); font-size: 0.72rem; font-weight: 700;">
+                                    <i class="bi bi-geo-alt-fill text-primary me-1"></i>Hecho en México (MX)
                                 </span>
                             @else
-                                <span class="badge shadow-sm" style="background: #003893; color: #fff; font-weight: 700; font-size: 0.72rem;">
-                                    🇨🇴 Hecho en Colombia
+                                <span class="badge shadow-sm rounded-pill px-2.5 py-1.5" style="background: rgba(255,255,255,0.95); color: #29252A; border: 1px solid rgba(127,29,63,0.2); font-weight: 700; font-size: 0.72rem;">
+                                    <i class="bi bi-geo-alt-fill text-primary me-1"></i>Hecho en Colombia (CO)
                                 </span>
                             @endif
 

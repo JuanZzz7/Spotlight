@@ -250,44 +250,68 @@
 }
 
 .editorial-badge {
-    font-size: 0.64rem;
-    font-weight: 800;
-    letter-spacing: 0.04em;
-    padding: 5px 10px;
-    box-shadow: 0 2px 8px rgba(127, 29, 63, 0.08);
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 0.63rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    padding: 4px 10px;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 2px 10px rgba(41, 37, 42, 0.08);
+    border: 1px solid rgba(127, 29, 63, 0.16);
+    color: var(--sl-navy, #29252A);
+}
+
+.editorial-badge.editorial-badge-themed {
+    background: rgba(255, 255, 255, 0.96);
+    color: var(--sl-navy, #29252A);
+    border: 1px solid color-mix(in srgb, var(--badge-accent, #7F1D3F) 35%, #e2e8f0);
+}
+
+.editorial-badge.editorial-badge-themed i {
+    color: var(--badge-accent, #7F1D3F);
+    font-size: 0.72rem;
 }
 
 .editorial-badge.tag-local {
-    background: #ffffff;
+    background: rgba(255, 255, 255, 0.95);
     color: var(--sl-primary, #7F1D3F);
-    border: 1px solid var(--sl-accent, #D98C9A);
+    border: 1px solid rgba(217, 140, 154, 0.55);
 }
 
 .editorial-badge.tag-hot {
     background: var(--sl-primary, #7F1D3F);
     color: #ffffff;
+    border: 1px solid var(--sl-primary, #7F1D3F);
 }
 
 .editorial-badge.tag-new {
     background: var(--sl-navy, #29252A);
     color: #ffffff;
+    border: 1px solid var(--sl-navy, #29252A);
 }
 
 .editorial-badge.tag-fast {
-    background: #FEF3C7;
+    background: #FFFBEB;
     color: #92400E;
-    border: 1px solid #FCD34D;
+    border: 1px solid #FDE68A;
 }
 
 .editorial-origin-pill {
-    background: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    background: rgba(255, 255, 255, 0.94);
     color: var(--sl-navy, #29252A);
-    font-size: 0.65rem;
+    font-size: 0.64rem;
     font-weight: 800;
     padding: 3px 9px;
     border-radius: 999px;
-    border: 1px solid rgba(217, 140, 154, 0.4);
-    box-shadow: 0 2px 6px rgba(41, 37, 42, 0.05);
+    border: 1px solid rgba(217, 140, 154, 0.45);
+    box-shadow: 0 2px 6px rgba(41, 37, 42, 0.06);
 }
 
 .editorial-img-footer {
@@ -1513,24 +1537,56 @@ input[type=number]::-webkit-outer-spin-button {
 }
 
 /* --------------------------------------------------------------------------
-   6. Filtro Dinámico con Animación Temática de Categorías
+   6. Filtro Dinámico con Animación Temática de Categorías (Diseño Editorial)
    -------------------------------------------------------------------------- */
 .category-theme-banner {
     position: relative;
     overflow: hidden;
-    animation: themeBannerEnter 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    background: linear-gradient(135deg, #ffffff 0%, color-mix(in srgb, var(--cat-accent, #7F1D3F) 8%, #fffcf7) 100%);
+    border: 1px solid color-mix(in srgb, var(--cat-accent, #7F1D3F) 25%, #eedddc);
+    border-left: 5px solid var(--cat-accent, #7F1D3F);
+    animation: themeBannerEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.category-theme-banner::after {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -20%;
-    width: 250px;
-    height: 250px;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.25) 0%, transparent 70%);
-    pointer-events: none;
-    border-radius: 50%;
+.category-theme-icon-box {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    background: color-mix(in srgb, var(--cat-accent, #7F1D3F) 12%, #ffffff);
+    border: 1px solid color-mix(in srgb, var(--cat-accent, #7F1D3F) 24%, transparent);
+    color: var(--cat-accent, #7F1D3F);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    box-shadow: 0 4px 12px rgba(41, 37, 42, 0.05);
+}
+
+.category-theme-kicker {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--cat-accent, #7F1D3F) 12%, #ffffff);
+    color: var(--cat-accent, #7F1D3F);
+    border: 1px solid color-mix(in srgb, var(--cat-accent, #7F1D3F) 22%, transparent);
+}
+
+.category-theme-reset-btn {
+    background: #ffffff;
+    color: var(--sl-navy, #29252A);
+    border: 1px solid var(--sl-border, #EEDDDC);
+    transition: all 0.2s ease;
+}
+
+.category-theme-reset-btn:hover {
+    background: var(--cat-accent, #7F1D3F);
+    color: #ffffff;
+    border-color: var(--cat-accent, #7F1D3F);
 }
 
 @keyframes themeBannerEnter {

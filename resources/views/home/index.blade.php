@@ -249,12 +249,12 @@
                                 </span>
                             @endif
                             @if($product->isMexican() || ($product->company && $product->company->isMexican()))
-                                <span class="badge position-absolute top-0 end-0 m-2 shadow-sm" style="background: #006847; color: #fff; font-size: 0.65rem; font-weight: 700;">
-                                    🇲🇽 MX
+                                <span class="badge position-absolute top-0 end-0 m-2 shadow-sm d-inline-flex align-items-center gap-1" style="background: rgba(255,255,255,0.95); color: #29252A; border: 1px solid rgba(217,140,154,0.45); font-size: 0.65rem; font-weight: 800; border-radius: 999px;">
+                                    <i class="bi bi-geo-alt-fill text-primary"></i> MX
                                 </span>
                             @else
-                                <span class="badge position-absolute top-0 end-0 m-2 shadow-sm" style="background: #003893; color: #fff; font-size: 0.65rem; font-weight: 700;">
-                                    🇨🇴 CO
+                                <span class="badge position-absolute top-0 end-0 m-2 shadow-sm d-inline-flex align-items-center gap-1" style="background: rgba(255,255,255,0.95); color: #29252A; border: 1px solid rgba(217,140,154,0.45); font-size: 0.65rem; font-weight: 800; border-radius: 999px;">
+                                    <i class="bi bi-geo-alt-fill text-primary"></i> CO
                                 </span>
                             @endif
                         </div>

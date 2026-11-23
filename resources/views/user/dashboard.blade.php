@@ -13,6 +13,7 @@
     // Mapeo temático para animación de categorías
     $themeAccent = $activeTag?->accent_color ?? '#7F1D3F';
     $tagColorMap = isset($allTags) ? $allTags->pluck('accent_color', 'label')->toArray() : [];
+    $tagIconMap = isset($allTags) ? $allTags->pluck('icon', 'label')->toArray() : [];
 @endphp
 
 <div class="consumer-split-wrapper">
@@ -29,9 +30,9 @@
                         <i class="bi bi-compass-fill me-1"></i> VITRINA LOCAL
                     </span>
                     @if($market === 'CO')
-                        <span class="badge rounded-pill consumer-market-tag">🇨🇴 Mercado Colombia</span>
+                        <span class="badge rounded-pill consumer-market-tag"><i class="bi bi-geo-alt-fill text-sl-primary me-1"></i>Mercado Colombia (CO)</span>
                     @elseif($market === 'MX')
-                        <span class="badge rounded-pill consumer-market-tag">🇲🇽 Mercado México</span>
+                        <span class="badge rounded-pill consumer-market-tag"><i class="bi bi-geo-alt-fill text-sl-primary me-1"></i>Mercado México (MX)</span>
                     @endif
                 </div>
                 <h3 class="consumer-canvas-title mb-0 mt-1">
@@ -105,7 +106,7 @@
 
             @if($market)
                 <a href="{{ route('user.dashboard', request()->except(['country', 'page'])) }}" class="consumer-active-chip text-decoration-none">
-                    <span>País: {{ $market === 'MX' ? '🇲🇽 México' : '🇨🇴 Colombia' }}</span>
+                    <span><i class="bi bi-globe-americas me-1"></i>País: {{ $market === 'MX' ? 'México (MX)' : 'Colombia (CO)' }}</span>
                     <i class="bi bi-x-lg"></i>
                 </a>
             @endif
@@ -116,26 +117,32 @@
         </div>
         @endif
 
-        {{-- Banner Temático Dinámico con Animación de Entrada --}}
+        {{-- Banner Temático Dinámico con Diseño Editorial Refinado --}}
         @if($activeCategory)
-        <div class="category-theme-banner mb-4 p-3 rounded-4 text-white shadow-sm d-flex align-items-center justify-content-between"
-             style="background: linear-gradient(135deg, {{ $themeAccent }} 0%, color-mix(in srgb, {{ $themeAccent }} 65%, #1f1d24) 100%); border-left: 6px solid #ffffff;">
+        <div class="category-theme-banner mb-4 p-3 p-sm-3.5 rounded-4 shadow-xs d-flex align-items-center justify-content-between gap-3"
+             style="--cat-accent: {{ $themeAccent }};">
             <div class="d-flex align-items-center gap-3 min-w-0">
-                <div class="rounded-circle p-2.5 bg-white bg-opacity-20 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 44px; height: 44px; font-size: 1.25rem;">
-                    <i class="bi {{ $activeTag?->icon ?: 'bi-tag-fill' }} text-white"></i>
+                <div class="category-theme-icon-box flex-shrink-0">
+                    <i class="bi {{ $activeTag?->icon ?: 'bi-tag-fill' }}"></i>
                 </div>
                 <div class="min-w-0">
-                    <span class="badge bg-white bg-opacity-20 text-white rounded-pill px-2.5 py-0.5 text-2xs fw-bold text-uppercase mb-1 d-inline-block">
-                        Categoría Seleccionada
-                    </span>
-                    <h5 class="fw-bold mb-0 text-white text-truncate">{{ $activeTag?->label ?: $activeCategory }}</h5>
-                    <small class="text-white text-opacity-80 text-xs">
+                    <div class="d-flex align-items-center gap-1.5 mb-1">
+                        <span class="category-theme-kicker">
+                            <i class="bi bi-funnel-fill me-1"></i>Categoría Seleccionada
+                        </span>
+                    </div>
+                    <h5 class="fw-bold mb-0 text-dark text-truncate" style="font-size: 1.15rem; letter-spacing: -0.02em;">
+                        {{ $activeTag?->label ?: $activeCategory }}
+                    </h5>
+                    <small class="text-muted d-block text-truncate" style="font-size: 0.78rem;">
                         Vitrina temática con productos filtrados para esta sección
                     </small>
                 </div>
             </div>
-            <a href="{{ route('user.dashboard', request()->except(['category', 'page'])) }}" class="btn btn-sm btn-light rounded-pill px-3 py-1 fw-bold text-xs shadow-xs text-nowrap flex-shrink-0 ms-2" title="Quitar filtro">
-                <i class="bi bi-x-circle me-1"></i> Ver todas
+            <a href="{{ route('user.dashboard', request()->except(['category', 'page'])) }}"
+               class="btn btn-sm rounded-pill px-3 py-1.5 fw-bold text-xs shadow-2xs text-nowrap flex-shrink-0 category-theme-reset-btn"
+               title="Quitar filtro">
+                <i class="bi bi-x-circle me-1"></i>Ver todas
             </a>
         </div>
         @endif
@@ -144,16 +151,20 @@
         <div id="productsContainer" class="row g-4 view-mode-grid" style="--theme-accent: {{ $themeAccent }};">
             @forelse($products as $product)
                 @php
-                    $tagText = 'ARTESANAL / LOCAL';
+                    $tagText = 'SELECCIÓN LOCAL';
+                    $tagIcon = 'bi-patch-check-fill';
                     $tagStyle = 'tag-local';
                     if ($product->id % 4 == 0) {
-                        $tagText = '🔥 TOP VENTAS';
+                        $tagText = 'DESTACADO';
+                        $tagIcon = 'bi-award-fill';
                         $tagStyle = 'tag-hot';
                     } elseif ($product->id % 3 == 0) {
-                        $tagText = '✨ NUEVO';
+                        $tagText = 'NUEVO';
+                        $tagIcon = 'bi-stars';
                         $tagStyle = 'tag-new';
                     } elseif ($product->id % 5 == 0) {
-                        $tagText = '⚡ ENVÍO HOY';
+                        $tagText = 'ENVÍO HOY';
+                        $tagIcon = 'bi-lightning-charge-fill';
                         $tagStyle = 'tag-fast';
                     }
                 @endphp
@@ -181,25 +192,32 @@
                                     @endif
                                 </a>
 
-                                {{-- Etiquetas flotantes superiores --}}
+                                {{-- Etiquetas flotantes superiores estilizadas con iconos profesionales --}}
                                 <div class="position-absolute top-0 start-0 m-2 d-flex flex-column gap-1 z-2">
                                     @if($product->primary_tag)
-                                        <span class="badge rounded-pill editorial-badge shadow-xs" style="background-color: {{ $product->primary_tag->accent_color }}; color: #ffffff;">
-                                            <i class="bi {{ $product->primary_tag->icon ?: 'bi-tag-fill' }} me-1"></i> {{ $product->primary_tag->label }}
+                                        <span class="badge rounded-pill editorial-badge editorial-badge-themed"
+                                              style="--badge-accent: {{ $product->primary_tag->accent_color }};">
+                                            <i class="bi {{ $product->primary_tag->icon ?: 'bi-tag-fill' }} me-1"></i>
+                                            <span>{{ $product->primary_tag->label }}</span>
                                         </span>
                                     @else
                                         <span class="badge rounded-pill editorial-badge {{ $tagStyle }}">
-                                            {{ $tagText }}
+                                            <i class="bi {{ $tagIcon }} me-1"></i>
+                                            <span>{{ $tagText }}</span>
                                         </span>
                                     @endif
                                 </div>
 
-                                {{-- Bandera de origen y stock --}}
+                                {{-- Indicador de origen con icono profesional --}}
                                 <div class="position-absolute top-0 end-0 m-2 d-flex align-items-center gap-1 z-2">
                                     @if($product->isMexican() || ($product->company && $product->company->isMexican()))
-                                        <span class="editorial-origin-pill" title="Comercio de México">🇲🇽 MX</span>
+                                        <span class="editorial-origin-pill" title="Comercio de México">
+                                            <i class="bi bi-geo-alt-fill text-sl-primary me-0.5"></i>MX
+                                        </span>
                                     @else
-                                        <span class="editorial-origin-pill" title="Comercio de Colombia">🇨🇴 CO</span>
+                                        <span class="editorial-origin-pill" title="Comercio de Colombia">
+                                            <i class="bi bi-geo-alt-fill text-sl-primary me-0.5"></i>CO
+                                        </span>
                                     @endif
                                 </div>
 
@@ -272,10 +290,10 @@
                                             <button type="button"
                                                     class="btn btn-sm p-0 border-0 bg-transparent text-start d-inline-flex align-items-center gap-1 mt-0.5"
                                                     style="font-size: 0.7rem; color: #7F1D3F; font-weight: 600;"
-                                                    onclick="const tag = this.previousElementSibling; const isCop = tag.dataset.mode === 'COP'; tag.dataset.mode = isCop ? 'MXN' : 'COP'; tag.querySelector('.js-card-price-val').textContent = isCop ? tag.dataset.mxn : tag.dataset.cop; tag.querySelector('.js-card-price-cur').textContent = isCop ? 'MXN' : 'COP'; this.querySelector('.js-alt-currency-label').textContent = isCop ? ('🇨🇴 ≈ ' + tag.dataset.cop + ' COP') : ('🇲🇽 ' + tag.dataset.mxn + ' MXN');"
+                                                    onclick="const tag = this.previousElementSibling; const isCop = tag.dataset.mode === 'COP'; tag.dataset.mode = isCop ? 'MXN' : 'COP'; tag.querySelector('.js-card-price-val').textContent = isCop ? tag.dataset.mxn : tag.dataset.cop; tag.querySelector('.js-card-price-cur').textContent = isCop ? 'MXN' : 'COP'; this.querySelector('.js-alt-currency-label').textContent = isCop ? ('≈ ' + tag.dataset.cop + ' COP') : (tag.dataset.mxn + ' MXN');"
                                                     title="Haz clic para alternar entre Pesos Colombianos (COP) y Pesos Mexicanos (MXN)">
                                                 <i class="bi bi-currency-exchange"></i>
-                                                <span class="js-alt-currency-label">🇲🇽 ${{ number_format($product->price, 2, ',', '.') }} MXN</span>
+                                                <span class="js-alt-currency-label">${{ number_format($product->price, 2, ',', '.') }} MXN</span>
                                             </button>
                                         @else
                                             <div class="product-price-tag">
@@ -444,16 +462,17 @@
                         <div class="dock-quick-chips mt-2">
                             <a href="{{ route('user.dashboard', request()->except(['category', 'page'])) }}"
                                class="dock-chip {{ empty($activeCategory) ? 'active' : '' }}">
-                                Todas
+                                <i class="bi bi-grid-fill me-1"></i>Todas
                             </a>
                             @foreach($categories->take(7) as $cat)
                                 @php
                                     $chipAccent = $tagColorMap[$cat] ?? '#7F1D3F';
+                                    $chipIcon = $tagIconMap[$cat] ?? 'bi-tag-fill';
                                 @endphp
                                 <a href="{{ route('user.dashboard', array_merge(request()->except('page'), ['category' => $cat])) }}"
                                    class="dock-chip themed-chip {{ $activeCategory === $cat ? 'active' : '' }}"
                                    style="--chip-accent: {{ $chipAccent }};">
-                                    {{ $cat }}
+                                    <i class="bi {{ $chipIcon }} me-1" style="color: {{ $activeCategory === $cat ? '#ffffff' : $chipAccent }};"></i>{{ $cat }}
                                 </a>
                             @endforeach
                         </div>
@@ -544,15 +563,15 @@
                     <div class="dock-market-grid">
                         <a href="{{ route('user.dashboard', request()->except(['country', 'page'])) }}"
                            class="dock-market-btn {{ empty($market) ? 'active' : '' }}">
-                            🌐 Todos
+                            <i class="bi bi-globe2 me-1"></i>Todos
                         </a>
                         <a href="{{ route('user.dashboard', array_merge(request()->except('page'), ['country' => 'CO'])) }}"
                            class="dock-market-btn {{ $market === 'CO' ? 'active' : '' }}">
-                            🇨🇴 CO
+                            <i class="bi bi-geo-alt-fill me-1"></i>CO
                         </a>
                         <a href="{{ route('user.dashboard', array_merge(request()->except('page'), ['country' => 'MX'])) }}"
                            class="dock-market-btn {{ $market === 'MX' ? 'active' : '' }}">
-                            🇲🇽 MX
+                            <i class="bi bi-geo-alt-fill me-1"></i>MX
                         </a>
                     </div>
                 </div>
@@ -574,7 +593,7 @@
 </div>
 
 @push('styles')
-<link href="{{ asset('css/user.css') }}?v=2.7" rel="stylesheet">
+<link href="{{ asset('css/user.css') }}?v=2.8" rel="stylesheet">
 @endpush
 
 @push('scripts')
