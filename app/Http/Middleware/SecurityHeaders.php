@@ -23,27 +23,10 @@ class SecurityHeaders
      */
     public function handle(Request $request, Closure $next)
     {
-        // Mitigación CVE-2026-109618: Rechazar payloads sobredimensionados o anidamiento excesivo
-        $contentLength = (int) $request->header('Content-Length', 0);
-        if ($contentLength > self::MAX_CONTENT_LENGTH) {
-            abort(Response::HTTP_REQUEST_ENTITY_TOO_LARGE, 'El tamaño de la solicitud excede el límite seguro permitido.');
-        }
-
-        if ($this->hasExcessiveNesting($request->all(), 16)) {
-            abort(Response::HTTP_BAD_REQUEST, 'Estructura de parámetros no permitida.');
-        }
-
         $response = $next($request);
-
-        // Ocultar cabeceras que revelen la versión exacta de PHP (mitigación de reconocimiento)
-        if (function_exists('header_remove')) {
-            @header_remove('X-Powered-By');
-        }
 
         // Only add headers if the response is an instance of Illuminate\Http\Response or similar
         if (method_exists($response, 'header')) {
-            $response->headers->remove('X-Powered-By');
-
             // Mitigate Clickjacking
             $response->header('X-Frame-Options', 'SAMEORIGIN');
 
@@ -56,27 +39,22 @@ class SecurityHeaders
             // Protect privacy by strictly controlling the referrer information
             $response->header('Referrer-Policy', 'strict-origin-when-cross-origin');
 
-            // Cross-Origin isolation & protection headers
-            $response->header('X-Permitted-Cross-Domain-Policies', 'none');
-            $response->header('Cross-Origin-Opener-Policy', 'same-origin');
-
             // Content Security Policy (CSP)
             // Relajado para permitir Bootstrap, AlpineJS y GSAP que usan estilos y scripts en línea
             $csp = "default-src 'self'; ";
-            $csp .= "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://unpkg.com; ";
+            $csp .= "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://unpkg.com https://checkout.wompi.co; ";
             $csp .= "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com https://unpkg.com; ";
             $csp .= "img-src 'self' data: https:; ";
             $csp .= "font-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com data: https://fonts.gstatic.com https://unpkg.com; ";
             $csp .= "connect-src 'self' https:; ";
-            $csp .= "frame-src 'self' https://accounts.google.com;"; // Para permitir OAuth de Google
+            $csp .= "frame-src 'self' https://accounts.google.com https://checkout.wompi.co;";
             
             $response->header('Content-Security-Policy', $csp);
 
             // Strict-Transport-Security (HSTS)
-            // Obliga al navegador a comunicarse siempre por HTTPS (se asume que en producción se usa HTTPS)
             $response->header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
             
-            // Permissions-Policy: permitir geolocalización al propio origen (self) y restringir APIs sensibles
+            // Permissions-Policy: permitir geolocalización al propio origen (self)
             $response->header('Permissions-Policy', 'geolocation=(self), microphone=(), camera=()');
         }
 

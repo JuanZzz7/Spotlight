@@ -10,9 +10,6 @@ class HomeController extends Controller
     public function index()
     {
         $companies = Company::where('status', 'active')
-            ->withCount(['products' => fn($q) => $q->where('active', true)])
-            ->withCount('reviews')
-            ->withAvg('reviews', 'rating')
             ->latest()
             ->take(6)
             ->get();

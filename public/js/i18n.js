@@ -515,6 +515,8 @@
         }
     }
 
+    let hasTranslatedToEn = false;
+
     /**
      * Establece el idioma global de Spotlight y persiste la preferencia.
      */
@@ -523,6 +525,16 @@
         localStorage.setItem(STORAGE_KEY, normalized);
         if (document.documentElement.getAttribute('lang') !== normalized) {
             document.documentElement.setAttribute('lang', normalized);
+        }
+
+        // Si el idioma inicial es español y nunca se ha traducido a inglés, no recorrer el DOM
+        if (normalized === 'es' && !hasTranslatedToEn) {
+            updateLanguageButtonsUI('es');
+            return;
+        }
+
+        if (normalized === 'en') {
+            hasTranslatedToEn = true;
         }
         applyTranslationsToDOM(normalized, document.body);
     }
