@@ -311,7 +311,7 @@ class FormalBusinessBillingSeeder extends Seeder
             );
         }
 
-        // 6. CREAR EMPRESA FORMAL EN PROCESO DE VERIFICACIÓN (Para prueba de Administrador en /admin/fiscal-verifications)
+        // 6. CREAR EMPRESA INFORMAL: Lácteos San Diego Ubaté (Roberto Sánchez)
         $userLacteos = User::firstOrCreate(
             ['email' => 'lacteos@spotlight.com'],
             [
@@ -325,41 +325,83 @@ class FormalBusinessBillingSeeder extends Seeder
             ['user_id' => $userLacteos->id],
             [
                 'name' => 'Lácteos San Diego Ubaté',
-                'description' => 'Producción de quesos madurados, arequipe y derivados lácteos tradicionales.',
+                'description' => 'Producción tradicional y artesanal de quesos madurados, arequipe y derivados lácteos de Ubaté.',
                 'category' => 'Alimentos',
                 'address' => 'Vereda San Diego, Finca El Paraíso, Ubaté',
                 'phone' => '3145678901',
                 'email' => 'lacteos@spotlight.com',
                 'status' => 'active',
-                'tipo_negocio' => 'formal',
-                'razon_social' => 'Lácteos del Valle de Ubaté S.A.S.',
-                'nit' => '901548921-3',
-                'nombre_representante' => 'Roberto Sánchez Pinzón',
+                'tipo_negocio' => 'informal',
+                'nombre_comercial' => 'Lácteos San Diego Ubaté',
                 'cedula_propietario' => '19456789',
-                'email_representante' => 'gerencia@lacteosdiego.com',
+                'razon_social' => null,
+                'nit' => null,
+                'nombre_representante' => null,
+                'email_representante' => null,
+            ]
+        );
+
+        // Asegurar que si ya existía quede como informal y sin perfil DIAN
+        $companyLacteos->update([
+            'tipo_negocio' => 'informal',
+            'nombre_comercial' => 'Lácteos San Diego Ubaté',
+            'cedula_propietario' => '19456789',
+            'razon_social' => null,
+            'nit' => null,
+            'nombre_representante' => null,
+            'email_representante' => null,
+        ]);
+        CompanyFiscalProfile::where('company_id', $companyLacteos->id)->delete();
+
+        // 7. CREAR EMPRESA FORMAL EN PROCESO DE VERIFICACIÓN (Para pruebas de Administrador en /admin/fiscal-verifications)
+        $userAgro = User::firstOrCreate(
+            ['email' => 'agro@spotlight.com'],
+            [
+                'name' => 'Hernando Gómez',
+                'password' => Hash::make('password'),
+                'role' => 'business',
+            ]
+        );
+
+        $companyAgro = Company::firstOrCreate(
+            ['user_id' => $userAgro->id],
+            [
+                'name' => 'Agroinsumos del Valle de Ubaté',
+                'description' => 'Comercialización de insumos agropecuarios y concentrados veterinarios.',
+                'category' => 'Tecnología',
+                'address' => 'Carrera 4 # 10-25, Ubaté',
+                'phone' => '3158901234',
+                'email' => 'agro@spotlight.com',
+                'status' => 'active',
+                'tipo_negocio' => 'formal',
+                'razon_social' => 'Agroinsumos del Valle de Ubaté S.A.S.',
+                'nit' => '901548921-3',
+                'nombre_representante' => 'Hernando Gómez Pinzón',
+                'cedula_propietario' => '19456789',
+                'email_representante' => 'gerencia@agroinsumosubate.com',
             ]
         );
 
         CompanyFiscalProfile::updateOrCreate(
-            ['company_id' => $companyLacteos->id],
+            ['company_id' => $companyAgro->id],
             [
                 'fiscal_status' => CompanyFiscalProfile::STATUS_IN_REVIEW,
                 'person_type' => 'persona_juridica',
                 'id_type' => '31',
                 'identification_number' => '901548921',
                 'dv' => '3',
-                'business_name' => 'Lácteos del Valle de Ubaté S.A.S.',
-                'commercial_name' => 'Lácteos San Diego Ubaté',
+                'business_name' => 'Agroinsumos del Valle de Ubaté S.A.S.',
+                'commercial_name' => 'Agroinsumos del Valle de Ubaté',
                 'tax_regime' => 'responsable_iva',
                 'tax_responsibilities' => ['O-13', 'O-47'],
-                'ciiu_code' => '1051', // Elaboración de productos lácteos
-                'fiscal_address' => 'Vereda San Diego, Finca El Paraíso',
+                'ciiu_code' => '4669', // Comercio de insumos
+                'fiscal_address' => 'Carrera 4 # 10-25, Ubaté',
                 'municipality_code' => '25843',
                 'department_code' => '25',
                 'postal_code' => '250420',
                 'country_code' => 'CO',
-                'fiscal_email' => 'tributaria@lacteosdiego.com',
-                'fiscal_phone' => '3145678901',
+                'fiscal_email' => 'tributaria@agroinsumosubate.com',
+                'fiscal_phone' => '3158901234',
                 'rut_document_path' => 'fiscal_docs/rut_sample.pdf',
                 'camara_comercio_document_path' => 'fiscal_docs/camara_sample.pdf',
                 'submitted_at' => now()->subDay(),

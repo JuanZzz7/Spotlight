@@ -25,9 +25,9 @@
             </p>
         </div>
         <div class="d-flex align-items-center gap-2 flex-wrap">
-            <button type="button" class="btn btn-sl-outlined" data-bs-toggle="modal" data-bs-target="#orderDetailsModal">
-                <i class="bi bi-geo-alt"></i> Rastrear envío
-            </button>
+            <a href="{{ route('user.orders.index') }}" class="btn btn-sl-outlined">
+                <i class="bi bi-truck me-1"></i> Mis Compras y Rastreo
+            </a>
             <a href="{{ route('user.dashboard') }}" class="btn btn-sl-primary">
                 <i class="bi bi-shop"></i> Explorar Marketplace
             </a>
@@ -107,16 +107,40 @@
                         <span class="fw-semibold">TechStore Pro</span>
                     </div>
                 </div>
+
+                <!-- Botones de acción del pedido -->
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <a href="{{ route('user.orders.tracking', $latestOrder) }}" class="btn btn-sl-primary btn-sm">
+                        <i class="bi bi-truck me-1"></i> Rastrear en tiempo real
+                    </a>
+                    <a href="{{ route('user.orders.index') }}" class="btn btn-sl-outlined btn-sm">
+                        <i class="bi bi-receipt me-1"></i> Todas mis compras ({{ $orders->count() }})
+                    </a>
+                </div>
             </div>
 
-            <!-- Botones de acción del pedido: 'Ver detalles de orden' abre la ventana modal sin salir del panel -->
-            <div class="d-flex align-items-center gap-2 flex-wrap">
-                <button type="button" class="btn btn-sl-outlined btn-sm" data-bs-toggle="modal" data-bs-target="#orderDetailsModal">
-                    <i class="bi bi-eye"></i> Ver detalles de orden
-                </button>
-                <a href="{{ route('chat.index') }}" class="btn btn-sl-primary btn-sm">
-                    <i class="bi bi-chat-dots"></i> Mensaje a tienda
-                </a>
+            <!-- Barra de progreso en vivo del envío -->
+            <div class="mb-3">
+                <div class="d-flex justify-content-between text-xs fw-bold text-muted mb-2">
+                    <span><i class="bi bi-box-seam me-1"></i>Preparación</span>
+                    <span><i class="bi bi-truck me-1"></i>Despacho</span>
+                    <span><i class="bi bi-arrow-left-right me-1"></i>En Tránsito</span>
+                    <span><i class="bi bi-bicycle me-1"></i>En Reparto</span>
+                    <span><i class="bi bi-check-circle-fill me-1"></i>Entregado</span>
+                </div>
+                <div class="progress" style="height: 8px; border-radius: 8px; background-color: #f1f5f9;">
+                    <div class="progress-bar" style="width: {{ $latestOrder->shipment?->progress_percentage ?? 20 }}%; background: linear-gradient(90deg, var(--sl-primary), var(--sl-secondary)); border-radius: 8px;"></div>
+                </div>
+            </div>
+
+            <!-- Aviso informativo de rastreo -->
+            <div class="d-flex justify-content-between align-items-center pt-2 flex-wrap gap-2" style="font-size: 12px; color: var(--sl-text-muted);">
+                <span><i class="bi bi-shield-check text-success me-1"></i> Envío asegurado y verificado por la plataforma Spotlight.</span>
+                @if($latestOrder->shipment?->tracking_number)
+                    <a href="{{ route('public.tracking', ['guia' => $latestOrder->shipment->tracking_number]) }}" target="_blank" class="text-decoration-none fw-semibold text-primary">
+                        <i class="bi bi-box-arrow-up-right me-1"></i>Ver en portal público de rastreo
+                    </a>
+                @endif
             </div>
         </div>
 
@@ -163,6 +187,13 @@
                     <div class="text-muted up-text-11">Estimada: 3:00 - 5:00 PM</div>
                 </div>
             </div>
+            <h4 class="font-outfit fw-bold text-dark mb-1">Aún no tienes pedidos registrados</h4>
+            <p class="text-muted text-sm mb-3 mx-auto" style="max-width: 460px;">
+                Cuando compres en Spotlight, aquí podrás ver en tiempo real la guía de transporte, el estado de preparación y la ubicación de tus productos.
+            </p>
+            <a href="{{ route('user.dashboard') }}" class="btn btn-sl-primary btn-sm px-4">
+                <i class="bi bi-shop me-1"></i> Explorar comercios y productos
+            </a>
         </div>
 
         <!-- Aviso discreto de una sola línea sin caja punteada -->
@@ -595,7 +626,7 @@
                     <div class="text-muted mt-1 up-text-11">Se utiliza para acceder a tu cuenta y notificaciones de compras.</div>
                 </div>
 
-                <!-- Teléfono / WhatsApp -->
+                <!-- Teléfono / WhatsApp (10 dígitos exactos) -->
                 <div>
                     <label class="form-label fw-bold mb-1 up-label-13" for="inputPhone">
                         Teléfono / WhatsApp

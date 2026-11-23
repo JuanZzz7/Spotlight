@@ -27,6 +27,10 @@ class DashboardController extends Controller
             ])->count(),
         ];
 
-        return view('admin.dashboard', compact('stats'));
+        // Datos recientes de la base de datos reflejados en vivo para supervisión del Administrador
+        $recentUsers = User::latest()->take(5)->get();
+        $recentCompanies = Company::with('user')->latest()->take(5)->get();
+
+        return view('admin.dashboard', compact('stats', 'recentUsers', 'recentCompanies'));
     }
 }

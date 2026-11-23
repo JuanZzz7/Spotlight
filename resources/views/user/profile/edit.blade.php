@@ -40,8 +40,8 @@
             </div>
             <div class="row">
                 <div class="col-md-6 mb-3">
-                    <label class="form-label text-sm fw-semibold text-dark">Teléfono</label>
-                    <input type="text" name="phone" class="form-control" value="{{ old('phone', $user->phone) }}">
+                    <label class="form-label text-sm fw-semibold text-dark">Teléfono / Celular (10 dígitos exactos)</label>
+                    <input type="tel" name="phone" class="form-control" value="{{ old('phone', $user->phone) }}" placeholder="3001234567" maxlength="10" minlength="10" pattern="[0-9]{10}" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);">
                 </div>
                 <div class="col-md-6 mb-3">
                     <label class="form-label text-sm fw-semibold text-dark">Documento</label>

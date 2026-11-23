@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 
 class AuthController extends Controller
 {
@@ -58,6 +59,19 @@ class AuthController extends Controller
             $country = 'CO';
         }
 
+        $baseMessages = [
+            'name.regex'         => 'El nombre completo solo puede contener caracteres alfabéticos (A-Z, a-z).',
+            'email.required'     => 'El correo electrónico es obligatorio.',
+            'email.email'        => 'El formato del correo electrónico no es válido.',
+            'email.regex'        => 'El formato del correo electrónico no es válido (ejemplo: usuario@correo.com).',
+            'email.unique'       => 'Este correo electrónico ya se encuentra registrado en Spotlight. Inicia sesión o usa otro.',
+            'password.required'  => 'La contraseña es obligatoria.',
+            'password.confirmed' => 'La confirmación de contraseña no coincide.',
+            'password.min'       => 'La contraseña debe tener mínimo 8 caracteres.',
+            'password.regex'     => 'La contraseña debe contener al menos una letra mayúscula, un número y un signo o carácter especial.',
+            'phone.regex'        => 'El número de celular debe contener exactamente 10 dígitos numéricos (ni más ni menos).',
+        ];
+
         // Reglas condicionales si es Empresario o Comprador
         if ($request->role === 'business') {
             $businessFormRequest = \App\Http\Requests\BusinessRegisterRequest::createFrom($request);
@@ -75,8 +89,8 @@ class AuthController extends Controller
             ]));
             $rules = array_merge($rules, $businessRulesToMerge);
         } else {
-            // Comprador (role: user) - No requiere ningún documento tributario ni requisitos complejos
-            $rules['phone'] = ['nullable', 'string', 'max:20'];
+            // Comprador (role: user) - El número de celular ya no es obligatorio en el registro
+            $rules['phone'] = ['nullable', 'string', 'regex:/^[0-9]{10}$/'];
             $rules['phone_prefix'] = ['nullable', 'string', 'max:10'];
             $rules['city'] = ['nullable', 'string', 'max:100'];
             $rules['state'] = ['nullable', 'string', 'max:100'];

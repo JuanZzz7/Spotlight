@@ -28,18 +28,18 @@ Route::get('/rastreo',                    [PublicController::class, 'trackingPor
 Route::get('/soporte-legal/{section?}',   [PublicController::class, 'legal'])->name('public.legal');
 Route::post('/soporte-legal/pqrs',        [PublicController::class, 'submitPqrs'])->name('public.legal.pqrs');
 
-// Auth
+// Auth (protegidos con rate limiting contra fuerza bruta)
 Route::get('/login',    [AuthController::class, 'showLogin'])->name('login');
-Route::post('/login',   [AuthController::class, 'login']);
+Route::post('/login',   [AuthController::class, 'login'])->middleware('throttle:5,1');
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
-Route::post('/register',[AuthController::class, 'register']);
+Route::post('/register',[AuthController::class, 'register'])->middleware('throttle:3,1');
 Route::post('/logout',  [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
-// Recuperación de Contraseña
+// Recuperación de Contraseña (rate limiting: 5 intentos por minuto)
 Route::get('/forgot-password',        [PasswordResetController::class, 'showLinkRequestForm'])->name('password.request');
-Route::post('/forgot-password',       [PasswordResetController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::post('/forgot-password',       [PasswordResetController::class, 'sendResetLinkEmail'])->name('password.email')->middleware('throttle:5,1');
 Route::get('/reset-password/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
-Route::post('/reset-password',        [PasswordResetController::class, 'reset'])->name('password.update');
+Route::post('/reset-password',        [PasswordResetController::class, 'reset'])->name('password.update')->middleware('throttle:5,1');
 
 // Google OAuth
 Route::get('/auth/google/redirect', [GoogleController::class, 'redirect'])->name('google.redirect');
@@ -58,6 +58,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
 
     Route::resource('users', AdminUser::class);
     Route::patch('users/{user}/toggle', [AdminUser::class, 'toggleActive'])->name('users.toggle');
+    Route::patch('users/{user}/verify', [AdminUser::class, 'verifyAccount'])->name('users.verify');
 
     Route::get('companies', [AdminCompany::class, 'index'])->name('companies.index');
     Route::patch('companies/{company}/toggle', [AdminCompany::class, 'toggleStatus'])->name('companies.toggle');
@@ -159,11 +160,6 @@ Route::prefix('user')->name('user.')->middleware(['auth', 'role:user'])->group(f
     Route::get('cart',                     [CartController::class, 'index'])->name('cart.index');
     Route::get('cart/checkout',            [CheckoutController::class, 'index'])->name('cart.checkout');
     Route::post('cart/checkout/process',    [CartController::class, 'processPayment'])->name('cart.payment.process');
-    
-    // Proceso oficial Checkout Marketplace Wompi / Mercado Pago
-    Route::get('/checkout',                     [CheckoutController::class, 'index'])->name('checkout.index');
-    Route::post('/checkout/process',            [CheckoutController::class, 'process'])->name('checkout.process');
-    Route::get('/checkout/result/{reference}',  [CheckoutController::class, 'result'])->name('checkout.result');
 
     Route::post('cart/{product}',          [CartController::class, 'add'])->name('cart.add');
     Route::delete('cart/{product}',        [CartController::class, 'remove'])->name('cart.remove');

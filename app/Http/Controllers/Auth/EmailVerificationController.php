@@ -110,7 +110,14 @@ class EmailVerificationController extends Controller
         // Limpiar sesión de verificación
         session()->forget('google_pending');
 
-        return redirect()->intended('/')->with('success', 'Su cuenta ha sido verificada correctamente.');
+        $currentUser = Auth::user();
+        if ($currentUser->isAdmin()) {
+            return redirect()->route('admin.dashboard')->with('success', 'Cuenta verificada con éxito. Bienvenido al panel de administración.');
+        } elseif ($currentUser->isBusiness()) {
+            return redirect()->route('business.dashboard')->with('success', 'Cuenta verificada con éxito. Bienvenido a tu panel de comercio.');
+        }
+
+        return redirect()->route('user.dashboard')->with('success', 'Tu cuenta ha sido verificada correctamente. ¡Bienvenido a Spotlight!');
     }
 
     /**
