@@ -15,15 +15,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Spotlight Design System (separated by concern) -->
-    <link href="{{ asset('css/tokens.css') }}?v=2.5" rel="stylesheet">
-    <link href="{{ asset('css/components.css') }}?v=2.5" rel="stylesheet">
-    <link href="{{ asset('css/layout.css') }}?v=2.5" rel="stylesheet">
-    <link href="{{ asset('css/utilities.css') }}?v=2.5" rel="stylesheet">
+    <link href="{{ asset('css/tokens.css') }}?v=2.6" rel="stylesheet">
+    <link href="{{ asset('css/components.css') }}?v=2.6" rel="stylesheet">
+    <link href="{{ asset('css/layout.css') }}?v=2.6" rel="stylesheet">
+    <link href="{{ asset('css/utilities.css') }}?v=2.6" rel="stylesheet">
     @auth
         @if(in_array(auth()->user()->role, ['user', 'business']))
         {{-- El widget de IA se renderiza en el <body>, después de @stack('styles'),
              habilitado exclusivamente para consumidores y emprendedores registrados --}}
-        <link href="{{ asset('css/chatbot.css') }}?v=2.5" rel="stylesheet">
+        <link href="{{ asset('css/chatbot.css') }}?v=2.6" rel="stylesheet">
         @endif
     @endauth
     @stack('styles')

@@ -107,18 +107,18 @@
                 <i class="bi bi-shield-check fs-3"></i>
             </div>
             <div>
-                <div class="d-flex align-items-center gap-2 mb-1">
-                    <span class="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-2 py-1 fw-bold">
+                <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                    <span class="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-2.5 py-1 fw-bold">
                         <i class="bi bi-patch-check-fill me-1 text-success"></i>Empresa Formal Certificada DIAN
                     </span>
-                    <span class="badge rounded-pill bg-light text-secondary border px-2 py-1 fw-semibold">
+                    <span class="badge rounded-pill bg-light border px-2.5 py-1 fw-bold" style="color: #3f3a42 !important; border-color: #d8d0d5 !important;">
                         NIT: {{ $company->nit }}
                     </span>
                 </div>
                 <h5 class="fw-bold mb-1 text-dark">
                     Facturación Electrónica DIAN Operativa
                 </h5>
-                <p class="mb-0 small text-secondary">
+                <p class="mb-0 small" style="color: #484249 !important; line-height: 1.5;">
                     Tu empresa formal tiene habilitada la emisión de facturas y notas crédito con resolución DIAN, generación UBL 2.1 y firma digital CUFE/CUDE. Puedes emitir facturas legales en 1 clic para tus ventas.
                 </p>
             </div>
@@ -143,18 +143,18 @@
                 <i class="bi bi-mortarboard-fill fs-3"></i>
             </div>
             <div>
-                <div class="d-flex align-items-center gap-2 mb-1">
-                    <span class="badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning-subtle px-2 py-1 fw-bold">
+                <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                    <span class="badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning-subtle px-2.5 py-1 fw-bold">
                         <i class="bi bi-stars me-1 text-warning"></i>Guía para Emprendimientos
                     </span>
-                    <span class="badge rounded-pill bg-light text-secondary border px-2 py-1 fw-semibold">
+                    <span class="badge rounded-pill bg-light border px-2.5 py-1 fw-bold" style="color: #3f3a42 !important; border-color: #d8d0d5 !important;">
                         Comercio Informal
                     </span>
                 </div>
                 <h5 class="fw-bold mb-1 text-dark">
                     ¿Deseas conocer el proceso para formalizar tu negocio?
                 </h5>
-                <p class="mb-0 small text-secondary">
+                <p class="mb-0 small" style="color: #484249 !important; line-height: 1.5;">
                     Accede a nuestros tutoriales en video y la ruta paso a paso (Cámara de Comercio y DIAN). 
                     <strong class="text-dark">Aviso:</strong> Spotlight no realiza trámites mercantiles ni tributarios; te brindamos los recursos oficiales para que lo gestiones de forma directa y autónoma.
                 </p>

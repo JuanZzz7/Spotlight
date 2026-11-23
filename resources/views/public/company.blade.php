@@ -136,8 +136,24 @@
                          style="transition: transform 0.2s, box-shadow 0.2s;"
                          onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='var(--sl-shadow-hover)'"
                          onmouseout="this.style.transform='';this.style.boxShadow=''">
-                        <a href="{{ route('public.product', $product) }}">
-                            <img src="{{ $product->image_url }}" class="card-img-top" style="height:200px;object-fit:cover;" alt="{{ $product->name }}">
+                        <a href="{{ route('public.product', $product) }}" class="text-decoration-none d-block" style="height:200px;">
+                            @if($product->hasCustomImage())
+                                <img src="{{ $product->image_url }}" class="card-img-top w-100 h-100" style="height:200px;object-fit:cover;" alt="{{ $product->name }}">
+                            @else
+                                <div class="editorial-placeholder-stage" style="height:200px;">
+                                    <div class="editorial-placeholder-showcase">
+                                        <div class="editorial-placeholder-halo">
+                                            <div class="editorial-placeholder-medallion">
+                                                <i class="bi {{ $product->placeholder_icon }}"></i>
+                                            </div>
+                                        </div>
+                                        <span class="editorial-placeholder-caption">
+                                            <img src="{{ asset('images/logo-symbol-burgundy.png') }}" alt="" class="editorial-placeholder-mini-logo">
+                                            <span>Spotlight</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            @endif
                         </a>
                         <div class="card-body d-flex flex-column p-4 flex-fill">
                             <h6 class="fw-bold mb-1 text-truncate" title="{{ $product->name }}">

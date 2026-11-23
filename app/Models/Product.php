@@ -132,17 +132,15 @@ class Product extends Model
 
     public function hasCustomImage(): bool
     {
-        if (!empty($this->image) && \Illuminate\Support\Facades\Storage::disk('public')->exists($this->image)) {
-            return true;
-        }
-        if ($this->company && !empty($this->company->logo) && \Illuminate\Support\Facades\Storage::disk('public')->exists($this->company->logo)) {
-            return true;
-        }
-        return false;
+        return !empty($this->image) && \Illuminate\Support\Facades\Storage::disk('public')->exists($this->image);
     }
 
     public function getPlaceholderIconAttribute(): string
     {
+        if ($this->relationLoaded('tags') && $this->tags->isNotEmpty() && !empty($this->tags->first()->icon)) {
+            return $this->tags->first()->icon;
+        }
+
         $haystack = mb_strtolower(($this->name ?? '') . ' ' . ($this->category ?? '') . ' ' . ($this->description ?? ''));
 
         return match (true) {

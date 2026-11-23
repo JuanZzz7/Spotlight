@@ -164,11 +164,21 @@
             <div class="vs-card h-100 border-0 shadow-sm rounded-4 overflow-hidden d-flex flex-column bg-white hover-lift">
                 <!-- Imagen del Producto -->
                 <div class="position-relative bg-light" style="height: 185px;">
-                    @if($product->image_url)
+                    @if($product->hasCustomImage())
                         <img src="{{ $product->image_url }}" class="w-100 h-100 object-fit-cover" alt="{{ $product->name }}">
                     @else
-                        <div class="w-100 h-100 d-flex align-items-center justify-content-center">
-                            <i class="bi bi-image text-muted opacity-25" style="font-size: 3rem;"></i>
+                        <div class="editorial-placeholder-stage" style="height: 185px;">
+                            <div class="editorial-placeholder-showcase">
+                                <div class="editorial-placeholder-halo">
+                                    <div class="editorial-placeholder-medallion">
+                                        <i class="bi {{ $product->placeholder_icon }}"></i>
+                                    </div>
+                                </div>
+                                <span class="editorial-placeholder-caption">
+                                    <img src="{{ asset('images/logo-symbol-burgundy.png') }}" alt="" class="editorial-placeholder-mini-logo">
+                                    <span>Spotlight</span>
+                                </span>
+                            </div>
                         </div>
                     @endif
                     <!-- Badge Activo / Agotado -->

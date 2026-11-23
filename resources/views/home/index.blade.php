@@ -224,8 +224,24 @@
                     <div class="product-card h-100">
                         
                         <div class="product-img-wrapper">
-                            <a href="{{ route('public.product', $product) }}">
-                                <img src="{{ $product->image_url }}" alt="{{ $product->name }}" loading="lazy">
+                            <a href="{{ route('public.product', $product) }}" class="d-block w-100 h-100 text-decoration-none">
+                                @if($product->hasCustomImage())
+                                    <img src="{{ $product->image_url }}" alt="{{ $product->name }}" loading="lazy">
+                                @else
+                                    <div class="editorial-placeholder-stage">
+                                        <div class="editorial-placeholder-showcase">
+                                            <div class="editorial-placeholder-halo">
+                                                <div class="editorial-placeholder-medallion">
+                                                    <i class="bi {{ $product->placeholder_icon }}"></i>
+                                                </div>
+                                            </div>
+                                            <span class="editorial-placeholder-caption">
+                                                <img src="{{ asset('images/logo-symbol-burgundy.png') }}" alt="" class="editorial-placeholder-mini-logo">
+                                                <span>Spotlight</span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                @endif
                             </a>
                             @if($product->category)
                                 <span class="badge badge-purple position-absolute top-0 start-0 m-2 shadow-sm" style="font-size: 0.68rem;">

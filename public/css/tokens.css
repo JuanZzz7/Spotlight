@@ -115,8 +115,8 @@
     /* --- Overrides Bootstrap 5 --- */
     --bs-primary: var(--sl-primary);
     --bs-primary-rgb: 127, 29, 63;
-    --bs-secondary: var(--sl-primary-soft);
-    --bs-secondary-rgb: 246, 231, 235;
+    --bs-secondary: #5C545F;
+    --bs-secondary-rgb: 92, 84, 95;
     --bs-success: var(--sl-success);
     --bs-success-rgb: 42, 135, 93;
     --bs-danger: var(--sl-danger);

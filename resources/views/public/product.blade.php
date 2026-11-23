@@ -175,7 +175,23 @@
                 <!-- Product Image Section -->
                 <div class="col-lg-6">
                     <div class="product-img-stage shadow-xs">
-                        <img src="{{ $product->image_url }}" alt="{{ $product->name }}" id="mainProductImg">
+                        @if($product->hasCustomImage())
+                            <img src="{{ $product->image_url }}" alt="{{ $product->name }}" id="mainProductImg">
+                        @else
+                            <div class="editorial-placeholder-stage w-100 h-100" style="min-height: 360px; border-radius: inherit;">
+                                <div class="editorial-placeholder-showcase">
+                                    <div class="editorial-placeholder-halo" style="width: 112px; height: 112px;">
+                                        <div class="editorial-placeholder-medallion" style="width: 86px; height: 86px; font-size: 2.3rem;">
+                                            <i class="bi {{ $product->placeholder_icon }}"></i>
+                                        </div>
+                                    </div>
+                                    <span class="editorial-placeholder-caption" style="font-size: 0.72rem; padding: 4px 14px;">
+                                        <img src="{{ asset('images/logo-symbol-burgundy.png') }}" alt="" class="editorial-placeholder-mini-logo">
+                                        <span>Spotlight</span>
+                                    </span>
+                                </div>
+                            </div>
+                        @endif
                         
                         <!-- Badges Overlay -->
                         <div class="position-absolute top-0 start-0 m-3 d-flex flex-column gap-2">
@@ -688,9 +704,25 @@
                         @foreach($relatedProducts as $rel)
                             <div class="col-sm-6 col-md-3">
                                 <div class="vs-card h-100 border-0 bg-white rounded-4 shadow-sm hover-lift d-flex flex-column overflow-hidden">
-                                    <div class="p-3 text-center" style="background: #FAF5F6;">
-                                        <a href="{{ route('public.product', $rel) }}">
-                                            <img src="{{ $rel->image_url }}" alt="{{ $rel->name }}" class="w-100" style="height: 140px; object-fit: contain;">
+                                    <div class="p-0 text-center" style="background: #FAF5F6; height: 165px;">
+                                        <a href="{{ route('public.product', $rel) }}" class="d-block w-100 h-100 text-decoration-none">
+                                            @if($rel->hasCustomImage())
+                                                <img src="{{ $rel->image_url }}" alt="{{ $rel->name }}" class="w-100 h-100 p-3" style="object-fit: contain;">
+                                            @else
+                                                <div class="editorial-placeholder-stage h-100" style="min-height: 165px;">
+                                                    <div class="editorial-placeholder-showcase">
+                                                        <div class="editorial-placeholder-halo" style="width: 72px; height: 72px;">
+                                                            <div class="editorial-placeholder-medallion" style="width: 54px; height: 54px; font-size: 1.45rem;">
+                                                                <i class="bi {{ $rel->placeholder_icon }}"></i>
+                                                            </div>
+                                                        </div>
+                                                        <span class="editorial-placeholder-caption">
+                                                            <img src="{{ asset('images/logo-symbol-burgundy.png') }}" alt="" class="editorial-placeholder-mini-logo">
+                                                            <span>Spotlight</span>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            @endif
                                         </a>
                                     </div>
                                     <div class="p-3 d-flex flex-column flex-fill">
