@@ -35,11 +35,11 @@ class User extends Authenticatable
 
     public function getDisplayNameAttribute(): string
     {
-        if ($this->role === 'business' && $this->relationLoaded('company') && $this->company && !empty($this->company->name)) {
-            return $this->company->name;
-        }
-        if ($this->role === 'business' && $this->company()->exists()) {
-            return $this->company?->name ?: $this->name;
+        if ($this->role === 'business') {
+            $comp = $this->company;
+            if ($comp && !empty($comp->name)) {
+                return $comp->name;
+            }
         }
         return $this->name;
     }
@@ -57,7 +57,7 @@ class User extends Authenticatable
     public function getDisplayLogoAttribute(): ?string
     {
         if ($this->role === 'business') {
-            $comp = $this->relationLoaded('company') ? $this->company : $this->company()->first();
+            $comp = $this->company;
             if ($comp && !empty($comp->logo)) {
                 return asset('storage/' . $comp->logo);
             }

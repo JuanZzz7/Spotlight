@@ -55,12 +55,19 @@ class Company extends Model
 
     public function getAverageRatingAttribute(): float
     {
+        if (array_key_exists('reviews_avg_rating', $this->attributes)) {
+            $avg = $this->attributes['reviews_avg_rating'];
+            return $avg ? round((float) $avg, 1) : 0.0;
+        }
         $avg = $this->reviews()->avg('rating');
         return $avg ? round((float) $avg, 1) : 0.0;
     }
 
     public function getReviewsCountAttribute(): int
     {
+        if (array_key_exists('reviews_count', $this->attributes)) {
+            return (int) $this->attributes['reviews_count'];
+        }
         return $this->reviews()->count();
     }
 

@@ -18,6 +18,9 @@ class PublicController extends Controller
 
         $products = Product::where('company_id', $company->id)
             ->where('active', true)
+            ->with(['tags'])
+            ->withCount('reviews')
+            ->withAvg('reviews', 'rating')
             ->latest()
             ->paginate(12);
 
@@ -53,7 +56,7 @@ class PublicController extends Controller
     {
         abort_if(!$product->active || ($product->company && $product->company->status !== 'active'), 404);
 
-        $product->load(['company', 'reviews.user']);
+        $product->load(['company', 'tags', 'reviews.user']);
 
         $userHasPurchased = false;
         $userReview = null;
@@ -70,6 +73,9 @@ class PublicController extends Controller
         $relatedProducts = Product::where('company_id', $product->company_id)
             ->where('id', '!=', $product->id)
             ->where('active', true)
+            ->with(['tags'])
+            ->withCount('reviews')
+            ->withAvg('reviews', 'rating')
             ->take(4)
             ->get();
 

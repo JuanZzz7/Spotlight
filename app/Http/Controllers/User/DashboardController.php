@@ -24,6 +24,8 @@ class DashboardController extends Controller
 
         $productsQuery = Product::where('active', true)
             ->with(['company', 'tags'])
+            ->withCount('reviews')
+            ->withAvg('reviews', 'rating')
             ->when($query, fn($q) => $q->where(function ($sub) use ($query) {
                 $sub->where('name', 'like', "%$query%")
                     ->orWhere('description', 'like', "%$query%");
@@ -86,6 +88,8 @@ class DashboardController extends Controller
         $companies = Company::where('status', 'active')
             ->whereNotNull('latitude')
             ->whereNotNull('longitude')
+            ->withCount('reviews')
+            ->withAvg('reviews', 'rating')
             ->with(['products' => function($q) {
                 $q->where('active', true)->latest();
             }])

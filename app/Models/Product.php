@@ -104,26 +104,68 @@ class Product extends Model
         return '$' . number_format($this->price_in_mxn, 2, ',', '.') . ' MXN';
     }
 
+    protected static array $fileExistsCache = [];
+
+    protected static function cachedStorageExists(?string $path): bool
+    {
+        if (empty($path)) {
+            return false;
+        }
+        if (!array_key_exists($path, self::$fileExistsCache)) {
+            self::$fileExistsCache[$path] = \Illuminate\Support\Facades\Storage::disk('public')->exists($path);
+        }
+        return self::$fileExistsCache[$path];
+    }
+
     public function getAverageRatingAttribute(): float
     {
+        if (array_key_exists('reviews_avg_rating', $this->attributes)) {
+            $avg = $this->attributes['reviews_avg_rating'];
+            return $avg ? round((float) $avg, 1) : 0.0;
+        }
+        if ($this->relationLoaded('reviews')) {
+            $avg = $this->reviews->avg('rating');
+            return $avg ? round((float) $avg, 1) : 0.0;
+        }
         $avg = $this->reviews()->avg('rating');
-        return $avg ? round((float)$avg, 1) : 0.0;
+        return $avg ? round((float) $avg, 1) : 0.0;
     }
 
     public function getReviewsCountAttribute(): int
     {
+        if (array_key_exists('reviews_count', $this->attributes)) {
+            return (int) $this->attributes['reviews_count'];
+        }
+        if ($this->relationLoaded('reviews')) {
+            return $this->reviews->count();
+        }
         return $this->reviews()->count();
     }
 
     public function getRatingStarsArrayAttribute(): array
     {
         $total = $this->reviews_count;
+        $countsByStar = [];
+
+        if ($this->relationLoaded('reviews')) {
+            foreach ($this->reviews as $rev) {
+                $r = (int) $rev->rating;
+                $countsByStar[$r] = ($countsByStar[$r] ?? 0) + 1;
+            }
+        } elseif ($total > 0) {
+            $countsByStar = $this->reviews()
+                ->selectRaw('rating, COUNT(*) as aggregate')
+                ->groupBy('rating')
+                ->pluck('aggregate', 'rating')
+                ->toArray();
+        }
+
         $breakdown = [];
         for ($star = 5; $star >= 1; $star--) {
-            $count = $this->reviews()->where('rating', $star)->count();
+            $count = (int) ($countsByStar[$star] ?? 0);
             $percentage = $total > 0 ? round(($count / $total) * 100) : 0;
             $breakdown[$star] = [
-                'count' => $count,
+                'count'      => $count,
                 'percentage' => $percentage,
             ];
         }
@@ -132,7 +174,7 @@ class Product extends Model
 
     public function hasCustomImage(): bool
     {
-        return !empty($this->image) && \Illuminate\Support\Facades\Storage::disk('public')->exists($this->image);
+        return self::cachedStorageExists($this->image);
     }
 
     public function getPlaceholderIconAttribute(): string
@@ -159,10 +201,10 @@ class Product extends Model
 
     public function getImageUrlAttribute()
     {
-        if (!empty($this->image) && \Illuminate\Support\Facades\Storage::disk('public')->exists($this->image)) {
+        if (self::cachedStorageExists($this->image)) {
             return asset('storage/' . $this->image);
         }
-        if ($this->company && !empty($this->company->logo) && \Illuminate\Support\Facades\Storage::disk('public')->exists($this->company->logo)) {
+        if ($this->company && self::cachedStorageExists($this->company->logo)) {
             return asset('storage/' . $this->company->logo);
         }
         return asset('images/logo-symbol-burgundy.png');
@@ -173,7 +215,7 @@ class Product extends Model
         $urls = [];
         if (is_array($this->gallery)) {
             foreach ($this->gallery as $path) {
-                if (!empty($path) && \Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
+                if (self::cachedStorageExists($path)) {
                     $urls[] = asset('storage/' . $path);
                 }
             }
@@ -184,7 +226,7 @@ class Product extends Model
     public function getAllImagesAttribute(): array
     {
         $images = [];
-        if (!empty($this->image) && \Illuminate\Support\Facades\Storage::disk('public')->exists($this->image)) {
+        if (self::cachedStorageExists($this->image)) {
             $images[] = asset('storage/' . $this->image);
         }
         foreach ($this->gallery_urls as $url) {
