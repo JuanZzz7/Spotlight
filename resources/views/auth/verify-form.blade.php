@@ -10,8 +10,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="{{ asset('css/tokens.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/auth-verify.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/tokens.css') }}?v=2.8" rel="stylesheet">
+    <link href="{{ asset('css/auth-verify.css') }}?v=2.8" rel="stylesheet">
 </head>
 <body>
 
