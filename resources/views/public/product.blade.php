@@ -2,7 +2,7 @@
 @section('title', $product->name . ' - Spotlight')
 
 @push('styles')
-<link href="{{ asset('css/public.css') }}" rel="stylesheet">
+<link href="{{ asset('css/public.css') }}?v=2.8" rel="stylesheet">
 <style>
     .gallery-thumb-btn {
         width: 64px;
@@ -170,7 +170,7 @@
         @endif
 
         <!-- Product Presentation Hero Card -->
-        <div class="product-hero-card p-4 p-md-5 mb-5">
+        <div class="product-hero-card p-3 p-sm-4 p-md-5 mb-5">
             <div class="row g-4 g-lg-5 align-items-center">
                 <!-- Product Image Section -->
                 <div class="col-lg-6">
@@ -178,7 +178,7 @@
                         @if($product->hasCustomImage())
                             <img src="{{ $product->image_url }}" alt="{{ $product->name }}" id="mainProductImg">
                         @else
-                            <div class="editorial-placeholder-stage w-100 h-100" style="min-height: 360px; border-radius: inherit;">
+                            <div class="editorial-placeholder-stage w-100 h-100" style="min-height: 320px; border-radius: inherit;">
                                 <div class="editorial-placeholder-showcase">
                                     <div class="editorial-placeholder-halo" style="width: 112px; height: 112px;">
                                         <div class="editorial-placeholder-medallion" style="width: 86px; height: 86px; font-size: 2.3rem;">
@@ -193,35 +193,32 @@
                             </div>
                         @endif
                         
-                        <!-- Badges Overlay -->
-                        <div class="position-absolute top-0 start-0 m-3 d-flex flex-column gap-2">
+                        <!-- Badges Overlay (Compactas y sin superposición en móvil) -->
+                        <div class="position-absolute top-0 start-0 m-2 m-sm-3 d-flex flex-column align-items-start gap-1.5 z-2" style="max-width: 62%;">
                             @if($product->isMexican() || ($product->company && $product->company->isMexican()))
-                                <span class="badge shadow-sm rounded-pill px-2.5 py-1.5" style="background: rgba(255,255,255,0.95); color: #29252A; border: 1px solid rgba(127,29,63,0.2); font-size: 0.72rem; font-weight: 700;">
-                                    <i class="bi bi-geo-alt-fill text-primary me-1"></i>Hecho en México (MX)
+                                <span class="badge shadow-xs rounded-pill px-2.5 py-1 text-truncate" style="background: rgba(255,255,255,0.95); color: #29252A; border: 1px solid rgba(127,29,63,0.2); font-size: 0.68rem; font-weight: 700;">
+                                    <i class="bi bi-geo-alt-fill text-primary me-1"></i>México (MX)
                                 </span>
                             @else
-                                <span class="badge shadow-sm rounded-pill px-2.5 py-1.5" style="background: rgba(255,255,255,0.95); color: #29252A; border: 1px solid rgba(127,29,63,0.2); font-weight: 700; font-size: 0.72rem;">
-                                    <i class="bi bi-geo-alt-fill text-primary me-1"></i>Hecho en Colombia (CO)
+                                <span class="badge shadow-xs rounded-pill px-2.5 py-1 text-truncate" style="background: rgba(255,255,255,0.95); color: #29252A; border: 1px solid rgba(127,29,63,0.2); font-weight: 700; font-size: 0.68rem;">
+                                    <i class="bi bi-geo-alt-fill text-primary me-1"></i>Colombia (CO)
                                 </span>
                             @endif
 
                             @if($product->stock > 0)
-                                <span class="badge badge-cyan shadow-sm" style="font-size: 0.7rem; font-weight: 700;">
-                                    <i class="bi bi-check2-circle me-1"></i> <span class="lang-en">In Stock</span><span class="lang-es">Disponible</span>
+                                <span class="badge badge-cyan shadow-xs rounded-pill px-2.5 py-1" style="font-size: 0.66rem; font-weight: 700;">
+                                    <i class="bi bi-check2-circle me-1"></i><span class="lang-en">In Stock</span><span class="lang-es">Disponible</span>
                                 </span>
                             @else
-                                <span class="badge bg-danger text-white shadow-sm" style="font-size: 0.7rem; font-weight: 700;">
-                                    <i class="bi bi-x-circle me-1"></i> <span class="lang-en">Out of Stock</span><span class="lang-es">Agotado</span>
+                                <span class="badge bg-danger text-white shadow-xs rounded-pill px-2.5 py-1" style="font-size: 0.66rem; font-weight: 700;">
+                                    <i class="bi bi-x-circle me-1"></i><span class="lang-en">Out of Stock</span><span class="lang-es">Agotado</span>
                                 </span>
                             @endif
-                            <span class="badge badge-purple shadow-sm" style="font-size: 0.7rem;">
-                                <i class="bi bi-stars me-1"></i> ALDEA DIGITAL
-                            </span>
                         </div>
 
-                        <div class="position-absolute top-0 end-0 m-3">
-                            <span class="badge bg-white text-dark shadow-sm border rounded-pill px-3 py-2 fw-bold" style="font-size: 0.75rem;">
-                                <span class="lang-en">Stock:</span><span class="lang-es">Stock:</span> {{ $product->stock }} <span class="lang-en">units</span><span class="lang-es">uds</span>
+                        <div class="position-absolute top-0 end-0 m-2 m-sm-3 z-2">
+                            <span class="badge bg-white text-dark shadow-xs border rounded-pill px-2.5 py-1.5 fw-bold" style="font-size: 0.7rem;">
+                                <i class="bi bi-box-seam text-primary me-1"></i><span class="lang-en">Stock:</span><span class="lang-es">Stock:</span> {{ $product->stock }}
                             </span>
                         </div>
                     </div>
@@ -240,26 +237,31 @@
                         </div>
                     @endif
 
-                    <!-- Company Card Mini -->
+                    <!-- Company Card Mini (Responsive sin desbordamiento) -->
                     @if($product->company)
-                    <div class="mt-4 p-3 rounded-4 bg-light d-flex align-items-center justify-content-between border">
-                        <div class="d-flex align-items-center gap-3">
-                            <img src="{{ $product->company->logo ? asset('storage/'.$product->company->logo) : asset('images/logo.png') }}" alt="{{ $product->company->name }}" class="rounded-circle shadow-xs" style="width: 48px; height: 48px; object-fit: cover; background: #fff;">
-                            <div>
-                                <div class="d-flex align-items-center gap-1">
-                                    <h6 class="fw-bold mb-0 text-dark">{{ $product->company->name }}</h6>
-                                    <i class="bi bi-patch-check-fill text-primary" style="font-size: 0.85rem;" title="Comercio Verificado"></i>
-                                    <span class="badge bg-white text-dark border ms-1" style="font-size: 0.7rem;">
-                                        {{ $product->company->country === 'MX' ? '🇲🇽 México' : '🇨🇴 Colombia' }}
+                    <div class="mt-3 mt-sm-4 p-3 rounded-4 bg-light d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center justify-content-between gap-3 border">
+                        <div class="d-flex align-items-center gap-2.5 min-w-0">
+                            <img src="{{ $product->company->logo ? asset('storage/'.$product->company->logo) : asset('images/logo.png') }}"
+                                 alt="{{ $product->company->name }}"
+                                 width="46"
+                                 height="46"
+                                 class="rounded-circle shadow-xs flex-shrink-0"
+                                 style="width: 46px; height: 46px; object-fit: cover; background: #fff;">
+                            <div class="min-w-0 flex-fill">
+                                <div class="d-flex flex-wrap align-items-center gap-1.5">
+                                    <h6 class="fw-bold mb-0 text-dark text-truncate" style="max-width: 100%;">{{ $product->company->name }}</h6>
+                                    <i class="bi bi-patch-check-fill text-primary flex-shrink-0" style="font-size: 0.85rem;" title="Comercio Verificado"></i>
+                                    <span class="badge bg-white text-dark border rounded-pill px-2 py-0.5 flex-shrink-0" style="font-size: 0.66rem;">
+                                        <i class="bi bi-geo-alt-fill text-primary me-1"></i>{{ $product->company->country === 'MX' ? 'México' : 'Colombia' }}
                                     </span>
                                 </div>
-                                <span class="text-muted" style="font-size: 0.75rem;">
+                                <div class="text-muted text-truncate mt-0.5" style="font-size: 0.74rem;">
                                     <i class="bi bi-geo-alt me-1 text-danger"></i>{{ $product->company->city ?? 'Aldea Digital' }}{{ $product->company->state ? ', ' . $product->company->state : '' }} • {{ $product->company->category ?? 'Emprendimiento' }}
-                                </span>
+                                </div>
                             </div>
                         </div>
-                        <a href="{{ route('public.company', $product->company) }}" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-bold">
-                            <span class="lang-en">View Store</span><span class="lang-es">Ver Tienda</span>
+                        <a href="{{ route('public.company', $product->company) }}" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1.5 fw-bold flex-shrink-0 text-center">
+                            <i class="bi bi-shop me-1"></i><span class="lang-en">View Store</span><span class="lang-es">Ver Tienda</span>
                         </a>
                     </div>
                     @endif
@@ -268,7 +270,7 @@
                 <!-- Product Details & Buy Section -->
                 <div class="col-lg-6">
                     <div class="ps-lg-3">
-                        <div class="d-flex align-items-center gap-2 mb-2">
+                        <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
                             <span class="badge badge-coral text-uppercase fw-bold" style="font-size: 0.7rem; letter-spacing: 0.5px;">
                                 {{ $product->company->category ?? 'Creación Original' }}
                             </span>
@@ -277,12 +279,12 @@
                             @endif
                         </div>
 
-                        <h1 class="fw-bold text-dark display-6 mb-3" style="font-family: 'Outfit', sans-serif; letter-spacing: -0.5px;">
+                        <h1 class="fw-bold text-dark display-6 mb-3" style="font-family: 'Outfit', sans-serif; letter-spacing: -0.5px; font-size: clamp(1.65rem, 5vw, 2.35rem);">
                             {{ $product->name }}
                         </h1>
 
                         <!-- Rating summary click-to-reviews -->
-                        <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom">
+                        <div class="d-flex flex-wrap align-items-center gap-2 gap-sm-3 mb-4 pb-3 border-bottom">
                             <div class="d-flex align-items-center gap-1">
                                 @php
                                     $avg = $product->average_rating;
@@ -291,10 +293,10 @@
                                 @for($i = 1; $i <= 5; $i++)
                                     <i class="bi bi-star-fill {{ $i <= round($avg) ? 'star-filled' : 'star-empty' }} fs-5"></i>
                                 @endfor
-                                <span class="fw-bold text-dark fs-5 ms-2">{{ $avg > 0 ? number_format($avg, 1) : '5.0' }}</span>
+                                <span class="fw-bold text-dark fs-5 ms-1.5">{{ $avg > 0 ? number_format($avg, 1) : '5.0' }}</span>
                             </div>
-                            <span class="text-muted">•</span>
-                            <a href="#reviews-section" class="text-decoration-none fw-semibold text-primary">
+                            <span class="text-muted d-none d-sm-inline">•</span>
+                            <a href="#reviews-section" class="text-decoration-none fw-semibold text-primary" style="font-size: 0.88rem;">
                                 <span class="lang-en">{{ $count }} ratings & reviews</span>
                                 <span class="lang-es">{{ $count }} calificaciones y reseñas</span>
                             </a>
@@ -315,19 +317,19 @@
                                     </span>
                                     <span class="fw-bold text-muted fs-5" id="heroMainPriceCur">COP</span>
                                     <span class="badge rounded-pill bg-light text-dark border px-2.5 py-1 ms-1" style="font-size: 0.72rem;">
-                                        🇨🇴 Conversión automática para Colombia
+                                        <i class="bi bi-currency-exchange text-primary me-1"></i>Conversión automática para Colombia
                                     </span>
                                 </div>
 
                                 <div class="mt-2 p-2.5 px-3 rounded-4 border d-flex flex-wrap align-items-center justify-content-between gap-2"
                                      style="background: #FAF5F6; border-color: rgba(127, 29, 63, 0.18) !important;">
-                                    <div class="d-flex align-items-center gap-2 text-xs">
+                                    <div class="d-flex flex-wrap align-items-center gap-2 text-xs">
                                         <span class="fw-bold text-dark">
-                                            🇲🇽 Precio de origen: <span style="color: #7F1D3F;">${{ number_format($product->price, 2, ',', '.') }} MXN</span>
+                                            Precio de origen: <span style="color: #7F1D3F;">${{ number_format($product->price, 2, ',', '.') }} MXN</span>
                                         </span>
                                         <span class="text-muted">•</span>
                                         <span class="text-muted">
-                                            🇨🇴 Equivalente: <strong>≈ ${{ number_format($product->price_in_cop, 0, ',', '.') }} COP</strong>
+                                            Equivalente: <strong>≈ ${{ number_format($product->price_in_cop, 0, ',', '.') }} COP</strong>
                                             <small class="text-muted">(1 MXN ≈ ${{ number_format(\App\Models\Product::mxnToCopRate(), 0, ',', '.') }} COP)</small>
                                         </span>
                                     </div>
@@ -346,9 +348,10 @@
                                     <span class="fw-bold text-muted fs-6">COP</span>
                                 </div>
                             @endif
-                            <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1 mt-2" style="font-size: 0.75rem;">
-                                <i class="bi bi-shield-check me-1"></i> <span class="lang-en">Guaranteed direct price without hidden markups</span><span class="lang-es">Precio directo de creador sin comisiones ocultas</span>
-                            </span>
+                            <div class="d-inline-flex align-items-center gap-1.5 bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1 mt-2 fw-bold" style="font-size: 0.74rem; max-width: 100%; line-height: 1.35;">
+                                <i class="bi bi-shield-check flex-shrink-0"></i>
+                                <span><span class="lang-en">Guaranteed direct price without hidden markups</span><span class="lang-es">Precio directo de creador sin comisiones ocultas</span></span>
+                            </div>
                         </div>
 
                         <!-- Description -->

@@ -33,19 +33,30 @@
 .product-img-stage {
     background: linear-gradient(135deg, #FFFCF7 0%, #F6E7EB 100%);
     border-radius: 20px;
-    min-height: 380px;
+    min-height: 360px;
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
     overflow: hidden;
     border: 1px solid rgba(238, 221, 220, 0.4);
+    padding: 2.5rem 1rem 1rem;
 }
 .product-img-stage img {
-    max-height: 340px;
+    max-height: 320px;
     width: 100%;
     object-fit: contain;
     transition: transform 0.3s ease;
+}
+
+@media (max-width: 575.98px) {
+    .product-img-stage {
+        min-height: 290px;
+        padding: 2.75rem 0.75rem 0.75rem;
+    }
+    .product-img-stage img {
+        max-height: 245px;
+    }
 }
 .product-img-stage:hover img {
     transform: scale(1.05);
