@@ -51,7 +51,11 @@
                 <tr>
                     <td class="ps-4 fw-semibold text-dark">{{ $user->name }}</td>
                     <td class="text-muted">{{ $user->email }}</td>
-                    <td><span class="badge badge-soft-primary rounded-pill px-3 py-1">{{ ucfirst($user->role) }}</span></td>
+                    <td>
+                        <span class="badge badge-soft-primary text-dark rounded-pill px-3 py-1 fw-bold" style="background-color: #F6E7EB !important; color: #111827 !important; border: 1px solid rgba(127, 29, 63, 0.22);">
+                            {{ ucfirst($user->role) }}
+                        </span>
+                    </td>
                     <td>
                         <span class="badge {{ $user->active ? 'badge-soft-success' : 'badge-soft-danger' }} rounded-pill px-3 py-1">
                             {{ $user->active ? 'Activo' : 'Inactivo' }}

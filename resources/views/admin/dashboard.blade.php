@@ -561,7 +561,9 @@
                             <td class="fw-semibold text-dark text-sm">{{ $ru->name }}</td>
                             <td class="text-muted text-xs">{{ $ru->email }}</td>
                             <td>
-                                <span class="badge badge-soft-primary rounded-pill px-2 py-1 text-xs">{{ ucfirst($ru->role) }}</span>
+                                <span class="badge badge-soft-primary text-dark rounded-pill px-2.5 py-1 text-xs fw-bold" style="background-color: #F6E7EB !important; color: #111827 !important; border: 1px solid rgba(127, 29, 63, 0.22);">
+                                    {{ ucfirst($ru->role) }}
+                                </span>
                             </td>
                             <td>
                                 @if($ru->email_verified_at)

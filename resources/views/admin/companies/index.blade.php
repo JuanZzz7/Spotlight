@@ -41,7 +41,7 @@
                         <p class="text-muted text-xs mb-0">{{ $company->user->name ?? 'Sin dueño' }}</p>
                     </div>
                     <div class="text-end">
-                        <span class="badge badge-soft-primary text-xs">{{ $company->category }}</span>
+                        <span class="badge badge-soft-primary text-dark text-xs fw-bold" style="background-color: #F6E7EB !important; color: #111827 !important; border: 1px solid rgba(127, 29, 63, 0.22);">{{ $company->category }}</span>
                     </div>
                 </div>
 

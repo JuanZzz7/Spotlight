@@ -240,14 +240,15 @@
     gap: 0.35rem;
 }
 
-/* Informativo / Principal: Rosa suave con acento Borgoña */
+/* Informativo / Principal: Rosa suave con texto oscuro legible */
 .badge-info,
 .badge-purple,
 .badge-cyan,
-.badge-primary {
-    background-color: var(--sl-primary-soft) !important;
-    color: var(--sl-primary) !important;
-    border: 1px solid rgba(127, 29, 63, 0.18) !important;
+.badge-primary,
+.badge-soft-primary {
+    background-color: var(--sl-primary-soft, #F6E7EB) !important;
+    color: #111827 !important;
+    border: 1px solid rgba(127, 29, 63, 0.22) !important;
 }
 
 /* Destacado / Oferta / Rosa Empolvado */
