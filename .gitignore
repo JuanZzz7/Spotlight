@@ -23,3 +23,19 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 /diagramas_png/
+
+# Configuraciones e instrucciones locales de asistentes IA
+AGENTS.md
+CLAUDE.md
+.agents/
+.claude/
+.cursor/
+.gemini/
+.aider*
+
+# Archivos temporales, respaldos y paquetes comprimidos
+scratch_*.php
+original_*.blade.php
+*.bak
+*.zip
+/despliegue/

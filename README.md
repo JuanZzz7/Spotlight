@@ -1,215 +1,124 @@
-# Spotlight
+# Spotlight — Plataforma de Comercio Electrónico y Visibilidad Digital
 
-Plataforma de comercio digital con 3 roles: Administrador, Empresario y Usuario.  
-Stack: Laravel 12 · PHP 8.2+ · MySQL · Bootstrap 5
+![Laravel](https://img.shields.io/badge/Laravel-12.x-FF2D20?style=flat-square&logo=laravel&logoColor=white)
+![PHP](https://img.shields.io/badge/PHP-8.2%2B-777BB4?style=flat-square&logo=php&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?style=flat-square&logo=mysql&logoColor=white)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-7952B3?style=flat-square&logo=bootstrap&logoColor=white)
 
----
-
-## Instalación
-
-### 1. Crear proyecto Laravel e instalar dependencias
-
-```bash
-composer create-project laravel/laravel spotlight
-cd spotlight
-```
-
-### 2. Copiar los archivos de este ZIP sobre el proyecto
-
-Reemplaza los archivos existentes. Los directorios principales a sobrescribir son:
-- `app/`
-- `database/`
-- `resources/views/`
-- `routes/web.php`
-- `bootstrap/app.php`
-
-### 3. Configurar .env
-
-```env
-APP_NAME="Spotlight"
-APP_URL=http://localhost:8000
-
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=Spotlight
-DB_USERNAME=root
-DB_PASSWORD=
-```
-
-### 4. Crear base de datos
-
-```sql
-CREATE DATABASE Spotlight CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-```
-
-### 5. Ejecutar migraciones y seeders
-
-```bash
-php artisan migrate --seed
-```
-
-### 6. Crear enlace de almacenamiento
-
-```bash
-php artisan storage:link
-```
-
-### 7. Iniciar servidor
-
-```bash
-php artisan serve
-```
-
-Accede en: http://localhost:8000
+**Spotlight** es una plataforma web de comercio electrónico multi-vendedor y visibilidad digital diseñada para impulsar emprendimientos, productores y comercios locales en Ubaté (Cundinamarca) y mercados regionales aliados (Colombia y México).
 
 ---
 
-## Estructura del proyecto
+## Características Principales
 
-```
-app/
-├── Http/
-│   ├── Controllers/
-│   │   ├── AuthController.php
-│   │   ├── HomeController.php
-│   │   ├── Admin/
-│   │   │   ├── DashboardController.php
-│   │   │   ├── UserController.php
-│   │   │   ├── CompanyController.php
-│   │   │   ├── ProductController.php
-│   │   │   └── ReportController.php
-│   │   ├── Business/
-│   │   │   ├── DashboardController.php
-│   │   │   ├── CompanyController.php
-│   │   │   ├── ProductController.php
-│   │   │   └── ExpenseController.php
-│   │   └── User/
-│   │       ├── DashboardController.php
-│   │       ├── ProfileController.php
-│   │       ├── CartController.php
-│   │       └── OrderController.php
-│   └── Middleware/
-│       └── RoleMiddleware.php
-├── Models/
-│   ├── User.php
-│   ├── Company.php
-│   ├── Product.php
-│   ├── Order.php
-│   ├── OrderDetail.php
-│   └── Expense.php
-database/
-├── migrations/
-└── seeders/
-    └── DatabaseSeeder.php
-resources/views/
-├── layouts/
-│   ├── app.blade.php
-│   └── dashboard.blade.php
-├── auth/
-│   ├── login.blade.php
-│   └── register.blade.php
-├── home/index.blade.php
-├── admin/
-│   ├── dashboard.blade.php
-│   ├── users/
-│   ├── companies/
-│   ├── products/
-│   └── reports/
-├── business/
-│   ├── dashboard.blade.php
-│   ├── company/
-│   ├── products/
-│   └── expenses/
-└── user/
-    ├── dashboard.blade.php
-    ├── profile/
-    ├── cart/
-    └── orders/
-routes/web.php
-bootstrap/app.php
+### 1. Marketplace y Experiencia del Comprador (`User`)
+- **Catálogo Temático con Filtros Dinámicos**: Exploración por etiquetas comerciales, categorías, comercios verificados y ordenamiento con transiciones temáticas.
+- **Conversión Multi-Moneda (`COP` / `MXN`)**: Visualización automática de precios en Pesos Colombianos con conversión de referencia para comercios internacionales.
+- **Carrito Multi-Vendedor y Checkout Seguro**: Agrupación inteligente de órdenes por comercio emisor e integración con **Wompi** (Tarjetas, PSE, Nequi, Bancolombia) y **Mercado Pago**.
+- **Mapa Interactivo de Comercios**: Geolocalización de tiendas físicas, horarios de apertura en tiempo real y catálogo rápido en mapa.
+- **Rastreo de Envíos y Calificaciones Verificadas**: Seguimiento de guías paso a paso y sistema de reseñas vinculadas a compras reales.
+
+### 2. Gestión Comercial y Facturación Electrónica (`Business`)
+- **Panel Operativo y Financiero**: Control de ingresos, egresos con soportes en PDF, margen neto, inventario de productos con galería multi-imagen y exportación de reportes contables.
+- **Facturación Electrónica DIAN (UBL 2.1)**:
+  - Ciclo de habilitación fiscal para comercios formales (`CompanyFiscalProfile`) y guía de formalización empresarial para negocios informales.
+  - Emisión de Facturas Electrónicas de Venta (`01`), Notas Crédito (`91`) y Notas Débito (`92`) con cálculo de **CUFE/CUDE SHA-384**, XML firmado y código QR oficial DIAN.
+  - Arquitectura desacoplada compatible con proveedor tecnológico **Factus** y entorno **Sandbox DIAN**.
+- **Centro Logístico de Despachos**: Generación de guías y actualización de estados de envío con bloqueo preventivo sobre órdenes sin pago verificado.
+- **Canal de Mensajería Directa**: Chat en tiempo real entre clientes y comercios con control de disponibilidad y respuestas rápidas.
+
+### 3. Administración y Auditoría (`Admin`)
+- **Verificación Fiscal y Moderación**: Auditoría de documentos tributarios (RUT y Cámara de Comercio) para habilitar facturación electrónica en comercios formales.
+- **Supervisión de Operaciones**: Gestión de usuarios, comercios, catálogo global, compras internacionales asistidas y métricas de la plataforma.
+
+---
+
+## Arquitectura del Proyecto
+
+```text
+├── app/
+│   ├── Http/
+│   │   ├── Controllers/
+│   │   │   ├── Admin/               # Moderación, auditoría fiscal y reportes globales
+│   │   │   ├── Api/                 # Webhooks de pago (Wompi / MercadoPago) y API de rastreo
+│   │   │   ├── Auth/                # Autenticación, OAuth Google y verificación OTP
+│   │   │   ├── Business/            # Panel comercial, productos, envíos y facturación DIAN
+│   │   │   └── User/                # Marketplace, carrito, pedidos, perfil y mapa
+│   │   ├── Middleware/              # Control de roles, cabeceras de seguridad y validación fiscal
+│   │   └── Requests/                # Validaciones de formularios y checkout
+│   ├── Models/                      # Modelos Eloquent (User, Company, Product, Order, Shipment, etc.)
+│   ├── Policies/                    # Políticas de autorización sobre documentos electrónicos
+│   └── Services/
+│       ├── Billing/                 # Motor de Facturación Electrónica DIAN (Factus & Sandbox UBL 2.1)
+│       ├── Payment/                 # Integración de pasarelas Wompi, MercadoPago y liquidaciones
+│       └── Shipping/                # Adaptadores multi-transportadora y telemetría de envíos
+├── config/                          # Configuración de aplicación, base de datos y proveedores
+├── database/
+│   ├── migrations/                  # Esquema relacional e histórico de migraciones
+│   └── seeders/                     # Datos iniciales y catálogo de etiquetas
+├── docs/                            # Documentación técnica y especificaciones de arquitectura
+├── public/                          # Punto de entrada web y hojas de estilo modulares (Design System)
+├── resources/views/                 # Vistas Blade organizadas por módulo (public, user, business, admin)
+├── routes/                          # Definición de rutas web y endpoints API REST
+└── tests/                           # Pruebas automatizadas (Feature & Unit)
 ```
 
 ---
 
-## Integración de IA (Spotlight AI Chatbot)
+## Requisitos e Instalación Local
 
-El proyecto incluye un asistente virtual inteligente impulsado por IA, diseñado para potenciar la experiencia de los usuarios en el marketplace, respetando principios de ética y autonomía.
+### Requisitos Previos
+- **PHP** >= 8.2 con extensiones `pdo_mysql`, `mbstring`, `openssl`, `curl`, `xml`, `gd`
+- **Composer** >= 2.x
+- **MySQL** >= 8.0 o MariaDB >= 10.6
+- **Node.js** >= 18.x & NPM
 
-### Arquitectura Técnica
-- **Motor principal**: Google Gemini 2.5 Flash API (v1beta).
-- **Backend (Laravel)**: `ChatbotService.php` gestiona la lógica, el enrutamiento de la API, y el manejo de excepciones. Las llamadas se realizan mediante `cURL` con verificación SSL adaptada para entornos locales (XAMPP).
-- **Frontend (Blade/JS)**: Interfaz construida con un diseño *glassmorphic* (sistema Stitch), integrada directamente en el menú de navegación del usuario. Incluye animaciones fluidas, chips de respuestas rápidas y control de estado (typing indicators).
-- **Soporte Bilingüe**: Detección automática del idioma basada en análisis léxico en el backend, complementada con un selector manual (ES/EN) en la interfaz gráfica que traduce dinámicamente toda la UI y fuerza a la IA a responder en el idioma seleccionado.
+### Pasos de Instalación
 
-### Declaración Persona Transhumana (Ideal Regulativo)
-El chatbot está fundamentado en principios de desarrollo humano y responsabilidad. Su *System Prompt* y su interfaz gráfica exponen la siguiente declaración institucional como núcleo filosófico:
+1. **Clonar el repositorio e instalar dependencias**:
+   ```bash
+   git clone https://github.com/JuanZzz7/Spotlight.git
+   cd Spotlight
+   composer install
+   npm install
+   ```
 
-> *"Soy LIBRE, AUTÓNOMO Y RESPONSABLE a través del diálogo y la construcción, como ideal regulativo; me dirijo, controlo y dicto mis propias leyes."*
+2. **Configurar variables de entorno**:
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+   Ajusta las credenciales de base de datos (`DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`) y llaves de servicios externos en `.env`.
 
-Esta declaración actúa como la directriz principal del bot, asegurando que sus respuestas promuevan el pensamiento crítico, el conocimiento y el empoderamiento del usuario local.
+3. **Ejecutar migraciones, seeders y enlace simbólico de almacenamiento**:
+   ```bash
+   php artisan migrate --seed
+   php artisan storage:link
+   ```
 
-### Sistema de Fallback (Resiliencia)
-En caso de que la API de Google Gemini alcance su límite de peticiones (Rate Limit) o la API Key sea inválida, el sistema cuenta con un modelo de *Fallback Local Inteligente*. Este mecanismo asegura que el bot siempre responda usando algoritmos de expresiones regulares (`preg_match`) para ofrecer respuestas estructuradas sobre ética, conocimiento y la plataforma Spotlight, garantizando 100% de disponibilidad.
-
----
-
-## Módulo de Rastreo Logístico en Tiempo Real (API REST)
-
-Spotlight cuenta con un subsistema logístico desacoplado bajo el patrón **Adapter / Multi-Carrier**, permitiendo que compradores y vendedores rastreen paquetes con telemetría en tiempo real.
-
-> 📖 **Documentación Técnica Completa:** Consulta [RASTREO_ENVIOS_API.md](file:///c:/xampp/htdocs/Spotligth/RASTREO_ENVIOS_API.md) para la especificación detallada de los endpoints, payloads JSON, adaptadores de transportadoras y diagramas de flujo.
-
-### Endpoints de la API (`routes/api.php`)
-* `GET /api/v1/tracking/{tracking_number}`: API pública de consulta en tiempo real por número de guía.
-* `GET /api/v1/orders/{order}/tracking`: API autenticada para consulta de rastreo del pedido del comprador.
-* `POST /api/v1/shipments/{shipment}/simulate-advance`: Simulador de avance de estado para demostraciones interactivas.
-
-### Transportadoras Soportadas (`App\Services\Shipping`)
-* **Coordinadora Mercantil** (`coordinadora`)
-* **Servientrega** (`servientrega`)
-* **Inter Rapidísimo** (`interrapidisimo`)
-* **Envía Colvanes** (`envia`)
-* **DHL Express** (`dhl`)
-* **Spotlight Express Local** (`spotlight_express`)
-
-### Vistas y Flujo Operativo
-* **Comprador:** En **Mis Compras** (`/user/orders`), cada pedido cuenta con el botón **"Rastrear Envío"** que abre el dashboard interactivo (`/user/orders/{order}/tracking`) con stepper visual, pulso en vivo y actualización asíncrona periódica (polling cada 15s).
-* **Portal Público:** Portal abierto de búsqueda de guías en `/rastreo`.
-* **Vendedor:** Centro de despachos en `/business/shipments` para asignar transportadoras, generar números de guía y emitir checkpoints.
-
----
-
-## Módulo de Calificaciones y Reseñas de Productos
-
-Sistema de reputación y feedback transparente integrado en el catálogo de productos:
-
-* **Modelo `Review`:** Calificación de 1 a 5 estrellas, comentario en texto e insignia automática de **"Compra Verificada"** (`is_verified_purchase`) cruzada con el historial de pedidos completados del cliente.
-* **Scorecard Dinámico:** Desglose porcentual y barras de distribución por estrella en `Product::rating_stars_array`.
-* **Vista Pública de Producto (`/productos/{product}`):** Ficha detallada con formulario interactivo de calificación, edición sin duplicidad (`updateOrCreate`) y muro cronológico de opiniones de la comunidad.
-* **Integración en Mis Compras (`/user/orders`):** Botón directo **"Calificar"** en cada producto adquirido.
-
----
-
-## Módulo de Facturación Electrónica DIAN
-
-Integración formal y legal de Facturación Electrónica DIAN bajo normativa UBL 2.1 colombiana:
-
-* **Habilitación y Verificación:** Separación de roles formales/informales mediante `CompanyFiscalProfile`.
-* **Cálculo de CUFE SHA-384 y XML UBL:** Generado en `App\Services\Billing\ElectronicDocumentService`.
-* **Documentación Técnica:** Ver [FACTURACION_ELECTRONICA_DIAN.md](file:///c:/xampp/htdocs/Spotligth/FACTURACION_ELECTRONICA_DIAN.md).
+4. **Iniciar el servidor de desarrollo**:
+   ```bash
+   php artisan serve
+   ```
+   La aplicación estará disponible en `http://127.0.0.1:8000`.
 
 ---
 
 ## Pruebas Automatizadas
 
-La suite completa de pruebas unitarias y de integración se ejecuta con:
+Para ejecutar la suite de pruebas del sistema (incluyendo validaciones de facturación electrónica DIAN, reglas de negocio y seguridad):
 
 ```bash
 php artisan test
 ```
 
-* **Pruebas de Rastreo Logístico:** `php artisan test --filter=ShipmentTrackingTest`
-* **Pruebas de Calificaciones y Reseñas:** `php artisan test --filter=ProductReviewTest`
-* **Pruebas de Facturación Electrónica:** `php artisan test --filter=ElectronicBillingTest`
-* **Pruebas de Autenticación y Usuarios:** `php artisan test --filter=UserLoginTest`
+---
+
+## Documentación Técnica
+
+La documentación detallada de cada subsistema se encuentra en el directorio [`docs/`](docs/):
+
+- [**Facturación Electrónica DIAN (UBL 2.1 & Factus)**](docs/facturacion-electronica-dian.md): Arquitectura fiscal, modelo de datos, cálculo de CUFE SHA-384 y habilitación de comercios formales.
+- [**API REST y Sistema de Rastreo Logístico**](docs/api-rastreo-envios.md): Especificación de endpoints `/api/v1/tracking`, adaptadores de transportadoras y estados de despacho.
+- [**Especificación de Casos de Uso y Actores**](docs/casos-de-uso.md): Diagramas de arquitectura funcional y flujos por rol.
+- [**Asistente Virtual Integrado**](docs/asistente-ia.md): Configuración del servicio de asistencia bilingüe y arquitectura de resiliencia.

@@ -1,17 +1,18 @@
-# 🤖 Spotlight AI Chatbot
+# Spotlight — Módulo de Asistente Virtual Bilingüe
 
-Chatbot multilingüe integrado en **Spotlight** — una plataforma marketplace para Villa de San Diego de Ubaté, Colombia.
+Asistente virtual integrado en **Spotlight** para orientación de compradores y comercios locales en Ubaté, Colombia.
 
-Powered by **Google Gemini 1.5 Flash** | Built with **Laravel 12**
+Construido sobre **Laravel 12** con integración a **Google Gemini API** y motor de respaldo local.
 
 ---
 
-## 🚀 Instalación Paso a Paso
+## Configuración e Instalación
 
 ### 1. Clonar / acceder al proyecto
 
 ```bash
-cd c:\xampp\htdocs\Spotligth
+git clone https://github.com/JuanZzz7/Spotlight.git
+cd Spotlight
 ```
 
 ### 2. Instalar dependencias
