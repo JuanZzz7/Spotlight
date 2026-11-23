@@ -137,6 +137,8 @@
 /* Base Resets */
 html {
     scroll-behavior: smooth;
+    max-width: 100vw;
+    overflow-x: clip;
 }
 
 body {
@@ -145,7 +147,10 @@ body {
     color: var(--sl-text-body);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: clip;
+    position: relative;
     line-height: 1.55;
 }
 

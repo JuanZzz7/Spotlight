@@ -4,7 +4,7 @@
 @push('styles')
 <!-- Leaflet Map CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<link href="{{ asset('css/home.css') }}" rel="stylesheet">
+<link href="{{ asset('css/home.css') }}?v=2.7" rel="stylesheet">
 @endpush
 
 @section('content')
@@ -14,12 +14,12 @@
 <div class="ambient-glow-2"></div>
 
 {{-- Navbar --}}
-<nav class="navbar navbar-expand-lg spotlight-nav">
-    <div class="container py-2 d-flex align-items-center justify-content-between">
+<nav class="navbar navbar-expand-lg spotlight-nav w-100">
+    <div class="container py-2 d-flex align-items-center justify-content-between flex-nowrap">
         
         <!-- Brand -->
         <a class="brand-mark" href="{{ route('home') }}">
-            <img src="{{ asset('images/logo-symbol-burgundy.png') }}" alt="Spotlight Logo" class="brand-logo-img">
+            <img src="{{ asset('images/logo-symbol-burgundy.png') }}" alt="Spotlight Logo" width="38" height="38" class="brand-logo-img">
             <div>
                 <div class="brand-text">SPOTLIGHT</div>
                 <div class="brand-tagline">
@@ -45,23 +45,23 @@
         </div>
 
         <!-- Auth & Language Actions -->
-        <div class="d-flex align-items-center gap-2">
+        <div class="d-flex align-items-center gap-1.5 gap-sm-2 nav-actions-wrap">
             <!-- Language Switcher Button -->
-            <button id="btnSwitchLang" class="btn btn-sm btn-pill-light fw-bold px-3">
-                <i class="bi bi-translate me-1"></i> EN / ES
+            <button id="btnSwitchLang" class="btn btn-sm btn-pill-light fw-bold px-2.5 px-sm-3">
+                <i class="bi bi-translate d-none d-sm-inline me-1"></i> EN / ES
             </button>
 
             @auth
                 @php $dash = match(auth()->user()->role) { 'admin'=>'admin.dashboard','business'=>'business.dashboard',default=>'user.dashboard'}; @endphp
-                <a href="{{ route($dash) }}" class="btn btn-sm btn-primary px-4">
+                <a href="{{ route($dash) }}" class="btn btn-sm btn-primary px-3 px-sm-4">
                     <i class="bi bi-grid-fill me-1"></i>
                     <span class="lang-en">My Panel</span><span class="lang-es">Mi Panel</span>
                 </a>
             @else
-                <a href="{{ route('login') }}" class="btn btn-sm btn-pill-light px-3">
+                <a href="{{ route('login') }}" class="btn btn-sm btn-pill-light px-2.5 px-sm-3">
                     <span class="lang-en">Log in</span><span class="lang-es">Ingresar</span>
                 </a>
-                <a href="{{ route('register') }}" class="btn btn-sm btn-primary px-4">
+                <a href="{{ route('register') }}" class="btn btn-sm btn-primary px-2.5 px-sm-4">
                     <span class="lang-en">Register</span><span class="lang-es">Registrarse</span>
                 </a>
             @endauth
@@ -75,7 +75,7 @@
     <div class="container text-center">
         
         <div class="hero-badge animate-fade-in">
-            <span class="pulse-dot"></span>
+            <span class="pulse-dot flex-shrink-0"></span>
             <span class="lang-en">SPOTLIGHT · DIGITAL VILLAGE OF ENTREPRENEURS</span>
             <span class="lang-es">SPOTLIGHT · ALDEA DIGITAL DE EMPRENDIMIENTOS</span>
         </div>
@@ -94,7 +94,7 @@
             </span>
         </p>
 
-        <div class="d-flex flex-wrap justify-content-center gap-3 mb-4 animate-fade-in">
+        <div class="d-flex flex-wrap justify-content-center gap-2.5 gap-sm-3 mb-4 animate-fade-in hero-cta-group">
             <a href="#productos" class="btn btn-lg btn-coral px-4">
                 <i class="bi bi-bag-check-fill me-1"></i>
                 <span class="lang-en">Explore Marketplace</span><span class="lang-es">Explorar Productos</span>
@@ -106,7 +106,7 @@
         </div>
 
         {{-- Metrics & Community Proof (Reutiliza los conteos existentes de empresas y productos) --}}
-        <div class="d-flex flex-wrap justify-content-center gap-4 pt-3 text-muted small fw-semibold">
+        <div class="d-flex flex-wrap justify-content-center gap-3 gap-sm-4 pt-3 text-muted small fw-semibold hero-metrics-wrap">
             <div class="d-flex align-items-center gap-2">
                 <span class="badge badge-purple fs-6">{{ $companies->count() }}+</span>
                 <span class="lang-en">Independent Brands</span><span class="lang-es">Emprendimientos Activos</span>
@@ -339,9 +339,9 @@
 </section>
 
 {{-- Sección 2: Manifiesto / Comunidad (#comunidad) --}}
-<section id="comunidad" class="py-5" style="background: linear-gradient(180deg, rgba(244, 239, 255, 0.5) 0%, rgba(250, 248, 254, 0.8) 100%);">
+<section id="comunidad" class="py-5 overflow-hidden" style="background: linear-gradient(180deg, rgba(244, 239, 255, 0.5) 0%, rgba(250, 248, 254, 0.8) 100%);">
     <div class="container py-4">
-        <div class="row align-items-center g-5">
+        <div class="row align-items-center g-4 g-lg-5">
             
             <div class="col-lg-6">
                 <div class="position-relative">
@@ -349,7 +349,7 @@
                         <img src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=900&auto=format&fit=crop" class="w-100 h-100 object-fit-cover" alt="Comunidad de Emprendedores">
                     </div>
                     <!-- Floating badge overlay -->
-                    <div class="position-absolute bottom-0 end-0 translate-middle-y me-n2 bg-white rounded-4 p-3 shadow-lg border d-flex align-items-center gap-3" style="max-width: 260px;">
+                    <div class="position-absolute bottom-0 end-0 translate-middle-y me-2 me-md-0 bg-white rounded-4 p-2.5 p-sm-3 shadow-lg border d-flex align-items-center gap-2.5 gap-sm-3" style="max-width: min(260px, 85%);">
                         <div class="rounded-circle bg-sl-primary-soft d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; color: var(--sl-primary);">
                             <i class="bi bi-heart-fill fs-5"></i>
                         </div>
