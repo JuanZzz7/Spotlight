@@ -66,10 +66,11 @@
     <div class="sbot-bottom-area">
         {{-- Quick Replies --}}
         <div class="sbot-quick-replies" id="sbot-quick-replies">
-            <button class="sbot-chip" type="button">¿Cómo rastrear mi pedido?</button>
-            <button class="sbot-chip" type="button">Ver tiendas locales</button>
             <button class="sbot-chip" type="button">Recomiéndame productos</button>
-            <button class="sbot-chip" type="button">Soporte técnico</button>
+            <button class="sbot-chip" type="button">Ver tiendas locales</button>
+            <button class="sbot-chip" type="button">Consejos de ventas y negocios</button>
+            <button class="sbot-chip" type="button">¿Cómo rastrear mi pedido?</button>
+            <button class="sbot-chip" type="button">Hazme una recomendación o cálculo</button>
         </div>
 
         {{-- Form --}}
@@ -104,8 +105,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const ENDPOINT = '{{ route("chatbot.message") }}';
     const CSRF     = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
-    const GREETING_ES = "¡Hola! Soy tu asistente de Spotlight IA. ¿En qué puedo ayudarte hoy? Puedo buscar productos, rastrear pedidos o guiarte en las tiendas locales.";
-    const GREETING_EN = "Hello! I am your Spotlight AI assistant. How can I help you today? I can search for products, track orders, or guide you through local stores.";
+    const GREETING_ES = "¡Hola! Soy tu asistente interactivo Spotlight IA. Puedes preguntarme sobre cualquier tema (negocios, tecnología, cálculos, redacción o cultura general) o pedirme que busque productos, tiendas y pedidos en Spotlight. ¿En qué te ayudo hoy?";
+    const GREETING_EN = "Hello! I am your interactive Spotlight AI assistant. You can ask me about any topic (business, tech, math, writing, or general knowledge) or ask me to find products, stores, and orders on Spotlight. How can I help you today?";
 
     let history = [];
     let busy    = false;

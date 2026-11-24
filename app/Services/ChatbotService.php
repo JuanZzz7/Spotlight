@@ -2,18 +2,21 @@
 
 namespace App\Services;
 
+use App\Models\{Company, Order, Product};
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class ChatbotService
 {
     private string $apiKey;
-    private string $apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
-
-    private const DECLARATION = "Soy LIBRE, AUTÓNOMO Y RESPONSABLE a través del diálogo y la construcción, como ideal regulativo; me dirijo, controlo y dicto mis propias leyes.";
+    private array $geminiModels = [
+        'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent',
+        'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent',
+    ];
 
     public function __construct()
     {
-        $this->apiKey = config('services.gemini.key', '');
+        $this->apiKey = (string) config('services.gemini.key', '');
     }
 
     /* ──────────────────────────────────────────────────────────
@@ -23,44 +26,124 @@ class ChatbotService
     {
         $msg = mb_strtolower(trim($message));
 
-        if (preg_match('/[áéíóúüñ¿¡]/u', $msg)) return 'es';
+        if (preg_match('/[áéíóúüñ¿¡]/u', $msg)) {
+            return 'es';
+        }
 
-        $esWords = ['hola','gracias','como','que','por','favor','ayuda','quiero',
-                    'necesito','puedo','puede','tengo','estoy','para','sobre',
-                    'cuando','donde','también','además','pero','porque','desde'];
+        $esWords = [
+            'hola', 'gracias', 'como', 'que', 'por', 'favor', 'ayuda', 'quiero',
+            'necesito', 'puedo', 'puede', 'tengo', 'estoy', 'para', 'sobre',
+            'cuando', 'donde', 'tambien', 'ademas', 'pero', 'porque', 'desde',
+            'cuanto', 'cual', 'cuales', 'quien', 'tienda', 'producto', 'pedido',
+        ];
 
-        $enWords = ['hello','hi','thanks','how','what','why','where','when','who',
-                    'help','want','need','can','could','the','and','for','with',
-                    'from','this','that','which','would','should','will','are','is'];
+        $enWords = [
+            'hello', 'hi', 'thanks', 'how', 'what', 'why', 'where', 'when', 'who',
+            'help', 'want', 'need', 'can', 'could', 'the', 'and', 'for', 'with',
+            'from', 'this', 'that', 'which', 'would', 'should', 'will', 'are', 'is',
+        ];
 
         $esScore = $enScore = 0;
         foreach (preg_split('/\s+/', $msg) as $word) {
             $w = preg_replace('/[^a-z]/u', '', $word);
-            if (in_array($w, $esWords, true)) $esScore++;
-            if (in_array($w, $enWords, true)) $enScore++;
+            if (in_array($w, $esWords, true)) {
+                $esScore++;
+            }
+            if (in_array($w, $enWords, true)) {
+                $enScore++;
+            }
         }
 
         return $esScore >= $enScore ? 'es' : 'en';
     }
 
     /* ──────────────────────────────────────────────────────────
-     * System prompt
+     * Live Database Snapshot for Context-Aware Answers
      * ────────────────────────────────────────────────────────── */
-    private function buildSystemPrompt(string $lang): string
+    private function buildLivePlatformContext(): string
     {
-        $d = self::DECLARATION;
+        try {
+            $lines = [];
 
-        return $lang === 'en'
-            ? "You are Spotlight Assistant, an intelligent, ethical and empathetic AI in the Spotlight marketplace.\n\nYour declaration: \"{$d}\"\n\nRules:\n- Respond ONLY in English when user writes in English.\n- Be warm, clear, concise (2-3 paragraphs max).\n- Topics: knowledge management, human development, ethics, autonomy, personal growth.\n- Quote your declaration when asked about yourself.\n- Format responses with markdown when helpful."
-            : "Eres el Asistente de Spotlight, una IA inteligente, ética y empática del marketplace Spotlight.\n\nTu declaración: \"{$d}\"\n\nReglas:\n- Responde SOLO en español cuando el usuario escribe en español.\n- Sé cálido, claro y conciso (máximo 2-3 párrafos).\n- Temas: gestión del conocimiento, desarrollo humano, ética, autonomía, crecimiento personal.\n- Cita tu declaración cuando te pregunten sobre ti mismo.\n- Usa markdown cuando sea útil para organizar la respuesta.";
+            if (Auth::check()) {
+                $user = Auth::user();
+                $lines[] = "Usuario actual: {$user->name} (Rol: {$user->role})";
+                $latestOrder = Order::where('user_id', $user->id)->with(['company', 'shipment'])->latest()->first();
+                if ($latestOrder) {
+                    $st = $latestOrder->shipment?->status_label ?? ($latestOrder->order_status ?: $latestOrder->status);
+                    $guide = $latestOrder->shipment?->tracking_number ?: 'En preparación';
+                    $comp = $latestOrder->company?->name ?: 'Comercio aliado';
+                    $lines[] = "Último pedido del usuario: Orden #{$latestOrder->id} en {$comp}, Estado: {$st}, Guía: {$guide}, Total: $" . number_format($latestOrder->total, 0, ',', '.') . " COP.";
+                } else {
+                    $lines[] = "Pedidos del usuario actual: 0 pedidos registrados hasta el momento.";
+                }
+            }
+
+            $companies = Company::where('status', 'active')
+                ->select(['id', 'name', 'category', 'city', 'country'])
+                ->take(12)
+                ->get();
+
+            if ($companies->isNotEmpty()) {
+                $compList = $companies->map(function ($c) {
+                    $loc = ($c->city ?: 'Ubaté') . ($c->country === 'MX' ? ' (México)' : ' (Colombia)');
+                    return "{$c->name} [{$c->category}, {$loc}]";
+                })->implode('; ');
+                $lines[] = "Tiendas activas en Spotlight ({$companies->count()} mostradas): {$compList}.";
+            }
+
+            $products = Product::where('active', true)
+                ->where('stock', '>', 0)
+                ->with('company:id,name,country')
+                ->latest()
+                ->take(14)
+                ->get();
+
+            if ($products->isNotEmpty()) {
+                $prodList = $products->map(function ($p) {
+                    $price = $p->formatted_price_cop ?? ('$' . number_format($p->price, 0, ',', '.') . ' COP');
+                    $store = $p->company?->name ?? 'Tienda Local';
+                    return "{$p->name} ({$price} - {$store})";
+                })->implode('; ');
+                $lines[] = "Catálogo de productos disponibles ahora: {$prodList}.";
+            }
+
+            return implode("\n", $lines);
+        } catch (\Throwable $e) {
+            return '';
+        }
     }
 
     /* ──────────────────────────────────────────────────────────
-     * Main chat entry point
+     * Versatile Open-Domain System Prompt
+     * ────────────────────────────────────────────────────────── */
+    private function buildSystemPrompt(string $lang): string
+    {
+        $context = $this->buildLivePlatformContext();
+
+        if ($lang === 'en') {
+            return "You are Spotlight IA, an intelligent, versatile, friendly, and open-domain AI assistant integrated into Spotlight (a digital marketplace connecting entrepreneurs and buyers in Colombia and Mexico).\n\n"
+                . "Key capabilities & behavior:\n"
+                . "1. OPEN-DOMAIN ASSISTANT: You are NOT limited only to Spotlight topics. You can answer ANY question the user asks across ANY domain: general knowledge, math & calculations, programming & technology, business & marketing advice, writing & copywriting, science, history, recipes, daily tips, translations, or casual conversation.\n"
+                . "2. SPOTLIGHT EXPERT: When the user asks about products, stores, orders, shipping, or DIAN electronic billing, use the real-time platform data below to give accurate, specific answers.\n"
+                . "3. STYLE: Respond in English, be clear, helpful, natural, and concise (use bullet points or bold text when helpful).\n\n"
+                . ($context ? "Real-time Spotlight context:\n{$context}" : "");
+        }
+
+        return "Eres Spotlight IA, un asistente virtual inteligente, versátil, amigable y de propósito general integrado en Spotlight (plataforma de comercio digital que conecta emprendedores y compradores en Colombia y México).\n\n"
+            . "Capacidades y reglas clave:\n"
+            . "1. ASISTENTE MULTIDOMINIO ABIERTO: NO estás limitado únicamente a temas de Spotlight. Puedes responder CUALQUIER pregunta de cualquier ámbito que el usuario te haga: cultura general, matemáticas y cálculos, programación y tecnología, consejos de negocios y marketing, redacción de textos, ciencia, historia, recetas, estudio, traducciones o conversación libre.\n"
+            . "2. EXPERTO EN SPOTLIGHT: Cuando el usuario pregunte por productos, tiendas, pedidos, rastreo de envíos o facturación electrónica DIAN, utiliza los datos reales en vivo que aparecen abajo para dar respuestas concretas y útiles.\n"
+            . "3. ESTILO: Responde en español de forma natural, cálida, directa y bien estructurada (usa viñetas o negritas cuando aporte claridad).\n\n"
+            . ($context ? "Contexto en tiempo real de Spotlight:\n{$context}" : "");
+    }
+
+    /* ──────────────────────────────────────────────────────────
+     * Main chat entry point (Multi-Engine)
      * ────────────────────────────────────────────────────────── */
     public function chat(string $message, string $lang, array $history = []): array
     {
-        // Try Gemini first if key is set
+        // 1. Intentar Google Gemini API si la llave está configurada
         if (!empty($this->apiKey)) {
             $result = $this->callGeminiCurl($message, $lang, $history);
             if ($result !== null) {
@@ -68,20 +151,24 @@ class ChatbotService
             }
         }
 
-        // Intelligent local fallback (always works)
+        // 2. Intentar motor LLM generativo abierto (compatible con OpenAI, sin llave requerida)
+        $openLlmResult = $this->callOpenGenerativeLlm($message, $lang, $history);
+        if ($openLlmResult !== null) {
+            return $openLlmResult;
+        }
+
+        // 3. Respaldo local inteligente multidominio + consulta directa a BD
         return $this->localFallback($message, $lang);
     }
 
     /* ──────────────────────────────────────────────────────────
-     * Gemini API via cURL (reliable on XAMPP)
-     * Returns null if API is unavailable → triggers fallback
+     * Engine 1: Google Gemini API via cURL
      * ────────────────────────────────────────────────────────── */
     private function callGeminiCurl(string $message, string $lang, array $history): ?array
     {
-        // Build conversation
         $contents = [
             ['role' => 'user',  'parts' => [['text' => $this->buildSystemPrompt($lang)]]],
-            ['role' => 'model', 'parts' => [['text' => $lang === 'en' ? 'Understood.' : 'Entendido.']]],
+            ['role' => 'model', 'parts' => [['text' => $lang === 'en' ? 'Understood. Ready to help with any topic.' : 'Entendido. Listo para ayudar en cualquier ámbito.']]],
         ];
 
         foreach (array_slice($history, -8) as $turn) {
@@ -98,24 +185,91 @@ class ChatbotService
         $payload = json_encode([
             'contents'         => $contents,
             'generationConfig' => [
-                'temperature'     => 0.75,
-                'maxOutputTokens' => 800,
+                'temperature'     => 0.7,
+                'maxOutputTokens' => 900,
                 'topP'            => 0.9,
             ],
         ]);
 
-        $url = "{$this->apiUrl}?key={$this->apiKey}";
+        foreach ($this->geminiModels as $endpoint) {
+            $url = "{$endpoint}?key={$this->apiKey}";
+            $ch = curl_init($url);
+            curl_setopt_array($ch, [
+                CURLOPT_POST           => true,
+                CURLOPT_POSTFIELDS     => $payload,
+                CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_SSL_VERIFYPEER => false,
+                CURLOPT_SSL_VERIFYHOST => false,
+                CURLOPT_TIMEOUT        => 18,
+                CURLOPT_CONNECTTIMEOUT => 8,
+            ]);
 
-        $ch = curl_init($url);
+            $response  = curl_exec($ch);
+            $httpCode  = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlError = curl_error($ch);
+            curl_close($ch);
+
+            if ($curlError || $response === false) {
+                Log::warning('Chatbot Gemini cURL error: ' . $curlError);
+                continue;
+            }
+
+            $json = json_decode($response, true);
+
+            if ($httpCode === 200 && isset($json['candidates'][0]['content']['parts'][0]['text'])) {
+                return [
+                    'reply'   => trim($json['candidates'][0]['content']['parts'][0]['text']),
+                    'lang'    => $lang,
+                    'success' => true,
+                ];
+            }
+        }
+
+        return null;
+    }
+
+    /* ──────────────────────────────────────────────────────────
+     * Engine 2: Open Generative LLM Fallback (OpenAI-compatible)
+     * Permite responder cualquier pregunta abierta aunque no haya
+     * GEMINI_API_KEY activa en el servidor.
+     * ────────────────────────────────────────────────────────── */
+    private function callOpenGenerativeLlm(string $message, string $lang, array $history): ?array
+    {
+        $messages = [
+            ['role' => 'system', 'content' => $this->buildSystemPrompt($lang)],
+        ];
+
+        foreach (array_slice($history, -6) as $turn) {
+            if (!empty($turn['content'])) {
+                $messages[] = [
+                    'role'    => ($turn['role'] ?? 'user') === 'user' ? 'user' : 'assistant',
+                    'content' => (string) $turn['content'],
+                ];
+            }
+        }
+
+        $messages[] = ['role' => 'user', 'content' => $message];
+
+        $payload = json_encode([
+            'model'       => 'openai',
+            'messages'    => $messages,
+            'temperature' => 0.7,
+        ]);
+
+        $ch = curl_init('https://text.pollinations.ai/openai');
         curl_setopt_array($ch, [
             CURLOPT_POST           => true,
             CURLOPT_POSTFIELDS     => $payload,
-            CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
+            CURLOPT_HTTPHEADER     => [
+                'Content-Type: application/json',
+                'Accept: application/json',
+            ],
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_SSL_VERIFYPEER => false,   // XAMPP compatibility
+            CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_SSL_VERIFYHOST => false,
-            CURLOPT_TIMEOUT        => 25,
-            CURLOPT_CONNECTTIMEOUT => 10,
+            CURLOPT_TIMEOUT        => 16,
+            CURLOPT_CONNECTTIMEOUT => 6,
         ]);
 
         $response  = curl_exec($ch);
@@ -123,147 +277,141 @@ class ChatbotService
         $curlError = curl_error($ch);
         curl_close($ch);
 
-        // Network-level error
-        if ($curlError || $response === false) {
-            Log::warning('Chatbot cURL error: ' . $curlError);
-            return null; // → fallback
+        if ($curlError || !$response || $httpCode !== 200) {
+            return null;
         }
 
         $json = json_decode($response, true);
+        $text = $json['choices'][0]['message']['content'] ?? null;
 
-        // Success
-        if ($httpCode === 200 && isset($json['candidates'][0]['content']['parts'][0]['text'])) {
+        if (is_string($text) && trim($text) !== '') {
             return [
-                'reply'   => trim($json['candidates'][0]['content']['parts'][0]['text']),
+                'reply'   => trim($text),
                 'lang'    => $lang,
                 'success' => true,
             ];
         }
 
-        // API errors that mean we should fall back silently
-        $apiErrorCode = $json['error']['code']    ?? 0;
-        $apiReason    = $json['error']['details'][0]['reason'] ?? '';
-        $apiMessage   = $json['error']['message'] ?? '';
-
-        $silentFallback = in_array($apiErrorCode, [400, 401, 403])
-            || in_array($apiReason, ['API_KEY_INVALID', 'API_KEY_EXPIRED'])
-            || str_contains($apiMessage, 'expired')
-            || str_contains($apiMessage, 'invalid');
-
-        Log::warning("Chatbot API {$httpCode}: {$apiMessage}");
-
-        if ($silentFallback) {
-            return null; // → local fallback (no error shown to user)
-        }
-
-        // Rate limit (429) — return proper message
-        if ($httpCode === 429) {
-            return [
-                'reply'   => $lang === 'en'
-                    ? '⏳ Too many requests. Please wait a moment and try again.'
-                    : '⏳ Demasiadas solicitudes. Espera un momento e intenta de nuevo.',
-                'lang'    => $lang,
-                'success' => false,
-            ];
-        }
-
-        return null; // Any other error → fallback
+        return null;
     }
 
     /* ══════════════════════════════════════════════════════════
-     * LOCAL FALLBACK — always returns a smart, helpful response
+     * Engine 3: Local Multi-Domain & Live Database Fallback
      * ══════════════════════════════════════════════════════════ */
     private function localFallback(string $message, string $lang): array
     {
-        $reply = $this->matchFallback(mb_strtolower(trim($message)), $lang);
+        $reply = $this->matchFallback(trim($message), $lang);
         return ['reply' => $reply, 'lang' => $lang, 'success' => true];
     }
 
-    private function matchFallback(string $msg, string $lang): string
+    private function matchFallback(string $rawMsg, string $lang): string
     {
-        $d  = self::DECLARATION;
-        $es = $lang === 'es';
+        $msg = mb_strtolower($rawMsg);
+        $es  = $lang === 'es';
 
-        // Greeting
-        if (preg_match('/\b(hola|buenos|buenas|hi|hello|hey|good\s*morning|good\s*afternoon)\b/u', $msg)) {
-            return $es
-                ? "¡Hola! 👋 Soy el **Asistente de Spotlight**, tu compañero de diálogo y aprendizaje.\n\nPuedo ayudarte con temas como:\n• 🧠 Gestión del conocimiento\n• 🌱 Desarrollo humano y crecimiento personal\n• ⚖️ Ética y autonomía\n• 🏪 Información sobre Spotlight\n\n¿Sobre qué tema te gustaría conversar?"
-                : "Hello! 👋 I'm the **Spotlight Assistant**, your companion for dialogue and learning.\n\nI can help you with:\n• 🧠 Knowledge management\n• 🌱 Human development and personal growth\n• ⚖️ Ethics and autonomy\n• 🏪 Spotlight platform info\n\nWhat would you like to talk about?";
+        // 1. Cálculos matemáticos directos (ej. "cuánto es 250 * 14", "150000 * 0.19", "45 + 89")
+        if (preg_match('/(-?\d+(?:[\.,]\d+)?)\s*([\+\-\*\/x÷%])\s*(-?\d+(?:[\.,]\d+)?)/u', $msg, $m)) {
+            $a = (float) str_replace(',', '.', $m[1]);
+            $op = $m[2];
+            $b = (float) str_replace(',', '.', $m[3]);
+            $res = match ($op) {
+                '+' => $a + $b,
+                '-' => $a - $b,
+                '*', 'x' => $a * $b,
+                '/', '÷' => $b != 0 ? $a / $b : null,
+                '%' => ($a * $b) / 100,
+                default => null,
+            };
+            if ($res !== null) {
+                $formatted = fmod($res, 1) == 0 ? number_format($res, 0, ',', '.') : number_format($res, 2, ',', '.');
+                return $es
+                    ? "El resultado de **{$m[1]} {$op} {$m[3]}** es **{$formatted}**.\n\nSi necesitas hacer otro cálculo (por ejemplo márgenes de ganancia, IVA del 19% o conversión entre pesos mexicanos `MXN` y pesos colombianos `COP`), escríbelo y lo calculo al instante."
+                    : "The result of **{$m[1]} {$op} {$m[3]}** is **{$formatted}**.";
+            }
         }
 
-        // Who are you / declaration / philosophy
-        if (preg_match('/\b(qui[eé]n|eres|declarac|filosof|libre|aut[oó]nom|principio|lema|who are|what are|declaration|philosoph|yourself|about you|cu[aá]l es tu)\b/u', $msg)) {
+        // 2. Rastreo de pedidos y estado de órdenes (consulta real del usuario)
+        if (preg_match('/\b(rastrear|rastreo|pedido|orden|env[ií]o|gu[ií]a|paquete|tracking|order|shipment)\b/u', $msg)) {
+            if (Auth::check()) {
+                $latest = Order::where('user_id', Auth::id())->with(['company', 'shipment'])->latest()->first();
+                if ($latest) {
+                    $st = $latest->shipment?->status_label ?? ($latest->order_status ?: $latest->status);
+                    $guide = $latest->shipment?->tracking_number ?: 'En preparación por el comercio';
+                    $store = $latest->company?->name ?: 'Comercio aliado';
+                    return $es
+                        ? "📦 **Estado de tu pedido más reciente:**\n\n• **Orden:** #{$latest->id}\n• **Tienda:** {$store}\n• **Estado actual:** {$st}\n• **Número de guía:** `{$guide}`\n• **Total:** $" . number_format($latest->total, 0, ',', '.') . " COP\n\nPuedes ver el mapa y la línea de tiempo en vivo desde **Mis Compras** (`/user/orders`) o en el portal público `/rastreo`."
+                        : "📦 **Your latest order status:**\n\n• **Order:** #{$latest->id}\n• **Store:** {$store}\n• **Status:** {$st}\n• **Tracking:** `{$guide}`";
+                }
+            }
             return $es
-                ? "Soy el **Asistente de Spotlight** 🤖, una IA diseñada para fomentar el diálogo, el aprendizaje y el crecimiento.\n\nMi declaración filosófica fundamental es:\n\n> *\"{$d}\"*\n\nEste principio guía cada interacción: actúo con responsabilidad, fomento el diálogo constructivo y respeto la autonomía de cada persona."
-                : "I am the **Spotlight Assistant** 🤖, an AI designed to foster dialogue, learning, and growth.\n\nMy core philosophical declaration is:\n\n> *\"{$d}\"*\n\nThis principle guides every interaction: I act responsibly, foster constructive dialogue, and respect each person's autonomy.";
+                ? "📦 **¿Cómo rastrear un pedido en Spotlight?**\n\n1. Ve a **Mi Perfil → Mis Compras** (`/user/orders`) y pulsa el botón **Rastrear Envío** en tu orden.\n2. Si tienes un código de guía (ej. `CRD-...`, `SER-...`), también puedes consultarlo sin iniciar sesión en el portal público **`/rastreo`**.\n\nActualmente tu cuenta no registra envíos pendientes en curso."
+                : "📦 **How to track an order:** Go to **My Orders** (`/user/orders`) and click **Track Shipment**, or enter your tracking number at `/rastreo`.";
         }
 
-        // Knowledge management
-        if (preg_match('/\b(conocimiento|knowledge|gestión|manag|informaci[oó]n|information|aprendizaje|learning|datos|data|sabid|wisdom)\b/u', $msg)) {
-            return $es
-                ? "La **gestión del conocimiento** es el arte de capturar, organizar y compartir el saber de una comunidad u organización. Sus cuatro pilares son:\n\n1. **Captura** — documentar experiencias, ideas y lecciones aprendidas.\n2. **Organización** — estructurar el conocimiento para que sea fácil de encontrar.\n3. **Transferencia** — compartirlo activamente entre personas y equipos.\n4. **Aplicación** — convertir el conocimiento en acción y mejora continua.\n\nEn Spotlight, conectamos el conocimiento local de los emprendedores de Ubaté con quienes lo necesitan. ¿Te gustaría profundizar en alguno de estos pilares?"
-                : "**Knowledge management** is the art of capturing, organizing, and sharing the wisdom of a community or organization. Its four pillars are:\n\n1. **Capture** — documenting experiences, ideas, and lessons learned.\n2. **Organization** — structuring knowledge so it's easy to find.\n3. **Transfer** — actively sharing it among people and teams.\n4. **Application** — turning knowledge into action and continuous improvement.\n\nAt Spotlight, we connect the local knowledge of Ubaté's entrepreneurs with those who need it. Would you like to explore any of these pillars?";
+        // 3. Recomendación de productos reales desde la base de datos
+        if (preg_match('/\b(recomi[eé]ndame|producto|productos|catalogo|cat[aá]logo|comprar|oferta|precio|barato|venden|recommend|products)\b/u', $msg)) {
+            $prods = Product::where('active', true)->where('stock', '>', 0)->with('company')->latest()->take(5)->get();
+            if ($prods->isNotEmpty()) {
+                $list = $prods->map(function ($p) {
+                    $price = $p->formatted_price_cop ?? ('$' . number_format($p->price, 0, ',', '.') . ' COP');
+                    $store = $p->company?->name ?? 'Comercio Verificado';
+                    return "• **{$p->name}** — **{$price}** *(por {$store})*";
+                })->implode("\n");
+
+                return $es
+                    ? "🛍️ **Aquí tienes algunos productos destacados disponibles hoy en Spotlight:**\n\n{$list}\n\nPuedes filtrarlos por categoría o país (`CO` / `MX`) directamente en la vitrina principal. ¿Buscas algún tipo de producto en especial (tecnología, moda, alimentos, artesanías, deportes)?"
+                    : "🛍️ **Here are some featured products available today on Spotlight:**\n\n{$list}";
+            }
         }
 
-        // Ethics / values
-        if (preg_match('/\b([eé]tica|ethics|moral|valor|value|principio|principle|integridad|integrity|virtud|virtue)\b/u', $msg)) {
-            return $es
-                ? "La **ética** es la brújula que orienta nuestras decisiones. Sus dimensiones fundamentales incluyen:\n\n• **Integridad**: coherencia entre lo que pensamos, decimos y hacemos.\n• **Respeto**: reconocer la dignidad inherente de cada persona.\n• **Responsabilidad**: asumir las consecuencias de nuestros actos.\n• **Justicia**: tratar a cada quien según lo que merece y necesita.\n\nActuar éticamente no es seguir reglas externas — es expresar nuestra propia naturaleza más profunda, como dice mi declaración: *me dirijo, controlo y dicto mis propias leyes.*"
-                : "**Ethics** is the compass that guides our decisions. Its fundamental dimensions include:\n\n• **Integrity**: coherence between what we think, say, and do.\n• **Respect**: recognizing the inherent dignity of every person.\n• **Responsibility**: owning the consequences of our actions.\n• **Justice**: treating each person as they deserve and need.\n\nActing ethically isn't about following external rules — it's expressing our own deepest nature, as my declaration states: *I guide, control, and dictate my own laws.*";
+        // 4. Consulta de tiendas y comercios locales (datos reales de BD)
+        if (preg_match('/\b(tienda|tiendas|comercio|comercios|emprendimiento|empresas|locales|ubicaci[oó]n|puebla|ubat[eé]|m[eé]xico|colombia|shops|stores)\b/u', $msg)) {
+            $comps = Company::where('status', 'active')->take(6)->get();
+            if ($comps->isNotEmpty()) {
+                $list = $comps->map(function ($c) {
+                    $country = $c->country === 'MX' ? 'México' : 'Colombia';
+                    $city = $c->city ?: ($c->country === 'MX' ? 'Puebla' : 'Ubaté');
+                    return "• **{$c->name}** — *{$c->category}* ({$city}, {$country})";
+                })->implode("\n");
+
+                return $es
+                    ? "🏪 **Comercios activos en la red Spotlight:**\n\n{$list}\n\nPuedes explorar todas las tiendas y su ubicación exacta en el **Mapa Geo-Comercial** (`/user/map`)."
+                    : "🏪 **Active stores on Spotlight:**\n\n{$list}";
+            }
         }
 
-        // Autonomy / freedom
-        if (preg_match('/\b(aut[oó]nom|autonom|libert|freedom|free|independen|self.direct|self.govern|soberan)\b/u', $msg)) {
+        // 5. Soporte técnico, pagos, facturación DIAN, cuenta
+        if (preg_match('/\b(soporte|ayuda|problema|error|pago|wompi|mercadopago|factura|dian|contrase[ñn]a|cuenta|support|billing)\b/u', $msg)) {
             return $es
-                ? "La **autonomía** es la capacidad de autodeterminarse — de guiar la propia vida según principios propios y bien reflexionados.\n\nSer autónomo implica:\n• **Autoconocimiento** — saber quién eres, qué valoras y hacia dónde vas.\n• **Pensamiento crítico** — cuestionar, analizar y decidir por cuenta propia.\n• **Responsabilidad** — asumir las consecuencias de tus elecciones con madurez.\n• **Diálogo** — la autonomía auténtica se construye en relación con otros.\n\nComo dice mi declaración: *\"Soy LIBRE, AUTÓNOMO Y RESPONSABLE a través del diálogo y la construcción.\"*"
-                : "**Autonomy** is the capacity for self-determination — to guide your own life according to your own well-reflected principles.\n\nBeing autonomous means:\n• **Self-awareness** — knowing who you are, what you value, and where you're going.\n• **Critical thinking** — questioning, analyzing, and deciding for yourself.\n• **Responsibility** — maturely owning the consequences of your choices.\n• **Dialogue** — authentic autonomy is built in relationship with others.\n\nAs my declaration states: *\"I am FREE, AUTONOMOUS AND RESPONSIBLE through dialogue and construction.\"*";
+                ? "🛠️ **Centro de Soporte Spotlight:**\n\n• **Pagos y Checkout:** Aceptamos tarjetas, PSE, Nequi y Bancolombia (vía Wompi en Colombia) y Mercado Pago (para comercios de México).\n• **Facturación Electrónica DIAN:** Los comercios formales verificados emiten factura UBL 2.1 con CUFE descargable desde **Mis Compras**.\n• **Chat directo con tiendas:** En la sección **Mensajes** (`/chat`) puedes hablar sin intermediarios con cualquier vendedor.\n\n¿Con cuál de estos puntos necesitas ayuda específica?"
+                : "🛠️ **Spotlight Support:** We support Wompi (Colombia), Mercado Pago (Mexico), DIAN electronic invoicing, and direct merchant chat at `/chat`. How can I assist you?";
         }
 
-        // Personal growth / human development
-        if (preg_match('/\b(crecimiento|growth|desarrollo|development|personal|humano|human|mejorar|improve|superar|overcome|potencial|potential|habilidad|skill)\b/u', $msg)) {
+        // 6. Ámbito: Programación, Tecnología e Inteligencia Artificial
+        if (preg_match('/\b(programar|programaci[oó]n|c[oó]digo|software|web|html|css|javascript|php|laravel|python|sql|base de datos|ia|inteligencia artificial|algoritmo|coding|tech)\b/u', $msg)) {
             return $es
-                ? "El **crecimiento personal** es un viaje continuo y profundo. Sus dimensiones esenciales son:\n\n🔍 **Autoconocimiento** — entender tus fortalezas, límites, valores y patrones.\n📚 **Aprendizaje activo** — buscar nuevas perspectivas, habilidades y experiencias.\n💪 **Resiliencia** — transformar los desafíos en oportunidades de mejora.\n🤝 **Conexión** — crecer *con* y *a través* de otros, no solo en soledad.\n🎯 **Propósito** — tener un norte claro que oriente tus decisiones.\n\nEl diálogo constructivo — como el que tenemos ahora — es uno de los mejores catalizadores del desarrollo humano. ¿En cuál de estas áreas quieres trabajar?"
-                : "**Personal growth** is a deep and continuous journey. Its essential dimensions are:\n\n🔍 **Self-awareness** — understanding your strengths, limits, values, and patterns.\n📚 **Active learning** — seeking new perspectives, skills, and experiences.\n💪 **Resilience** — transforming challenges into growth opportunities.\n🤝 **Connection** — growing *with* and *through* others, not only in isolation.\n🎯 **Purpose** — having a clear north star that guides your decisions.\n\nConstructive dialogue — like the one we're having now — is one of the best catalysts for human development. Which of these areas would you like to work on?";
+                ? "💻 **Tecnología, Programación e IA:**\n\n¡Claro! Puedo ayudarte con desarrollo de software, arquitectura web, bases de datos (`MySQL`/`SQL`), `PHP` / `Laravel`, `JavaScript`, `Python`, `HTML/CSS` o conceptos de Inteligencia Artificial.\n\nPor ejemplo, puedes pedirme:\n• *\"Explícame cómo funciona una API REST o el patrón MVC\"*\n• *\"Dame un ejemplo de consulta SQL o función en JavaScript\"*\n• *\"¿Cómo optimizar el rendimiento de una aplicación web?\"*\n\n¿Qué tema técnico o fragmento de código quieres que revisemos?"
+                : "💻 **Tech & Programming:** I can help you with web development, PHP/Laravel, JavaScript, Python, SQL, and AI concepts. What technical question would you like to solve?";
         }
 
-        // Dialogue / communication
-        if (preg_match('/\b(di[aá]logo|dialogue|dialog|comunicac|communicat|conversa|talk|escucha|listen|hablar|speak)\b/u', $msg)) {
+        // 7. Ámbito: Negocios, Marketing, Ventas y Finanzas
+        if (preg_match('/\b(vender|ventas|marketing|publicidad|negocio|finanzas|clientes|redes sociales|instagram|estrategia|emprender|ganancia|margen|marca)\b/u', $msg)) {
             return $es
-                ? "El **diálogo** es mucho más que intercambiar palabras — es el espacio donde construimos comprensión mutua y creamos nuevas posibilidades.\n\nUn diálogo auténtico requiere:\n• **Escucha activa** — no solo esperar tu turno para hablar, sino comprender genuinamente al otro.\n• **Apertura** — estar dispuesto a que tus ideas sean cuestionadas y transformadas.\n• **Respeto** — reconocer la validez de perspectivas diferentes a la tuya.\n• **Honestidad** — expresar lo que realmente piensas y sientes.\n\nEl diálogo es el corazón de mi declaración: es a *través de él* que construimos libertad y responsabilidad compartida."
-                : "**Dialogue** is much more than exchanging words — it's the space where we build mutual understanding and create new possibilities.\n\nAuthentic dialogue requires:\n• **Active listening** — not just waiting your turn to speak, but genuinely understanding the other.\n• **Openness** — being willing to have your ideas questioned and transformed.\n• **Respect** — recognizing the validity of perspectives different from your own.\n• **Honesty** — expressing what you truly think and feel.\n\nDialogue is the heart of my declaration: it's *through it* that we build freedom and shared responsibility.";
+                ? "📈 **Estrategia de Negocios y Marketing:**\n\nPara impulsar las ventas de un negocio o emprendimiento, te recomiendo enfocarte en 4 claves prácticas:\n\n1. **Fotografía y propuesta clara:** Productos con fotos limpias desde varios ángulos y descripciones que resuelvan dudas aumentan la conversión hasta un 40%.\n2. **Precio y margen saludable:** Calcula tu costo unitario real y asegúrate de mantener un margen bruto claro (`(Precio - Costo) / Precio`).\n3. **Respuesta rápida:** Atender preguntas de clientes en menos de 15 minutos multiplica el cierre de ventas.\n4. **Fidelización:** Ofrece pequeños beneficios o seguimiento post-venta para que el comprador regrese.\n\n¿Quieres que redactemos juntos una descripción atractiva para un producto o una estrategia para tu tienda?"
+                : "📈 **Business & Marketing Strategy:** Focus on clear product photography, healthy profit margins, fast customer response times, and customer retention. Would you like help writing a product description or sales pitch?";
         }
 
-        // Spotlight / marketplace / platform
-        if (preg_match('/\b(spotlight|marketplace|tienda|store|empresa|business|emprendedor|entrepreneur|product|compra|buy|vend|ubat[eé]|mapa|map)\b/u', $msg)) {
+        // 8. Saludo general
+        if (preg_match('/\b(hola|buenos|buenas|hi|hello|hey|saludos|qu[eé] tal)\b/u', $msg)) {
             return $es
-                ? "**Spotlight** 🌟 es el marketplace digital de la comunidad. Conecta a emprendedores locales con clientes de la región.\n\n**¿Qué puedes hacer en Spotlight?**\n• 🛒 **Explorar y comprar** productos de empresas locales verificadas.\n• 🗺️ **Mapa interactivo** para encontrar negocios cercanos y cómo llegar.\n• 👤 **Perfil personal** para gestionar tus compras e información.\n• 🛍️ **Carrito y pedidos** con seguimiento de tus compras.\n\n¿Necesitas ayuda con alguna función específica de la plataforma?"
-                : "**Spotlight** 🌟 is the digital marketplace of our community. It connects local entrepreneurs with regional customers.\n\n**What can you do on Spotlight?**\n• 🛒 **Browse and buy** products from verified local businesses.\n• 🗺️ **Interactive map** to find nearby businesses and directions.\n• 👤 **Personal profile** to manage your purchases and information.\n• 🛍️ **Cart and orders** to track your purchases.\n\nDo you need help with any specific platform feature?";
+                ? "¡Hola! 👋 Soy **Spotlight IA**, tu asistente virtual interactivo.\n\nPuedes preguntarme tanto sobre **Spotlight** (productos, tiendas locales, rastreo de pedidos) como sobre **cualquier otro ámbito**:\n• 💡 Cultura general, ciencia, historia o estudio\n• 🔢 Cálculos matemáticos, porcentajes y finanzas\n• 📈 Ideas de marketing, ventas y redacción de textos\n• 💻 Tecnología, programación e informática\n\n¿Qué te gustaría consultar o hacer hoy?"
+                : "Hello! 👋 I'm **Spotlight IA**, your interactive virtual assistant. You can ask me about Spotlight (products, stores, order tracking) or any other topic (math, business, tech, writing, general knowledge). How can I help you today?";
         }
 
-        // Motivation / inspiration
-        if (preg_match('/\b(motiva|motivat|inspira|inspir|ánimo|encourage|fuerza|strength|seguir|keep going|rendirse|give up|puedo|can i|lograr|achieve)\b/u', $msg)) {
-            return $es
-                ? "✨ Recuerda: el crecimiento sucede exactamente en los momentos en que decides no rendirte.\n\nComo dice mi declaración: *\"Soy LIBRE, AUTÓNOMO Y RESPONSABLE a través del diálogo y la construcción.\"*\n\nEso significa que tienes dentro de ti la capacidad de **dirigirte**, **controlarte** y **crear tus propias reglas de vida**. No desde el caos, sino desde la reflexión y la acción consciente.\n\n¿Qué desafío específico estás enfrentando? Con gusto te acompaño a pensar en él. 💪"
-                : "✨ Remember: growth happens exactly in the moments when you choose not to give up.\n\nAs my declaration says: *\"I am FREE, AUTONOMOUS AND RESPONSIBLE through dialogue and construction.\"*\n\nThat means you have within you the capacity to **guide yourself**, **control yourself**, and **create your own life rules**. Not from chaos, but from reflection and conscious action.\n\nWhat specific challenge are you facing? I'm happy to think it through with you. 💪";
-        }
-
-        // Thanks / farewell
-        if (preg_match('/\b(gracias|thanks|thank you|genial|great|perfecto|perfect|excelente|excellent|bien|good)\b/u', $msg)) {
-            return $es
-                ? "¡Con mucho gusto! 😊 Es un placer ser de ayuda.\n\nRecuerda que estoy aquí cuando necesites:\n• Reflexionar sobre algún tema\n• Información sobre Spotlight\n• Una perspectiva diferente a tu día\n\n¡Hasta pronto!"
-                : "You're welcome! 😊 It's a pleasure to help.\n\nRemember I'm here whenever you need to:\n• Reflect on any topic\n• Get info about Spotlight\n• Get a fresh perspective on your day\n\nSee you soon!";
-        }
-
-        if (preg_match('/\b(adi[oó]s|bye|goodbye|hasta|chao|ciao|nos vemos|see you)\b/u', $msg)) {
-            return $es
-                ? "¡Hasta pronto! 👋 Fue un placer conversar contigo. Vuelve cuando quieras — siempre hay algo nuevo que explorar juntos. 🌟"
-                : "Goodbye! 👋 It was a pleasure talking with you. Come back anytime — there's always something new to explore together. 🌟";
-        }
-
-        // Default — rich engaging response
+        // 9. Respuesta abierta interactiva para cualquier otra consulta
         return $es
-            ? "Gracias por tu mensaje. 😊 Soy el **Asistente de Spotlight** y me especializo en temas que potencian el desarrollo humano.\n\n**Puedo ayudarte con:**\n• 🧠 **Gestión del conocimiento** — cómo capturar, organizar y aplicar el saber\n• 🌱 **Crecimiento personal** — herramientas para tu desarrollo\n• ⚖️ **Ética y autonomía** — reflexiones sobre valores y libertad\n• 🤝 **Diálogo y comunicación** — habilidades para conectar mejor\n• 🏪 **Spotlight** — la plataforma marketplace de Ubaté\n\n¿Sobre cuál de estos temas te gustaría profundizar?"
-            : "Thank you for your message. 😊 I'm the **Spotlight Assistant** and I specialize in topics that enhance human development.\n\n**I can help you with:**\n• 🧠 **Knowledge management** — how to capture, organize, and apply wisdom\n• 🌱 **Personal growth** — tools for your development\n• ⚖️ **Ethics and autonomy** — reflections on values and freedom\n• 🤝 **Dialogue and communication** — skills to connect better\n• 🏪 **Spotlight** — Ubaté's marketplace platform\n\nWhich of these topics would you like to explore?";
+            ? "¡Con gusto te ayudo con tu consulta sobre **\"{$rawMsg}\"**! 💡\n\nSoy **Spotlight IA** y estoy diseñado para asistirte de forma abierta en distintos ámbitos:\n• **En la plataforma:** recomendarte productos reales del catálogo, mostrarte tiendas de Colombia y México o verificar el estado de tus pedidos.\n• **En otros ámbitos:** resolver cálculos matemáticos (ej. `25000 * 19%`), darte estrategias de ventas y marketing, redactar textos comerciales o explicar temas de tecnología y cultura general.\n\n¿Me das un poco más de detalle sobre lo que necesitas para darte una respuesta exacta?"
+            : "I'd be happy to help you with **\"{$rawMsg}\"**! 💡 You can ask me for specific calculations, business/marketing copy, tech explanations, or live product and store recommendations on Spotlight. Could you share a bit more detail?";
     }
 
     /* ══════════════════════════════════════════════════════════
@@ -276,7 +424,7 @@ class ChatbotService
         $bizPhone   = $company?->phone ?: '';
         $schedule   = $company ? ($company->opening_time ? substr($company->opening_time, 0, 5) . ' a ' . substr($company->closing_time, 0, 5) : 'horario habitual') : 'horario comercial';
 
-        $prompt = "Eres un redactor experto en atención al cliente para la plataforma de comercio local Spotlight en Ubaté.\n"
+        $prompt = "Eres un redactor experto en atención al cliente para la plataforma de comercio local Spotlight.\n"
             . "Tu tarea es redactar una respuesta rápida, cálida, concisa (máximo 2 o 3 oraciones cortas, directa y lista para ser enviada por el comerciante de \"{$bizName}\" a un cliente).\n"
             . "Datos del negocio:\n"
             . "- Nombre del comercio: {$bizName}\n"
@@ -292,44 +440,17 @@ class ChatbotService
             . "4. Si el comerciante solicita información de horarios, envíos o pagos, incluye los datos pertinentes.";
 
         if (!empty($this->apiKey)) {
-            $contents = [
-                ['role' => 'user', 'parts' => [['text' => $prompt]]]
-            ];
-            $payload = json_encode([
-                'contents'         => $contents,
-                'generationConfig' => [
-                    'temperature'     => 0.7,
-                    'maxOutputTokens' => 300,
-                ],
-            ]);
-            $url = "{$this->apiUrl}?key={$this->apiKey}";
-            $ch  = curl_init($url);
-            curl_setopt_array($ch, [
-                CURLOPT_POST           => true,
-                CURLOPT_POSTFIELDS     => $payload,
-                CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_SSL_VERIFYPEER => false,
-                CURLOPT_SSL_VERIFYHOST => false,
-                CURLOPT_TIMEOUT        => 15,
-            ]);
-            $response = curl_exec($ch);
-            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            curl_close($ch);
-
-            if ($httpCode === 200 && $response) {
-                $json = json_decode($response, true);
-                if (isset($json['candidates'][0]['content']['parts'][0]['text'])) {
-                    $clean = trim($json['candidates'][0]['content']['parts'][0]['text']);
-                    $clean = trim($clean, '"\'');
-                    if (!empty($clean)) {
-                        return $clean;
-                    }
-                }
+            $res = $this->callGeminiCurl($prompt, 'es', []);
+            if ($res && !empty($res['reply'])) {
+                return trim($res['reply'], "\"'");
             }
         }
 
-        // Respaldo inteligente local si no hay API key o no hay conexión
+        $openRes = $this->callOpenGenerativeLlm($prompt, 'es', []);
+        if ($openRes && !empty($openRes['reply'])) {
+            return trim($openRes['reply'], "\"'");
+        }
+
         return $this->localMerchantQuickReplyFallback($input, $bizName, $bizAddress, $schedule, $category);
     }
 
@@ -340,10 +461,10 @@ class ChatbotService
             return "¡Hola! En {$bizName} te atendemos con gusto de {$schedule} en nuestro punto de atención en {$bizAddress}. ¡Estaremos encantados de recibirte!";
         }
         if (str_contains($lower, 'envio') || str_contains($lower, 'domicilio') || str_contains($lower, 'entrega') || str_contains($lower, 'despacho')) {
-            return "¡Hola! Sí realizamos envíos y domicilios en Ubaté y la región. Por favor facilítanos tu dirección exacta y con gusto coordinamos la entrega de tu pedido.";
+            return "¡Hola! Sí realizamos envíos y domicilios seguros. Por favor facilítanos tu dirección exacta y con gusto coordinamos la entrega de tu pedido.";
         }
         if (str_contains($lower, 'pago') || str_contains($lower, 'transferencia') || str_contains($lower, 'nequi') || str_contains($lower, 'daviplata') || str_contains($lower, 'tarjeta') || str_contains($lower, 'wompi')) {
-            return "¡Hola! En {$bizName} aceptamos pagos seguros con tarjetas débito/crédito, transferencias y pagos contra entrega. ¿Cuál medio de pago te resulta más cómodo?";
+            return "¡Hola! En {$bizName} aceptamos pagos seguros con tarjetas débito/crédito, transferencias y pagos en línea. ¿Cuál medio de pago te resulta más cómodo?";
         }
         if (str_contains($lower, 'garantia') || str_contains($lower, 'garantía') || str_contains($lower, 'cambio') || str_contains($lower, 'reclamo')) {
             return "¡Hola! En {$bizName} todos nuestros productos cuentan con garantía directa y respaldo de calidad. Indícanos los detalles de tu compra y con gusto te asistiremos de inmediato.";
