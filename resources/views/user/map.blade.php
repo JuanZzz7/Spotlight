@@ -26,7 +26,7 @@
 
 @push('styles')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
-<link href="{{ asset('css/user.css') }}" rel="stylesheet">
+<link href="{{ asset('css/user.css') }}?v=3.2" rel="stylesheet">
 @endpush
 
 @section('dashboard-content')
@@ -69,17 +69,17 @@
             <button type="button" class="close-btn shadow-sm" id="closeDetail" title="Cerrar"><i class="bi bi-x-lg"></i></button>
             
             {{-- Cabecera con Foto / Logo y Nombre --}}
-            <div class="d-flex align-items-center gap-3 mb-2">
-                <div class="rounded-circle bg-light border shadow-sm overflow-hidden flex-shrink-0" style="width: 58px; height: 58px;">
+            <div class="d-flex align-items-start gap-2.5 mb-2 pe-4">
+                <div class="rounded-circle bg-light border shadow-sm overflow-hidden flex-shrink-0" style="width: 52px; height: 52px;">
                     <img src="" id="detImg" class="w-100 h-100 object-fit-cover" alt="Comercio">
                 </div>
                 <div class="min-w-0 flex-fill">
-                    <div class="d-flex align-items-center gap-2 mb-1">
+                    <div class="d-flex align-items-center flex-wrap gap-1.5 mb-1">
                         <span class="badge" style="background: var(--sl-primary-soft, #F6E7EB); color: var(--sl-primary, #7F1D3F); font-size: 0.55rem; font-weight: 800; letter-spacing: 0.5px;">VERIFICADO</span>
-                        <span class="text-muted fw-bold text-uppercase text-truncate" style="font-size: 0.6rem;" id="detCat">Comercio</span>
+                        <span class="text-muted fw-bold text-uppercase" style="font-size: 0.6rem;" id="detCat">Comercio</span>
                     </div>
-                    <h5 class="fw-bold text-dark mb-1 text-truncate" id="detName" style="letter-spacing: -0.5px;">Nombre de la Tienda</h5>
-                    <div class="text-muted text-truncate" style="font-size: 0.75rem;" id="detAddr">Ubicación</div>
+                    <h5 class="fw-bold text-dark mb-1" id="detName" style="letter-spacing: -0.3px; font-size: 1rem; line-height: 1.25; word-break: break-word;">Nombre de la Tienda</h5>
+                    <div class="text-muted" style="font-size: 0.73rem; line-height: 1.35; word-break: break-word;" id="detAddr">Ubicación</div>
                 </div>
             </div>
             
@@ -113,7 +113,7 @@
             </div>
             
             {{-- Lista de productos dinámica con botón + Carrito --}}
-            <div class="mb-3" id="detProductsContainer" style="max-height: 200px; overflow-y: auto;">
+            <div class="mb-3" id="detProductsContainer" style="max-height: 215px; overflow-y: auto; overflow-x: hidden;">
                 {{-- Renderizado con JS --}}
             </div>
 
@@ -498,12 +498,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         <img src="${p.image_url}" class="w-100 h-100 object-fit-cover" alt="${escapeHtml(p.name)}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(p.name)}&background=f1f5f9'">
                     </div>
                     <div class="flex-fill min-w-0">
-                        <div class="fw-bold text-dark text-truncate" style="font-size: 0.78rem;" title="${escapeHtml(p.name)}">${escapeHtml(p.name)}</div>
-                        <div class="text-muted" style="font-size: 0.65rem;">Stock: ${p.stock > 0 ? p.stock + ' unidades' : '<span class=\"text-danger\">Agotado</span>'}</div>
+                        <div class="fw-bold text-dark product-mini-title" title="${escapeHtml(p.name)}">${escapeHtml(p.name)}</div>
+                        <div class="text-muted" style="font-size: 0.65rem;">Stock: ${p.stock > 0 ? p.stock + ' uds' : '<span class=\"text-danger\">Agotado</span>'}</div>
                     </div>
-                    <div class="text-end flex-shrink-0">
-                        <div class="fw-bold text-dark mb-1" style="font-size: 0.78rem;">${p.formatted_price}</div>
-                        <button type="button" class="btn btn-sm rounded-pill fw-bold btn-add-cart-mini" onclick="addToCartAjax(event, ${p.id}, '${p.add_cart_url}')" ${p.stock <= 0 ? 'disabled' : ''}>
+                    <div class="text-end flex-shrink-0 ms-1">
+                        <div class="fw-bold text-dark lh-1" style="font-size: 0.78rem; color: var(--sl-primary, #7F1D3F) !important;">${p.formatted_price}</div>
+                        ${p.original_mxn ? `<div class="text-muted" style="font-size: 0.62rem;">(${p.original_mxn})</div>` : ''}
+                        <button type="button" class="btn btn-sm rounded-pill fw-bold btn-add-cart-mini mt-1" onclick="addToCartAjax(event, ${p.id}, '${p.add_cart_url}')" ${p.stock <= 0 ? 'disabled' : ''}>
                             <i class="bi bi-cart-plus me-1"></i>+ Carrito
                         </button>
                     </div>

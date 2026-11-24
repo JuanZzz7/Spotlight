@@ -96,3 +96,4 @@ html[lang="en"] .lang-es { display: none !important; }
 .text-2xs { font-size: 0.72rem !important; }
 .text-xs  { font-size: 0.78rem !important; }
 .text-sm  { font-size: 0.875rem !important; }
+.min-w-0  { min-width: 0 !important; }

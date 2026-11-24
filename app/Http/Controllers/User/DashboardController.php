@@ -121,14 +121,19 @@ class DashboardController extends Controller
                     'reviews_count'    => $reviewsCount,
                     'products'         => $company->products->map(function ($product) {
                         $formattedPrice = $product->effective_currency === 'MXN'
-                            ? $product->formatted_price_cop . ' (🇲🇽 $' . number_format($product->price, 2, ',', '.') . ' MXN)'
+                            ? $product->formatted_price_cop
                             : '$' . number_format($product->price, 0, ',', '.') . ' COP';
+
+                        $originalMxn = $product->effective_currency === 'MXN'
+                            ? '$' . number_format($product->price, 0, ',', '.') . ' MXN'
+                            : null;
 
                         return [
                             'id'              => $product->id,
                             'name'            => $product->name,
                             'price'           => (float) $product->price,
                             'formatted_price' => $formattedPrice,
+                            'original_mxn'    => $originalMxn,
                             'image_url'       => $product->image_url,
                             'stock'           => $product->stock,
                             'add_cart_url'    => route('user.cart.add', $product->id),
