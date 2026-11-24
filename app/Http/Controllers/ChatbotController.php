@@ -24,28 +24,41 @@ class ChatbotController extends Controller
      */
     public function message(Request $request): JsonResponse
     {
-        $request->validate([
-            'message' => 'required|string|max:2000',
-            'lang'    => 'nullable|in:es,en',
-            'history' => 'nullable|array|max:20',
-        ]);
-
-        $userMessage = trim($request->input('message'));
-        $history     = $request->input('history', []);
-
-        // Determine language: use client-provided lang, or auto-detect
-        $lang = $request->input('lang');
-        if (!$lang) {
-            $lang = $this->chatbot->detectLanguage($userMessage);
+        $userMessage = trim((string) $request->input('message', ''));
+        if ($userMessage === '') {
+            return response()->json([
+                'reply'   => 'Por favor escribe tu pregunta o consulta.',
+                'lang'    => 'es',
+                'success' => true,
+            ]);
         }
 
-        $result = $this->chatbot->chat($userMessage, $lang, $history);
+        $userMessage = mb_substr($userMessage, 0, 2000);
+        $rawHistory  = $request->input('history', []);
+        $history     = is_array($rawHistory) ? array_slice($rawHistory, -12) : [];
 
-        return response()->json([
-            'reply'   => $result['reply'],
-            'lang'    => $result['lang'],
-            'success' => $result['success'] ?? true,
-        ]);
+        $rawLang = $request->input('lang');
+        $lang = in_array($rawLang, ['es', 'en'], true)
+            ? $rawLang
+            : $this->chatbot->detectLanguage($userMessage);
+
+        try {
+            $result = $this->chatbot->chat($userMessage, $lang, $history);
+            return response()->json([
+                'reply'   => $result['reply'] ?? 'Estoy listo para ayudarte. ¿Puedes reformular tu pregunta?',
+                'lang'    => $result['lang'] ?? $lang,
+                'success' => $result['success'] ?? true,
+            ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('ChatbotController error: ' . $e->getMessage());
+            return response()->json([
+                'reply'   => $lang === 'en'
+                    ? 'I encountered a temporary hiccup processing that. Could you ask me again?'
+                    : 'Tuve un inconveniente temporal al procesar la consulta. ¿Me la repites por favor?',
+                'lang'    => $lang,
+                'success' => false,
+            ]);
+        }
     }
 
     /**

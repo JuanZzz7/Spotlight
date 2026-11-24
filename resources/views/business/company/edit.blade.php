@@ -809,8 +809,8 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // ─── Spinner en botones al enviar ──────────────────────
-    document.querySelectorAll('form').forEach(function (form) {
+    // ─── Spinner en botones al enviar (excluyendo el widget de Spotlight IA) ──
+    document.querySelectorAll('.settings-panel form').forEach(function (form) {
         form.addEventListener('submit', function () {
             const btn = form.querySelector('button[type="submit"]');
             if (btn) {

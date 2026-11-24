@@ -226,8 +226,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/chat/api/{receiver}', [ChatController::class, 'getMessages'])->name('chat.messages');
 });
 
-// AI Chatbot Widget (available to registered consumers and businesses)
-Route::middleware(['auth', 'role:user,business'])->group(function () {
+// AI Chatbot Widget (available to all authenticated users)
+Route::middleware(['auth'])->group(function () {
     Route::get('/chatbot', [ChatbotController::class, 'index'])->name('chatbot.index');
     Route::post('/chatbot/message',     [ChatbotController::class, 'message'])->name('chatbot.message');
     Route::post('/chatbot/detect-lang', [ChatbotController::class, 'detectLang'])->name('chatbot.detect-lang');

@@ -271,13 +271,20 @@ document.addEventListener('DOMContentLoaded', function () {
             addMsg('bot', currentLang === 'en' ? "Connection error. Please try again." : "Hubo un error de conexión. Por favor intenta de nuevo.");
         } finally {
             busy = false;
-            if (sendBtn) sendBtn.disabled = false;
+            if (sendBtn) {
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = '<i class="bi bi-send-fill"></i>';
+            }
             if (input && window.innerWidth > 768) input.focus();
         }
     }
 
     form.addEventListener('submit', e => {
         e.preventDefault();
+        e.stopPropagation();
+        if (sendBtn) {
+            sendBtn.innerHTML = '<i class="bi bi-send-fill"></i>';
+        }
         const text = input.value.trim();
         sendMessage(text);
     });

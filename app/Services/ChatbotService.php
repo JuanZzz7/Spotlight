@@ -10,8 +10,9 @@ class ChatbotService
 {
     private string $apiKey;
     private array $geminiModels = [
-        'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent',
-        'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent',
+        'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent',
+        'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent',
+        'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent',
     ];
 
     public function __construct()
@@ -252,7 +253,7 @@ class ChatbotService
         $messages[] = ['role' => 'user', 'content' => $message];
 
         $payload = json_encode([
-            'model'       => 'openai',
+            'model'       => 'openai-fast',
             'messages'    => $messages,
             'temperature' => 0.7,
         ]);
