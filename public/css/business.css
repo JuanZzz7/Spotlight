@@ -105,6 +105,54 @@
     border-color: #e2e8f0;
 }
 
+/* Alineación armónica de campos en formularios de registro y empresa */
+#container-mexico .form-label,
+#container-colombia .form-label,
+.biz-uniform-label {
+    display: flex;
+    align-items: center;
+    min-height: 22px;
+    line-height: 1.25;
+}
+
+#container-mexico .row > [class*="col-"] > .form-label,
+#container-colombia .row > [class*="col-"] > .form-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#container-mexico .form-control:not(textarea):not([type="file"]),
+#container-mexico .form-select,
+#container-mexico .input-group > .form-control,
+#container-mexico .input-group > .input-group-text,
+#container-mexico .input-group > .btn,
+#container-colombia .form-control:not(textarea):not([type="file"]),
+#container-colombia .form-select,
+#container-colombia .input-group > .form-control,
+#container-colombia .input-group > .input-group-text,
+#container-colombia .input-group > .btn {
+    height: 40px !important;
+    min-height: 40px !important;
+    font-size: 0.84rem !important;
+}
+
+#container-mexico .input-group > .input-group-text,
+#container-colombia .input-group > .input-group-text {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+#container-mexico .input-group > .btn,
+#container-colombia .input-group > .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
 /* --------------------------------------------------------------------------
    2. Ajustes de Empresa (business/company/edit.blade.php)
    -------------------------------------------------------------------------- */

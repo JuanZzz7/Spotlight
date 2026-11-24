@@ -5,7 +5,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
-<link href="{{ asset('css/auth.css') }}" rel="stylesheet">
+<link href="{{ asset('css/auth.css') }}?v=2.9" rel="stylesheet">
 @endpush
 @section('content')
 <div class="min-vh-100 d-flex align-items-center justify-content-center position-relative py-5" style="background-color: var(--sl-bg); min-height: 100vh;">
@@ -266,7 +266,7 @@
 
 @push('scripts')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-<script src="{{ asset('js/colombia-geo.js') }}"></script>
+<script src="{{ asset('js/colombia-geo.js') }}?v=2.9"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {

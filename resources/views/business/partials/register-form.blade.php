@@ -85,13 +85,13 @@
             </button>
         </div>
 
-        <div class="d-flex align-items-center justify-content-between mb-2">
-            <small class="text-muted" style="font-size: 0.725rem;">
-                <i class="bi bi-info-circle me-1 text-primary"></i>Escribe la calle o arrastra el marcador rojo al punto exacto de tu local.
-            </small>
-            <span id="map-status-badge" class="badge bg-light text-muted border px-2 py-0.5" style="font-size: 0.7rem;">
-                <i class="bi bi-geo-fill me-1" style="color: #7F1D3F;"></i>Listo
-            </span>
+        <div class="map-helper-status-box rounded-3 p-2.5 mb-2 border" style="background: #f8fafc; border-color: #e2e8f0 !important;">
+            <div id="map-status-badge" class="fw-medium mb-1" style="font-size: 0.78rem; line-height: 1.4; white-space: normal; word-break: break-word;">
+                <span class="text-dark"><i class="bi bi-geo-fill me-1" style="color: #7F1D3F;"></i>Mapa listo para ubicar tu negocio</span>
+            </div>
+            <div class="text-muted" style="font-size: 0.72rem; line-height: 1.35;">
+                <i class="bi bi-info-circle me-1 text-primary"></i>Escribe la calle y pulsa <strong>"Ubicar"</strong>, o arrastra el marcador azul al punto exacto de tu local.
+            </div>
         </div>
 
         {{-- Mapa Interactivo de Ubicación --}}
@@ -341,28 +341,38 @@
 <div id="container-mexico" class="country-container animate-fade-in" style="{{ $selectedCountry === 'MX' ? 'display: block;' : 'display: none;' }}">
     
     <!-- Banner de Encabezado México (Puebla) -->
-    <div class="d-flex align-items-center justify-content-between p-3 rounded-3 mb-4" style="background: linear-gradient(135deg, rgba(127, 29, 63, 0.08), rgba(217, 140, 154, 0.15)); border: 1px solid rgba(127, 29, 63, 0.15);">
+    <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-2 p-3 rounded-3 mb-4" style="background: linear-gradient(135deg, rgba(127, 29, 63, 0.08), rgba(217, 140, 154, 0.15)); border: 1px solid rgba(127, 29, 63, 0.15);">
         <div class="d-flex align-items-center gap-3">
-            <div class="fs-2">🇲🇽</div>
+            <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0 shadow-xs" style="width: 42px; height: 42px; background: #ffffff; border: 1px solid rgba(127, 29, 63, 0.18);">
+                <svg xmlns="http://www.w3.org/2000/svg" width="26" height="18" viewBox="0 0 36 24" class="rounded-1">
+                    <rect width="12" height="24" x="0" fill="#006847"/>
+                    <rect width="12" height="24" x="12" fill="#ffffff"/>
+                    <rect width="12" height="24" x="24" fill="#ce1126"/>
+                    <circle cx="18" cy="12" r="2.8" fill="#8c6239"/>
+                </svg>
+            </div>
             <div>
-                <h6 class="fw-bold mb-0" style="color: #7F1D3F;">Emprendimiento en Puebla, México</h6>
-                <small class="text-muted">Registro exclusivo para emprendedores, artesanos y negocios de Puebla sin trámites colombianos ni RFC obligatorio.</small>
+                <h6 class="fw-bold mb-0.5" style="color: #7F1D3F; font-size: 0.94rem;">Emprendimiento en Puebla, México</h6>
+                <small class="text-muted d-block" style="font-size: 0.75rem; line-height: 1.35;">Registro exclusivo para emprendedores, artesanos y negocios de México sin trámites colombianos ni RFC obligatorio.</small>
             </div>
         </div>
-        <span class="badge rounded-pill px-3 py-1" style="background: #7F1D3F; color: #fff; font-size: 0.72rem;">Spotlight Puebla</span>
+        <span class="badge rounded-pill px-3 py-1.5 align-self-start align-self-sm-center flex-shrink-0" style="background: #7F1D3F; color: #fff; font-size: 0.72rem;">Spotlight Puebla</span>
     </div>
 
     <!-- 1. Datos Básicos del Emprendimiento -->
     <h6 class="fw-bold mb-3" style="color: #7F1D3F;"><i class="bi bi-shop me-1"></i> Información General del Emprendimiento</h6>
-    <div class="row g-3 mb-3">
-        <div class="col-md-7">
-            <label class="form-label text-sm fw-medium text-dark mb-1">Nombre Comercial o de la Marca <span class="text-danger">*</span></label>
-            <input type="text" name="nombre_comercial" id="mx_nombre_comercial" class="form-control text-sm" value="{{ old('nombre_comercial', $company->name ?? '') }}" placeholder="Ej. Talavera y Cerámica Tradicional de Puebla" required>
-            <small class="text-muted" style="font-size: 0.72rem;">Nombre visible con el que tus clientes te conocerán en el marketplace.</small>
+    <div class="row g-3 mb-3 align-items-start">
+        <div class="col-md-6">
+            <label class="form-label text-sm fw-semibold text-dark mb-1 biz-uniform-label">Nombre Comercial o Marca <span class="text-danger">*</span></label>
+            <div class="input-group">
+                <span class="input-group-text bg-light text-muted border-end-0"><i class="bi bi-shop"></i></span>
+                <input type="text" name="nombre_comercial" id="mx_nombre_comercial" class="form-control form-control-sm border-start-0 text-sm" value="{{ old('nombre_comercial', $company->name ?? '') }}" placeholder="Ej. Creta Accesorios, Talavera Puebla" required>
+            </div>
+            <small class="text-muted d-block mt-1" style="font-size: 0.72rem;">Nombre visible para tus clientes en el marketplace.</small>
         </div>
-        <div class="col-md-5">
-            <label class="form-label text-sm fw-medium text-dark mb-1">Categoría del Emprendimiento <span class="text-danger">*</span></label>
-            <select name="category" id="mx_category" class="form-select text-sm" required>
+        <div class="col-md-6">
+            <label class="form-label text-sm fw-semibold text-dark mb-1 biz-uniform-label">Categoría del Negocio <span class="text-danger">*</span></label>
+            <select name="category" id="mx_category" class="form-select form-select-sm text-sm" required>
                 <option value="">Selecciona una categoría...</option>
                 @php
                     $categories = [
@@ -383,22 +393,23 @@
                     <option value="{{ $cat }}" {{ $currentCat === $cat ? 'selected' : '' }}>{{ $cat }}</option>
                 @endforeach
             </select>
+            <small class="text-muted d-block mt-1" style="font-size: 0.72rem;">Sector principal donde se exhibirán tus productos.</small>
         </div>
     </div>
 
     <!-- 2. Responsable y Contacto -->
     <h6 class="fw-bold mb-3 mt-4" style="color: #7F1D3F;"><i class="bi bi-person-badge me-1"></i> Responsable y Medios de Contacto</h6>
-    <div class="row g-3 mb-3">
+    <div class="row g-3 mb-3 align-items-start">
         <div class="col-md-6">
-            <label class="form-label text-sm fw-medium text-dark mb-1">Nombre del Responsable</label>
+            <label class="form-label text-sm fw-semibold text-dark mb-1 biz-uniform-label">Nombre del Responsable</label>
             <div class="input-group">
                 <span class="input-group-text bg-light text-muted border-end-0"><i class="bi bi-person"></i></span>
                 <input type="text" name="nombre_representante" id="mx_nombre_representante" class="form-control form-control-sm border-start-0 text-sm" value="{{ old('nombre_representante', $company->nombre_representante ?? '') }}" placeholder="Ej. Valentina Ramos Flores" pattern="^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\.\'\-]+$" oninput="this.value = this.value.replace(/[0-9]/g, '').replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\.\'\-]/g, '')">
             </div>
-            <small class="text-muted" style="font-size: 0.72rem;">Solo letras y espacios (sin números)</small>
+            <small class="text-muted d-block mt-1" style="font-size: 0.72rem;">Solo letras y espacios (sin números).</small>
         </div>
         <div class="col-md-6">
-            <label class="form-label text-sm fw-semibold text-dark mb-1">
+            <label class="form-label text-sm fw-semibold text-dark mb-1 biz-uniform-label">
                 Fecha de Nacimiento
             </label>
             <div class="input-group">
@@ -410,28 +421,28 @@
             </small>
         </div>
     </div>
-    <div class="row g-3 mb-4">
+    <div class="row g-3 mb-4 align-items-start">
         <div class="col-md-6">
-            <label class="form-label text-sm fw-medium text-dark mb-1">Correo Electrónico de Atención</label>
+            <label class="form-label text-sm fw-semibold text-dark mb-1 biz-uniform-label">Correo Electrónico de Atención</label>
             <div class="input-group">
                 <span class="input-group-text bg-light text-muted border-end-0"><i class="bi bi-envelope"></i></span>
                 <input type="email" name="email_representante" id="mx_email_representante" class="form-control form-control-sm border-start-0 text-sm" value="{{ old('email_representante', $company->email ?? '') }}" placeholder="contacto@mitienda.mx">
             </div>
-            <small class="text-muted" style="font-size: 0.72rem;">Para notificaciones y contacto directo.</small>
+            <small class="text-muted d-block mt-1" style="font-size: 0.72rem;">Para notificaciones y contacto directo.</small>
         </div>
         <div class="col-md-6">
-            <label class="form-label text-sm fw-medium text-dark mb-1">Teléfono Móvil o WhatsApp (+52)</label>
+            <label class="form-label text-sm fw-semibold text-dark mb-1 biz-uniform-label">Teléfono Móvil o WhatsApp (+52)</label>
             <div class="input-group">
                 <span class="input-group-text bg-light text-sm fw-bold border-end-0"><i class="bi bi-whatsapp text-success me-1"></i> +52</span>
                 <input type="tel" name="phone" id="mx_phone" class="form-control form-control-sm border-start-0 text-sm" value="{{ old('phone', $company->phone ?? '') }}" placeholder="222 123 4567">
             </div>
-            <small class="text-muted" style="font-size: 0.72rem;">Clave Lada de Puebla (222) o tu número de WhatsApp.</small>
+            <small class="text-muted d-block mt-1" style="font-size: 0.72rem;">Clave Lada de Puebla (222) o tu número de WhatsApp.</small>
         </div>
     </div>
 
     <!-- 3. Ubicación Local en México (Puebla u otros Estados) -->
     <div class="mb-4">
-        <label class="form-label text-sm fw-semibold text-dark mb-2 d-flex align-items-center justify-content-between">
+        <label class="form-label text-sm fw-semibold text-dark mb-2 d-flex align-items-center justify-content-between flex-wrap gap-1">
             <span><i class="bi bi-geo-alt-fill text-danger me-1"></i> Ubicación Física del Emprendimiento (México) <span class="text-danger">*</span></span>
             <span class="badge bg-light text-primary border rounded-pill px-2.5 py-0.5 text-2xs fw-semibold">
                 Puebla o cualquier Estado
@@ -439,15 +450,15 @@
         </label>
 
         {{-- Selector de Estado y Municipio para México --}}
-        <div class="row g-2 mb-2">
+        <div class="row g-2 mb-2 align-items-start">
             <div class="col-md-6">
-                <label class="form-label text-2xs fw-bold text-dark mb-1">Estado en México <span class="text-danger">*</span></label>
+                <label class="form-label text-2xs fw-bold text-dark mb-1 biz-uniform-label">Estado en México <span class="text-danger">*</span></label>
                 <select name="state" id="mx_state" class="form-select form-select-sm fw-semibold">
                     {{-- Dinámico con colombia-geo.js (Puebla por defecto) --}}
                 </select>
             </div>
             <div class="col-md-6">
-                <label class="form-label text-2xs fw-bold text-dark mb-1">Municipio / Alcaldía <span class="text-danger">*</span></label>
+                <label class="form-label text-2xs fw-bold text-dark mb-1 biz-uniform-label">Municipio / Alcaldía <span class="text-danger">*</span></label>
                 <select name="city" id="mx_city" class="form-select form-select-sm fw-semibold">
                     {{-- Dinámico con colombia-geo.js --}}
                 </select>
@@ -455,32 +466,32 @@
         </div>
 
         {{-- Dirección con buscador acotado y Código Postal --}}
-        <div class="row g-2 mb-2">
+        <div class="row g-2 mb-2 align-items-start">
             <div class="col-md-8">
-                <label class="form-label text-2xs fw-bold text-dark mb-1">Dirección o Calle <span class="text-danger">*</span></label>
+                <label class="form-label text-2xs fw-bold text-dark mb-1 biz-uniform-label">Dirección o Calle <span class="text-danger">*</span></label>
                 <div class="input-group">
                     <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-signpost"></i></span>
                     <input type="text" name="address" id="mx_address" class="form-control form-control-sm border-start-0 text-sm"
-                           value="{{ old('address', $company->address ?? '') }}" placeholder="Ej. Av. Juan de Palafox y Mendoza #204, Centro Histórico" required autocomplete="off">
+                           value="{{ old('address', $company->address ?? '') }}" placeholder="Ej. Trópico 3 Int 104, Av. Palafox #204" required autocomplete="off">
                     <button type="button" class="btn btn-sm btn-primary px-3 fw-semibold shadow-2xs" id="btn_search_mx_map">
                         <i class="bi bi-search me-1"></i> Ubicar
                     </button>
                 </div>
             </div>
             <div class="col-md-4">
-                <label class="form-label text-2xs fw-bold text-dark mb-1">Código Postal (C.P.)</label>
+                <label class="form-label text-2xs fw-bold text-dark mb-1 biz-uniform-label">Código Postal (C.P.)</label>
                 <input type="text" name="postal_code" id="mx_postal_code" class="form-control form-control-sm text-sm"
-                       value="{{ old('postal_code', $company->postal_code ?? '') }}" placeholder="Ej. 72000" maxlength="10">
+                       value="{{ old('postal_code', $company->postal_code ?? '') }}" placeholder="Ej. 72640" maxlength="10" inputmode="numeric">
             </div>
         </div>
 
-        <div class="d-flex align-items-center justify-content-between mb-2">
-            <small class="text-muted" style="font-size: 0.725rem;">
-                <i class="bi bi-info-circle me-1 text-primary"></i>Ubicado en Puebla por defecto. Puedes cambiar a cualquier estado y mover el pin al punto exacto.
-            </small>
-            <span id="mx-map-status-badge" class="badge bg-light text-muted border px-2 py-0.5" style="font-size: 0.7rem;">
-                <i class="bi bi-geo-fill me-1" style="color: #7F1D3F;"></i>Listo
-            </span>
+        <div class="map-helper-status-box rounded-3 p-2.5 mb-2 border" style="background: #f8fafc; border-color: #e2e8f0 !important;">
+            <div id="mx-map-status-badge" class="fw-medium mb-1" style="font-size: 0.78rem; line-height: 1.4; white-space: normal; word-break: break-word;">
+                <span class="text-dark"><i class="bi bi-geo-fill me-1" style="color: #7F1D3F;"></i>Ubicado en Puebla por defecto</span>
+            </div>
+            <div class="text-muted" style="font-size: 0.72rem; line-height: 1.35;">
+                <i class="bi bi-info-circle me-1 text-primary"></i>Selecciona tu municipio, escribe tu calle y C.P. y pulsa <strong>"Ubicar"</strong>, o arrastra el pin azul al punto exacto.
+            </div>
         </div>
 
         {{-- Mapa Interactivo para México --}}
@@ -558,7 +569,7 @@
 
 @once
 @push('styles')
-<link href="{{ asset('css/business.css') }}" rel="stylesheet">
+<link href="{{ asset('css/business.css') }}?v=2.9" rel="stylesheet">
 @endpush
 @endonce
 
@@ -662,6 +673,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     stateSelectId: 'mx_state',
                     citySelectId: 'mx_city',
                     addressInputId: 'mx_address',
+                    postalCodeInputId: 'mx_postal_code',
                     latInputId: 'mx_lat',
                     lngInputId: 'mx_lng',
                     searchBtnId: 'btn_search_mx_map',

@@ -333,19 +333,34 @@ window.SPOTLIGHT_GEO_DATA = {
                 zoom: 12,
                 cities: {
                     'Puebla': [19.0414, -98.2063],
-                    'Tehuacán': [18.4633, -97.3933],
+                    'Juan C. Bonilla': [19.1069, -98.3347],
                     'San Andrés Cholula': [19.0558, -98.3000],
                     'San Pedro Cholula': [19.0628, -98.3075],
+                    'Cuautlancingo': [19.0911, -98.2778],
+                    'Coronango': [19.1231, -98.3069],
+                    'Huejotzingo': [19.1586, -98.4069],
                     'Atlixco': [18.9083, -98.4333],
                     'San Martín Texmelucan': [19.2842, -98.4347],
+                    'Amozoc': [19.0400, -98.0500],
+                    'San Gregorio Atzompa': [19.0233, -98.3475],
+                    'Ocoyucan': [18.9750, -98.3000],
+                    'Calpan': [19.1044, -98.4619],
+                    'Tlaltenango': [19.1714, -98.3419],
+                    'San Miguel Xoxtla': [19.1711, -98.3056],
+                    'Tehuacán': [18.4633, -97.3933],
                     'Teziutlán': [19.8167, -97.3667],
                     'Huauchinango': [20.1772, -98.0528],
                     'Zacatlán': [19.9328, -97.9608],
                     'Chignahuapan': [19.8378, -98.0322],
-                    'Amozoc': [19.0400, -98.0500],
-                    'Cuautlancingo': [19.0911, -98.2778],
                     'Izúcar de Matamoros': [18.6014, -98.4633],
                     'Tepeaca': [18.9667, -97.9000],
+                    'Tecamachalco': [18.8833, -97.7333],
+                    'Acatzingo': [18.9811, -97.7817],
+                    'Acajete': [19.1050, -97.9511],
+                    'Ciudad Serdán': [18.9889, -97.4467],
+                    'Cuetzalan del Progreso': [20.0181, -97.5228],
+                    'Zacapoaxtla': [19.8736, -97.5875],
+                    'Tlatlauquitepec': [19.8511, -97.4956],
                     'Xicotepec': [20.2764, -97.9575]
                 }
             },
@@ -684,6 +699,7 @@ window.initSpotlightPreciseLocation = function(cfg) {
     const stateSelect = document.getElementById(cfg.stateSelectId);
     const citySelect = document.getElementById(cfg.citySelectId);
     const addressInput = document.getElementById(cfg.addressInputId);
+    const postalCodeInput = cfg.postalCodeInputId ? document.getElementById(cfg.postalCodeInputId) : null;
     const latInput = document.getElementById(cfg.latInputId);
     const lngInput = document.getElementById(cfg.lngInputId);
     const searchBtn = document.getElementById(cfg.searchBtnId);
@@ -788,9 +804,9 @@ window.initSpotlightPreciseLocation = function(cfg) {
     updateFormCoords(initLat, initLng);
 
     // 4. Geocodificación Inversa (Reverse Geocoding)
-    function reverseGeocode(lat, lng) {
+    function reverseGeocode(lat, lng, preserveUserAddress = false) {
         if (statusDisplay) {
-            statusDisplay.innerHTML = '<span class="text-muted"><i class="bi bi-arrow-repeat spin-me"></i> Detectando dirección en el mapa...</span>';
+            statusDisplay.innerHTML = '<span class="text-muted"><i class="bi bi-arrow-repeat spin-me me-1"></i> Detectando dirección exacta en el mapa...</span>';
         }
         const lang = country === 'MX' ? 'es-MX' : 'es-CO';
         fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=${lang}`)
@@ -801,25 +817,33 @@ window.initSpotlightPreciseLocation = function(cfg) {
                     let cleanStreet = '';
                     if (a.road) cleanStreet += a.road;
                     if (a.house_number) cleanStreet += ' #' + a.house_number;
-                    if (a.neighbourhood || a.suburb) cleanStreet += (cleanStreet ? ', ' : '') + (a.neighbourhood || a.suburb);
+                    if (a.neighbourhood || a.suburb || a.residential) {
+                        cleanStreet += (cleanStreet ? ', ' : '') + (a.neighbourhood || a.suburb || a.residential);
+                    }
 
-                    const detectedCity = a.town || a.city || a.municipality || a.village || currentCity;
+                    const detectedCity = a.town || a.city || a.municipality || a.village || a.county || currentCity;
                     const detectedState = a.state || currentState;
 
-                    let finalLabel = cleanStreet ? `${cleanStreet}, ${detectedCity}` : (data.display_name ? data.display_name.split(',').slice(0, 3).join(', ') : `${lat.toFixed(4)}, ${lng.toFixed(4)}`);
+                    if (postalCodeInput && a.postcode && !postalCodeInput.value.trim()) {
+                        postalCodeInput.value = a.postcode;
+                    }
+
+                    let finalLabel = cleanStreet
+                        ? `${cleanStreet}, ${detectedCity}`
+                        : (data.display_name ? data.display_name.split(',').slice(0, 3).join(', ') : `${lat.toFixed(5)}, ${lng.toFixed(5)}`);
 
                     if (statusDisplay) {
-                        statusDisplay.innerHTML = `<i class="bi bi-geo-alt-fill text-danger me-1"></i><strong>${finalLabel}</strong> <span class="text-muted d-block text-2xs mt-0.5">${detectedCity}, ${detectedState}</span>`;
+                        statusDisplay.innerHTML = `<span class="text-success"><i class="bi bi-geo-alt-fill text-danger me-1"></i><strong>Ubicación fijada:</strong> ${finalLabel} (${detectedState})</span>`;
                     }
-                    if (addressInput) {
+                    if (addressInput && (!preserveUserAddress || !addressInput.value.trim())) {
                         addressInput.value = cleanStreet || finalLabel;
                     }
                 } else {
                     const fallbackLabel = `${currentCity}, ${currentState} (${lat.toFixed(5)}, ${lng.toFixed(5)})`;
                     if (statusDisplay) {
-                        statusDisplay.innerHTML = `<i class="bi bi-geo-alt-fill text-danger me-1"></i><strong>${fallbackLabel}</strong>`;
+                        statusDisplay.innerHTML = `<span class="text-dark"><i class="bi bi-geo-alt-fill text-danger me-1"></i><strong>Coordenadas fijadas:</strong> ${fallbackLabel}</span>`;
                     }
-                    if (addressInput) {
+                    if (addressInput && !addressInput.value.trim()) {
                         addressInput.value = `${currentCity}, ${currentState}`;
                     }
                 }
@@ -827,84 +851,172 @@ window.initSpotlightPreciseLocation = function(cfg) {
             .catch(() => {
                 const fallbackLabel = `${currentCity}, ${currentState} (${lat.toFixed(5)}, ${lng.toFixed(5)})`;
                 if (statusDisplay) {
-                    statusDisplay.innerHTML = `<i class="bi bi-geo-alt-fill text-danger me-1"></i><strong>${fallbackLabel}</strong>`;
-                }
-                if (addressInput) {
-                    addressInput.value = `${currentCity}, ${currentState}`;
+                    statusDisplay.innerHTML = `<span class="text-dark"><i class="bi bi-geo-alt-fill text-danger me-1"></i><strong>Coordenadas fijadas:</strong> ${fallbackLabel}</span>`;
                 }
             });
     }
 
-    // 5. Búsqueda Directa Acotada por Ciudad y Departamento
-    function searchAddress() {
-        const query = (addressInput?.value || '').trim();
+    // Auxiliares para normalizar municipios y direcciones (especialmente México y Colombia)
+    function normalizeMunicipality(mun, dept) {
+        if (!mun) return '';
+        let cleaned = mun.trim();
+        if (dept) {
+            const escapedDept = dept.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const trailingDeptRegex = new RegExp(`[\\s,]+${escapedDept}$`, 'i');
+            cleaned = cleaned.replace(trailingDeptRegex, '').trim();
+        }
+        return cleaned || mun.trim();
+    }
+
+    function findKnownCityCoords(dept, mun) {
+        const deptObj = geo.departments[dept];
+        if (!deptObj || !deptObj.cities) return null;
+        if (deptObj.cities[mun]) return deptObj.cities[mun];
+
+        const cleanMun = normalizeMunicipality(mun, dept).toLowerCase();
+        for (const [cityName, coords] of Object.entries(deptObj.cities)) {
+            if (cityName.toLowerCase() === cleanMun) {
+                return coords;
+            }
+        }
+        return null;
+    }
+
+    function stripInteriorDetails(rawAddress) {
+        if (!rawAddress) return '';
+        return rawAddress
+            .replace(/\b(?:int(?:erior)?|depto|departamento|apt(?:o)?|local|loc|piso|nivel|edif(?:icio)?|torre|mz|manzana|lt|lote|casa|bodega|oficina|of)\.?\s*[a-z0-9\-]+/gi, ' ')
+            .replace(/\b(?:no\.?|núm\.?|num\.?)\s*(\d+)/gi, '$1')
+            .replace(/#(\d+)/g, ' $1')
+            .replace(/\s{2,}/g, ' ')
+            .replace(/[,\s]+$/g, '')
+            .trim();
+    }
+
+    function stripHouseNumber(streetAddress) {
+        if (!streetAddress) return '';
+        return streetAddress
+            .replace(/\s+\d+[a-z\-]*$/i, '')
+            .trim();
+    }
+
+    async function queryNominatim(qStr, countryCode, extraParams = '') {
+        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(qStr)}&countrycodes=${countryCode}&accept-language=es&limit=5${extraParams}`;
+        const res = await fetch(url);
+        if (!res.ok) return [];
+        const data = await res.json();
+        return Array.isArray(data) ? data : [];
+    }
+
+    // 5. Búsqueda Directa Inteligente en Cascada (Dirección + C.P. + Municipio + Estado)
+    async function searchAddress() {
+        const rawQuery = (addressInput?.value || '').trim();
+        const postalCode = (postalCodeInput?.value || '').trim();
         const selectedDept = stateSelect ? stateSelect.value : currentState;
-        const selectedMun = citySelect ? citySelect.value : currentCity;
+        const rawMun = citySelect ? citySelect.value : currentCity;
+        const cleanMun = normalizeMunicipality(rawMun, selectedDept);
 
         if (statusDisplay) {
-            statusDisplay.innerHTML = '<span class="text-primary"><i class="bi bi-search spin-me me-1"></i> Buscando en ' + selectedMun + '...</span>';
+            statusDisplay.innerHTML = `<span class="text-primary"><i class="bi bi-search spin-me me-1"></i> Buscando ubicación en <strong>${cleanMun}, ${selectedDept}</strong>...</span>`;
         }
 
-        // Construir consulta contextual obligando el país y ciudad
         const countryName = country === 'MX' ? 'México' : 'Colombia';
         const countryCode = country.toLowerCase();
-        
-        let fullQuery = '';
-        if (query.length > 0) {
-            fullQuery = `${query}, ${selectedMun}, ${selectedDept}, ${countryName}`;
-        } else {
-            fullQuery = `${selectedMun}, ${selectedDept}, ${countryName}`;
+        const cleanStreet = stripInteriorDetails(rawQuery);
+        const streetOnly = stripHouseNumber(cleanStreet);
+
+        // Construir cola de intentos desde el más específico al más general
+        const attempts = [];
+
+        if (cleanStreet.length > 0) {
+            if (postalCode.length >= 4) {
+                attempts.push({ q: `${cleanStreet}, ${postalCode}, ${cleanMun}, ${selectedDept}, ${countryName}`, exact: true, zoom: 17 });
+            }
+            attempts.push({ q: `${cleanStreet}, ${cleanMun}, ${selectedDept}, ${countryName}`, exact: true, zoom: 17 });
+
+            if (rawQuery !== cleanStreet) {
+                attempts.push({ q: `${rawQuery}, ${cleanMun}, ${selectedDept}, ${countryName}`, exact: true, zoom: 17 });
+            }
+            if (postalCode.length >= 4) {
+                attempts.push({ q: `${cleanStreet}, ${postalCode}, ${selectedDept}, ${countryName}`, exact: true, zoom: 17 });
+            }
+            if (streetOnly.length >= 3 && streetOnly !== cleanStreet) {
+                attempts.push({ q: `${streetOnly}, ${cleanMun}, ${selectedDept}, ${countryName}`, exact: true, zoom: 16 });
+                if (postalCode.length >= 4) {
+                    attempts.push({ q: `${streetOnly}, ${postalCode}, ${selectedDept}, ${countryName}`, exact: true, zoom: 16 });
+                }
+            }
         }
 
-        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fullQuery)}&countrycodes=${countryCode}&accept-language=es&limit=5`)
-            .then(r => r.json())
-            .then(results => {
+        if (postalCode.length >= 4) {
+            attempts.push({ q: `${postalCode}, ${cleanMun}, ${selectedDept}, ${countryName}`, exact: false, label: `Código Postal ${postalCode} (${cleanMun})`, zoom: 15 });
+            attempts.push({ q: `${postalCode}, ${selectedDept}, ${countryName}`, exact: false, label: `Código Postal ${postalCode}`, zoom: 15 });
+        }
+
+        attempts.push({ q: `${cleanMun}, ${selectedDept}, ${countryName}`, exact: false, label: cleanMun, zoom: 15 });
+
+        try {
+            for (const attempt of attempts) {
+                const results = await queryNominatim(attempt.q, countryCode);
                 if (results && results.length > 0) {
                     const top = results[0];
                     const lat = parseFloat(top.lat);
                     const lon = parseFloat(top.lon);
 
                     marker.setLatLng([lat, lon]);
-                    map.flyTo([lat, lon], 17, { duration: 1.2 });
+                    map.flyTo([lat, lon], attempt.zoom || 16, { duration: 1.1 });
                     updateFormCoords(lat, lon);
 
+                    const shortDisplay = top.display_name ? top.display_name.split(',').slice(0, 3).join(', ') : `${cleanMun}, ${selectedDept}`;
+
                     if (statusDisplay) {
-                        statusDisplay.innerHTML = `<span class="text-success"><i class="bi bi-check-circle-fill me-1"></i> <strong>Ubicación detectada:</strong> ${top.display_name.split(',').slice(0, 3).join(', ')}</span>`;
-                    }
-                } else {
-                    // Intento de fallback más amplio (solo el municipio / ciudad)
-                    const fallbackCoords = geo.departments[selectedDept]?.cities[selectedMun] || geo.departments[selectedDept]?.center;
-                    if (fallbackCoords) {
-                        marker.setLatLng(fallbackCoords);
-                        map.flyTo(fallbackCoords, 15, { duration: 1.0 });
-                        updateFormCoords(fallbackCoords[0], fallbackCoords[1]);
-                        if (statusDisplay) {
-                            statusDisplay.innerHTML = `<span class="text-warning"><i class="bi bi-exclamation-triangle-fill me-1"></i> No se encontró el número exacto, te ubicamos en el centro de <strong>${selectedMun}</strong>. Arrastra el punto en el mapa a tu local.</span>`;
+                        if (attempt.exact) {
+                            statusDisplay.innerHTML = `<span class="text-success"><i class="bi bi-check-circle-fill me-1"></i><strong>Ubicación encontrada:</strong> ${shortDisplay}. Puedes arrastrar el pin azul para mayor precisión.</span>`;
+                        } else if (rawQuery.length > 0) {
+                            statusDisplay.innerHTML = `<span class="text-dark"><i class="bi bi-geo-alt-fill me-1" style="color:#7F1D3F;"></i><strong>Ubicado en ${attempt.label || cleanMun}:</strong> (${shortDisplay}). Arrastra el pin azul al punto exacto de tu calle.</span>`;
+                        } else {
+                            statusDisplay.innerHTML = `<span class="text-success"><i class="bi bi-check-circle-fill me-1"></i><strong>Zona ubicada:</strong> ${shortDisplay}</span>`;
                         }
-                    } else if (statusDisplay) {
-                        statusDisplay.innerHTML = '<span class="text-danger"><i class="bi bi-x-circle me-1"></i> No se encontró la dirección. Haz clic en el mapa para ubicarla manualmente.</span>';
                     }
+                    return;
                 }
-            })
-            .catch(err => {
-                console.error('Error buscando dirección:', err);
+            }
+
+            // Fallback a coordenadas conocidas del catálogo si Nominatim no respondió
+            const fallbackCoords = findKnownCityCoords(selectedDept, rawMun) || geo.departments[selectedDept]?.center;
+            if (fallbackCoords) {
+                marker.setLatLng(fallbackCoords);
+                map.flyTo(fallbackCoords, 15, { duration: 1.0 });
+                updateFormCoords(fallbackCoords[0], fallbackCoords[1]);
                 if (statusDisplay) {
-                    statusDisplay.innerHTML = '<span class="text-danger">Error de conexión al buscar. Por favor ubica tu local haciendo clic en el mapa.</span>';
+                    statusDisplay.innerHTML = `<span class="text-dark"><i class="bi bi-geo-alt-fill me-1" style="color:#7F1D3F;"></i>Mapa centrado en <strong>${cleanMun}</strong>. Arrastra el marcador azul en el mapa hasta tu ubicación exacta.</span>`;
                 }
-            });
+            }
+        } catch (err) {
+            console.error('Error buscando dirección:', err);
+            const fallbackCoords = findKnownCityCoords(selectedDept, rawMun) || geo.departments[selectedDept]?.center;
+            if (fallbackCoords) {
+                marker.setLatLng(fallbackCoords);
+                map.flyTo(fallbackCoords, 14, { duration: 1.0 });
+                updateFormCoords(fallbackCoords[0], fallbackCoords[1]);
+            }
+            if (statusDisplay) {
+                statusDisplay.innerHTML = '<span class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>No se pudo conectar al buscador. Ubica tu local arrastrando el pin azul en el mapa.</span>';
+            }
+        }
     }
 
     // 6. Eventos de interacción en Mapa y Marcador (Punto Azul)
     map.on('click', function(e) {
         marker.setLatLng(e.latlng);
         updateFormCoords(e.latlng.lat, e.latlng.lng);
-        reverseGeocode(e.latlng.lat, e.latlng.lng);
+        reverseGeocode(e.latlng.lat, e.latlng.lng, true);
     });
 
     marker.on('dragend', function() {
         const pos = marker.getLatLng();
         updateFormCoords(pos.lat, pos.lng);
-        reverseGeocode(pos.lat, pos.lng);
+        reverseGeocode(pos.lat, pos.lng, true);
     });
 
     // 7. Eventos de los Selectores de Departamento y Ciudad
@@ -923,9 +1035,9 @@ window.initSpotlightPreciseLocation = function(cfg) {
 
     citySelect?.addEventListener('change', function() {
         if (this.value === '_other_') {
-            const customCity = prompt('Escribe el nombre del municipio o ciudad:');
+            const customCity = prompt('Escribe el nombre del municipio o alcaldía:');
             if (customCity && customCity.trim()) {
-                const clean = customCity.trim();
+                const clean = normalizeMunicipality(customCity.trim(), currentState);
                 const opt = document.createElement('option');
                 opt.value = clean;
                 opt.textContent = clean;
@@ -940,15 +1052,27 @@ window.initSpotlightPreciseLocation = function(cfg) {
         }
 
         currentCity = this.value;
-        const deptObj = geo.departments[currentState];
-        const cityCoords = deptObj?.cities[currentCity];
+        const cityCoords = findKnownCityCoords(currentState, currentCity);
 
-        if (cityCoords) {
+        if (cityCoords && !(addressInput && addressInput.value.trim().length >= 4)) {
             marker.setLatLng(cityCoords);
             map.flyTo(cityCoords, 15, { duration: 1.0 });
             updateFormCoords(cityCoords[0], cityCoords[1]);
-            reverseGeocode(cityCoords[0], cityCoords[1]);
+            reverseGeocode(cityCoords[0], cityCoords[1], true);
         } else {
+            searchAddress();
+        }
+    });
+
+    // Evento en Código Postal para centrar o refinar búsqueda automáticamente
+    postalCodeInput?.addEventListener('change', function() {
+        if (this.value.trim().length >= 4) {
+            searchAddress();
+        }
+    });
+    postalCodeInput?.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
             searchAddress();
         }
     });
