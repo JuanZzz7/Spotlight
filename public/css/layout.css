@@ -4,17 +4,32 @@
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
-   Sidebar (Menú Lateral en Carbón Oscuro)
+   Sidebar (Menú Lateral en Carbón Oscuro — Estático / Fijo en Pantalla)
    -------------------------------------------------------------------------- */
 .vs-sidebar {
-    background-color: var(--sl-navy);
-    border-right: 1px solid rgba(255, 255, 255, 0.08);
-    min-height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100dvh;
     width: 270px;
     min-width: 270px;
+    background-color: var(--sl-navy);
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
     transition: left 0.25s ease;
     z-index: 1045;
     color: var(--sl-text-on-dark);
+    overflow: hidden;
+}
+
+.vs-sidebar-nav-scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }
 
 .vs-sidebar-dark {
@@ -22,12 +37,16 @@
     border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
 
+@media (min-width: 992px) {
+    .vs-sidebar ~ .vs-main-content {
+        margin-left: 270px;
+        width: calc(100% - 270px);
+    }
+}
+
 @media (max-width: 991.98px) {
     .vs-sidebar {
-        position: fixed;
         left: -270px;
-        top: 0;
-        bottom: 0;
     }
     .vs-sidebar.show {
         left: 0;

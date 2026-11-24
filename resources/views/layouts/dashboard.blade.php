@@ -56,11 +56,11 @@
             </div>
         </div>
 
-        <nav class="flex-fill p-3 d-flex flex-column gap-1">
+        <nav class="flex-fill p-3 d-flex flex-column gap-1 vs-sidebar-nav-scroll">
             @include('partials.sidebar')
         </nav>
 
-        <div class="p-4 border-top vs-sidebar-header">
+        <div class="p-4 border-top vs-sidebar-header flex-shrink-0">
             <form action="{{ route('logout') }}" method="POST">
                 @csrf
                 <button class="btn btn-sm w-100 d-flex justify-content-center align-items-center gap-2 text-white border-0 vs-sidebar-logout-btn">
