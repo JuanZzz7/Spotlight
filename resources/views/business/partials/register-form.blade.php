@@ -52,12 +52,14 @@
 
     <!-- Campos Comunes: Ubicación Geográfica Precisa -->
     <div class="mb-4">
-        <label class="form-label text-sm fw-semibold text-dark mb-2 d-flex align-items-center justify-content-between">
-            <span><i class="bi bi-geo-alt-fill text-danger me-1"></i> Ubicación Física del Negocio <span class="text-danger">*</span></span>
-            <span class="badge bg-light text-primary border rounded-pill px-2.5 py-0.5 text-2xs fw-semibold">
-                Selecciona tu ciudad
-            </span>
-        </label>
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+            <label class="form-label text-sm fw-semibold text-dark mb-0">
+                <i class="bi bi-geo-alt-fill text-danger me-1"></i> Ubicación Física del Negocio <span class="text-danger">*</span>
+            </label>
+            <button type="button" id="btn_gps_reg_map" class="btn btn-sm rounded-pill px-3 py-1 fw-bold d-inline-flex align-items-center gap-1 shadow-2xs" style="background-color: #F6E7EB; color: #7F1D3F; border: 1px solid rgba(127, 29, 63, 0.25); font-size: 0.74rem;">
+                <i class="bi bi-crosshair"></i> Usar mi GPS actual
+            </button>
+        </div>
 
         {{-- Selector de Departamento y Ciudad --}}
         <div class="row g-2 mb-2">
@@ -442,12 +444,14 @@
 
     <!-- 3. Ubicación Local en México (Puebla u otros Estados) -->
     <div class="mb-4">
-        <label class="form-label text-sm fw-semibold text-dark mb-2 d-flex align-items-center justify-content-between flex-wrap gap-1">
-            <span><i class="bi bi-geo-alt-fill text-danger me-1"></i> Ubicación Física del Emprendimiento (México) <span class="text-danger">*</span></span>
-            <span class="badge bg-light text-primary border rounded-pill px-2.5 py-0.5 text-2xs fw-semibold">
-                Puebla o cualquier Estado
-            </span>
-        </label>
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+            <label class="form-label text-sm fw-semibold text-dark mb-0">
+                <i class="bi bi-geo-alt-fill text-danger me-1"></i> Ubicación Física del Emprendimiento (México) <span class="text-danger">*</span>
+            </label>
+            <button type="button" id="btn_gps_mx_map" class="btn btn-sm rounded-pill px-3 py-1 fw-bold d-inline-flex align-items-center gap-1 shadow-2xs" style="background-color: #F6E7EB; color: #7F1D3F; border: 1px solid rgba(127, 29, 63, 0.25); font-size: 0.74rem;">
+                <i class="bi bi-crosshair"></i> Usar mi GPS actual
+            </button>
+        </div>
 
         {{-- Selector de Estado y Municipio para México --}}
         <div class="row g-2 mb-2 align-items-start">
@@ -569,7 +573,7 @@
 
 @once
 @push('styles')
-<link href="{{ asset('css/business.css') }}?v=2.9" rel="stylesheet">
+<link href="{{ asset('css/business.css') }}?v=3.0" rel="stylesheet">
 @endpush
 @endonce
 
@@ -641,6 +645,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     latInputId: 'business_lat',
                     lngInputId: 'business_lng',
                     searchBtnId: 'btn_search_reg_map',
+                    gpsBtnId: 'btn_gps_reg_map',
                     statusDisplayId: 'map-status-badge',
                     mapId: 'company_reg_map',
                     initialState: "{{ old('state', $company->state ?? 'Cundinamarca') }}",
@@ -677,6 +682,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     latInputId: 'mx_lat',
                     lngInputId: 'mx_lng',
                     searchBtnId: 'btn_search_mx_map',
+                    gpsBtnId: 'btn_gps_mx_map',
                     statusDisplayId: 'mx-map-status-badge',
                     mapId: 'mx_reg_map',
                     initialState: "{{ old('state', $company->state ?? 'Puebla') }}",

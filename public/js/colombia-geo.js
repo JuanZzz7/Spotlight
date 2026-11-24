@@ -804,7 +804,7 @@ window.initSpotlightPreciseLocation = function(cfg) {
     updateFormCoords(initLat, initLng);
 
     // 4. Geocodificación Inversa (Reverse Geocoding)
-    function reverseGeocode(lat, lng, preserveUserAddress = false) {
+    function reverseGeocode(lat, lng, preserveUserAddress = false, syncSelectsFromGps = false) {
         if (statusDisplay) {
             statusDisplay.innerHTML = '<span class="text-muted"><i class="bi bi-arrow-repeat spin-me me-1"></i> Detectando dirección exacta en el mapa...</span>';
         }
@@ -824,8 +824,21 @@ window.initSpotlightPreciseLocation = function(cfg) {
                     const detectedCity = a.town || a.city || a.municipality || a.village || a.county || currentCity;
                     const detectedState = a.state || currentState;
 
-                    if (postalCodeInput && a.postcode && !postalCodeInput.value.trim()) {
+                    if (postalCodeInput && a.postcode && (syncSelectsFromGps || !postalCodeInput.value.trim())) {
                         postalCodeInput.value = a.postcode;
+                    }
+
+                    // Si proviene de GPS, sincronizar selectores de Estado y Municipio automáticamente
+                    if (syncSelectsFromGps && stateSelect && detectedState) {
+                        for (let i = 0; i < stateSelect.options.length; i++) {
+                            const optVal = stateSelect.options[i].value.toLowerCase();
+                            if (detectedState.toLowerCase().includes(optVal) || optVal.includes(detectedState.toLowerCase())) {
+                                stateSelect.selectedIndex = i;
+                                currentState = stateSelect.value;
+                                populateCities(currentState, detectedCity);
+                                break;
+                            }
+                        }
                     }
 
                     let finalLabel = cleanStreet
@@ -833,7 +846,7 @@ window.initSpotlightPreciseLocation = function(cfg) {
                         : (data.display_name ? data.display_name.split(',').slice(0, 3).join(', ') : `${lat.toFixed(5)}, ${lng.toFixed(5)}`);
 
                     if (statusDisplay) {
-                        statusDisplay.innerHTML = `<span class="text-success"><i class="bi bi-geo-alt-fill text-danger me-1"></i><strong>Ubicación fijada:</strong> ${finalLabel} (${detectedState})</span>`;
+                        statusDisplay.innerHTML = `<span class="text-success"><i class="bi bi-geo-alt-fill text-danger me-1"></i><strong>Ubicación precisa fijada:</strong> ${finalLabel} (${detectedState})</span>`;
                     }
                     if (addressInput && (!preserveUserAddress || !addressInput.value.trim())) {
                         addressInput.value = cleanStreet || finalLabel;
@@ -1124,32 +1137,42 @@ window.initSpotlightPreciseLocation = function(cfg) {
             }
             return;
         }
+        const origHtml = gpsBtn.innerHTML;
+        gpsBtn.disabled = true;
+        gpsBtn.innerHTML = '<i class="bi bi-arrow-repeat spin-me"></i> Ubicando GPS...';
+
         if (statusDisplay) {
-            statusDisplay.innerHTML = '<span class="text-primary"><i class="bi bi-crosshair spin-me me-1"></i> Solicitando coordenadas satelitales GPS...</span>';
+            statusDisplay.innerHTML = '<span class="text-primary"><i class="bi bi-crosshair spin-me me-1"></i> Solicitando permiso de ubicación GPS precisa al navegador...</span>';
         }
         navigator.geolocation.getCurrentPosition(
             pos => {
+                gpsBtn.disabled = false;
+                gpsBtn.innerHTML = '<i class="bi bi-check2-circle"></i> GPS Activo';
+                setTimeout(() => { gpsBtn.innerHTML = origHtml; }, 3500);
+
                 const lat = pos.coords.latitude;
                 const lon = pos.coords.longitude;
                 marker.setLatLng([lat, lon]);
                 map.flyTo([lat, lon], 17, { duration: 1.2 });
                 updateFormCoords(lat, lon);
-                reverseGeocode(lat, lon);
+                reverseGeocode(lat, lon, false, true);
             },
             err => {
+                gpsBtn.disabled = false;
+                gpsBtn.innerHTML = origHtml;
                 let msg = 'No se pudo obtener la ubicación GPS.';
                 if (err.code === 1) {
-                    msg = 'Permiso de ubicación no concedido en el navegador. Puedes usar el buscador o hacer clic en el mapa.';
+                    msg = 'Permiso de ubicación bloqueado o denegado. Habilita el permiso de ubicación en el icono del candado junto a la URL del navegador.';
                 } else if (err.code === 2) {
-                    msg = 'Ubicación no disponible en este momento. Usa el buscador o haz clic en el mapa.';
+                    msg = 'Señal GPS no disponible en este momento. Usa el buscador o mueve el pin azul en el mapa.';
                 } else if (err.code === 3) {
-                    msg = 'Tiempo de espera de GPS agotado. Usa el buscador o haz clic en el mapa.';
+                    msg = 'Tiempo de espera de GPS agotado. Intenta de nuevo o usa el buscador.';
                 }
                 if (statusDisplay) {
-                    statusDisplay.innerHTML = `<span class="text-warning"><i class="bi bi-info-circle me-1"></i> ${msg}</span>`;
+                    statusDisplay.innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i> ${msg}</span>`;
                 }
             },
-            { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+            { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
         );
     });
 

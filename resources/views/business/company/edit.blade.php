@@ -727,7 +727,7 @@
 
 @push('scripts')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-<script src="{{ asset('js/colombia-geo.js') }}?v=2.9"></script>
+<script src="{{ asset('js/colombia-geo.js') }}?v=3.0"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 
