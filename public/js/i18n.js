@@ -499,7 +499,7 @@
         buttons.forEach(btn => {
             btn.setAttribute('aria-label', lang === 'en' ? 'Switch language to Spanish' : 'Cambiar idioma a Inglés');
             btn.setAttribute('title', lang === 'en' ? 'Switch to Español (ES)' : 'Switch to English (EN)');
-            btn.innerHTML = `<i class="bi bi-translate me-1"></i><span>${lang === 'en' ? 'ES / <strong>EN</strong>' : '<strong>ES</strong> / EN'}</span>`;
+            btn.innerHTML = `<i class="bi bi-translate d-none d-sm-inline me-1"></i><span>${lang === 'en' ? 'ES / <strong>EN</strong>' : '<strong>ES</strong> / EN'}</span>`;
         });
     }
 

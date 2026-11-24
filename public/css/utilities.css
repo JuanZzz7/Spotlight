@@ -78,3 +78,21 @@
 /* Control de Visibilidad de Idiomas */
 html[lang="es"] .lang-en { display: none !important; }
 html[lang="en"] .lang-es { display: none !important; }
+
+/* Utilidades de Espaciado Fraccionario y Tipografía Compacta */
+.gap-1\.5 { gap: 0.375rem !important; }
+.gap-2\.5 { gap: 0.625rem !important; }
+.p-1\.5   { padding: 0.375rem !important; }
+.p-2\.5   { padding: 0.625rem !important; }
+.p-3\.5   { padding: 0.875rem !important; }
+.px-1\.5  { padding-left: 0.375rem !important; padding-right: 0.375rem !important; }
+.px-2\.5  { padding-left: 0.625rem !important; padding-right: 0.625rem !important; }
+.py-0\.5  { padding-top: 0.125rem !important; padding-bottom: 0.125rem !important; }
+.py-1\.5  { padding-top: 0.375rem !important; padding-bottom: 0.375rem !important; }
+.m-1\.5   { margin: 0.375rem !important; }
+.mb-0\.5  { margin-bottom: 0.125rem !important; }
+.mt-0\.5  { margin-top: 0.125rem !important; }
+.text-3xs { font-size: 0.65rem !important; }
+.text-2xs { font-size: 0.72rem !important; }
+.text-xs  { font-size: 0.78rem !important; }
+.text-sm  { font-size: 0.875rem !important; }

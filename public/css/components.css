@@ -170,6 +170,12 @@
     padding: 0.45rem 1.15rem;
 }
 
+.btn-sm.btn-pill-light {
+    min-height: 34px;
+    padding: 0.32rem 0.85rem;
+    font-size: 0.8rem;
+}
+
 .btn-pill-light:hover {
     background-color: var(--sl-primary-soft);
     border-color: var(--sl-accent);

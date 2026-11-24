@@ -4,7 +4,7 @@
 @push('styles')
 <!-- Leaflet Map CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<link href="{{ asset('css/home.css') }}?v=2.7" rel="stylesheet">
+<link href="{{ asset('css/home.css') }}?v=3.1" rel="stylesheet">
 @endpush
 
 @section('content')
@@ -94,7 +94,7 @@
             </span>
         </p>
 
-        <div class="d-flex flex-wrap justify-content-center gap-2.5 gap-sm-3 mb-4 animate-fade-in hero-cta-group">
+        <div class="d-flex flex-wrap justify-content-center gap-3 mb-4 animate-fade-in hero-cta-group">
             <a href="#productos" class="btn btn-lg btn-coral px-4">
                 <i class="bi bi-bag-check-fill me-1"></i>
                 <span class="lang-en">Explore Marketplace</span><span class="lang-es">Explorar Productos</span>
