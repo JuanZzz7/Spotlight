@@ -25,15 +25,15 @@ class DashboardController extends Controller
         $pendingCompanies  = Company::where('status', 'pending')->count();
         $inactiveCompanies = max(0, $totalCompanies - $activeCompanies - $pendingCompanies);
 
-        $formalCompanies   = Company::where('tipo_negocio', 'formal')->count();
-        $informalCompanies = max(0, $totalCompanies - $formalCompanies);
-        $mappedCompanies   = Company::whereNotNull('latitude')->whereNotNull('longitude')->count();
-        $companiesWithProd = Company::whereHas('products', fn($q) => $q->where('active', true))->count();
-
         $coCompanies = Company::where(function ($q) {
             $q->where('country', 'CO')->orWhereNull('country');
         })->count();
         $mxCompanies = Company::where('country', 'MX')->count();
+
+        $formalCompanies   = Company::where(fn($q) => $q->where('country', 'CO')->orWhereNull('country'))->where('tipo_negocio', 'formal')->count();
+        $informalCompanies = max(0, $coCompanies - $formalCompanies);
+        $mappedCompanies   = Company::whereNotNull('latitude')->whereNotNull('longitude')->count();
+        $companiesWithProd = Company::whereHas('products', fn($q) => $q->where('active', true))->count();
 
         $dianEnabled  = CompanyFiscalProfile::where('fiscal_status', CompanyFiscalProfile::STATUS_ENABLED)->count();
         $dianInReview = CompanyFiscalProfile::where('fiscal_status', CompanyFiscalProfile::STATUS_IN_REVIEW)->count();

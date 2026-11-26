@@ -65,7 +65,16 @@
                         <span class="badge badge-purple ms-1 fw-bold">
                             {{ mb_strtoupper($company->category) }}
                         </span>
-                        @if($company->isFormal())
+                        @if($company->isMexican())
+                            <span class="badge rounded-pill bg-light text-dark border px-2.5 py-1 fw-bold">
+                                🇲🇽 Comercio México • {{ $company->city ?: 'Puebla' }}
+                            </span>
+                            @if($company->tax_id)
+                                <span class="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-2 py-1 fw-bold">
+                                    <i class="bi bi-shield-check me-1"></i>RFC {{ $company->tax_id }}
+                                </span>
+                            @endif
+                        @elseif($company->isFormal())
                             <span class="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-2 py-1 fw-bold">
                                 <i class="bi bi-shield-check me-1"></i>Empresa Formal • NIT {{ $company->nit }}
                             </span>
@@ -306,6 +315,7 @@
                         <i class="bi bi-arrow-right text-muted ms-auto"></i>
                     </div>
                 </a>
+                @if($company && $company->isColombian())
                 <a href="{{ route('business.billing.reports.index') }}" class="text-decoration-none">
                     <div class="d-flex align-items-center gap-3 p-3 rounded-4 border bg-white shadow-sm" style="transition: all 0.2s;">
                         <div class="rounded-3 d-flex align-items-center justify-content-center" style="width: 42px; height: 42px; background: #f1f5f9;">
@@ -317,6 +327,7 @@
                         </div>
                     </div>
                 </a>
+                @endif
             </div>
             
             <div class="d-flex align-items-center gap-3 p-3 rounded-3 mt-auto" style="background-color: var(--sl-primary-soft, #F6E7EB); border: 1px dashed rgba(127,29,63,0.3);">
@@ -324,7 +335,7 @@
                     <i class="bi bi-shield-lock-fill text-white"></i>
                 </div>
                 <div class="text-dark" style="font-size: 0.75rem; line-height: 1.4;">
-                    Tus fondos están respaldados por la pasarela segura de <span class="fw-bold" style="color: #7F1D3F;">SPOTLIGHT Ubaté</span>.
+                    Tus fondos están respaldados por la pasarela segura de <span class="fw-bold" style="color: #7F1D3F;">SPOTLIGHT {{ ($company && $company->isMexican()) ? 'México' : 'Ubaté' }}</span>.
                 </div>
             </div>
         </div>

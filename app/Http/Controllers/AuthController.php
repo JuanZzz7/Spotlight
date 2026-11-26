@@ -145,8 +145,7 @@ class AuthController extends Controller
                 $companyData['tax_id'] = ($rawTaxId !== '' && $rawTaxId !== '000000' && strtoupper($rawTaxId) !== 'N/A') ? $rawTaxId : null;
                 $companyData['category'] = $request->input('category', 'General');
                 $companyData['description'] = $request->input('description', '');
-                $companyData['tipo_negocio'] = $request->input('tipo_negocio', 'informal');
-                $companyData['formalization'] = $request->input('tipo_negocio', 'informal');
+                unset($companyData['tipo_negocio'], $companyData['formalization'], $companyData['nit'], $companyData['cedula_propietario']);
             } else {
                 $companyData['state'] = $request->input('state') ?: 'Cundinamarca';
                 $companyData['city'] = $request->input('city') ?: 'Ubaté';

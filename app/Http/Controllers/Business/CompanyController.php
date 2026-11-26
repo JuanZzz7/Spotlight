@@ -80,9 +80,10 @@ class CompanyController extends Controller
             if ($isMexico) {
                 $request->validate([
                     'country'              => 'nullable|in:CO,MX',
-                    'tipo_negocio'         => 'required|in:formal,informal',
+                    'tipo_negocio'         => 'nullable|in:formal,informal',
                     'habeas_data_accepted' => 'accepted',
-                    'direccion_fisica'     => 'required|string|max:255',
+                    'direccion_fisica'     => 'nullable|string|max:255',
+                    'address'              => 'nullable|string|max:255',
                     'state'                => 'nullable|string|max:100',
                     'city'                 => 'nullable|string|max:100',
                     'postal_code'          => 'nullable|string|max:20',
@@ -92,9 +93,7 @@ class CompanyController extends Controller
                     'nombre_representante' => ['nullable', 'string', 'max:255', 'regex:/^[\pL\s\.\'\-]+$/u'],
                     'birthdate'            => ['nullable', 'date', 'before_or_equal:' . now()->subYears(18)->format('Y-m-d')],
                 ], [
-                    'tipo_negocio.required'         => 'Debe seleccionar el tipo de negocio.',
                     'habeas_data_accepted.accepted' => 'Debe aceptar la política de privacidad.',
-                    'direccion_fisica.required'     => 'La dirección física es obligatoria.',
                     'nombre_representante.regex'    => 'El nombre del representante legal solo puede contener letras y espacios (sin números).',
                     'birthdate.before_or_equal'     => 'El representante o propietario de la empresa debe ser mayor de 18 años.',
                 ]);
@@ -214,12 +213,20 @@ class CompanyController extends Controller
 
         } elseif ($section === 'legal') {
             $company = $user->company;
+            $isMexico = ($company && $company->isMexican()) || $request->input('country') === 'MX';
             $data = $request->only([
                 'tipo_negocio', 'razon_social', 'nit', 'nombre_comercial',
                 'nombre_representante', 'email_representante',
                 'cedula_propietario', 'habeas_data_accepted', 'direccion_fisica',
-                'country', 'state', 'city', 'postal_code', 'tax_id', 'currency', 'phone_prefix'
+                'address', 'latitude', 'longitude', 'category', 'description',
+                'country', 'state', 'city', 'postal_code', 'tax_id', 'currency', 'phone_prefix', 'phone'
             ]);
+            if ($isMexico) {
+                unset($data['tipo_negocio'], $data['nit'], $data['cedula_propietario']);
+                if (!empty($data['nombre_comercial'])) {
+                    $data['name'] = $data['nombre_comercial'];
+                }
+            }
 
             if ($request->filled('birthdate')) {
                 $user->update(['birthdate' => $request->birthdate]);

@@ -14,6 +14,11 @@ class FormalizationGuideController extends Controller
     {
         $company = Auth::user()->company;
 
+        if ($company && $company->isMexican()) {
+            return redirect()->route('business.dashboard')
+                ->with('info', 'La guía de formalización colombiana (Cámara de Comercio y DIAN) aplica únicamente para comercios en Colombia.');
+        }
+
         return view('business.formalization.guide', compact('company'));
     }
 }

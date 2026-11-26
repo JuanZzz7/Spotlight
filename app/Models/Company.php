@@ -175,12 +175,12 @@ class Company extends Model
 
     public function isFormal(): bool
     {
-        return $this->tipo_negocio === 'formal';
+        return $this->isColombian() && $this->tipo_negocio === 'formal';
     }
 
     public function isInformal(): bool
     {
-        return $this->tipo_negocio === 'informal';
+        return $this->isColombian() && $this->tipo_negocio === 'informal';
     }
 
     public function isColombian(): bool
