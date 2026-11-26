@@ -460,7 +460,7 @@
                                 <span class="badge badge-purple">{{ $company->category }}</span>
                             </div>
                             
-                            <p class="text-muted small mb-3 flex-fill" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.5;">
+                            <p class="text-muted small mb-3 flex-fill" style="line-height: 1.5; white-space: pre-line; word-break: break-word;">
                                 {{ $company->description ?? 'Emprendimiento verificado de la red Spotlight.' }}
                             </p>
 
@@ -510,7 +510,7 @@
                             </div>
                         </div>
                         @if($company->description)
-                        <p class="tooltip-desc">{{ Str::limit($company->description, 80) }}</p>
+                        <p class="tooltip-desc" style="white-space: pre-line; word-break: break-word;">{{ $company->description }}</p>
                         @endif
                         <div class="tooltip-grid">
                             @if($company->phone)<div class="tooltip-info-item"><i class="bi bi-telephone-fill"></i><span>{{ $company->phone }}</span></div>@endif

@@ -72,13 +72,13 @@
 
 {{-- Barra info + Redes --}}
 <div class="bg-white border-bottom py-3">
-    <div class="container d-flex align-items-center justify-content-between flex-wrap gap-3">
-        <div class="text-muted small">
+    <div class="container d-flex flex-column flex-lg-row align-items-lg-start justify-content-between gap-3">
+        <div class="text-muted small flex-fill" style="line-height: 1.6; white-space: pre-line; word-break: break-word;">
             @if($company->description)
-                <i class="bi bi-info-circle me-1"></i>{{ Str::limit($company->description, 120) }}
+                <i class="bi bi-info-circle me-1 text-primary"></i>{{ $company->description }}
             @endif
         </div>
-        <div class="d-flex gap-3 align-items-center flex-wrap">
+        <div class="d-flex gap-3 align-items-center flex-wrap flex-shrink-0">
             @if($company->instagram)
                 <a href="{{ $company->instagram }}" target="_blank" class="text-muted fs-5"><i class="bi bi-instagram"></i></a>
             @endif
