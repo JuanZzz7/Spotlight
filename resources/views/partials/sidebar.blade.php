@@ -34,10 +34,10 @@
     <a href="{{ route('business.products.index') }}" class="vs-nav-link {{ request()->routeIs('business.products*') ? 'active' : '' }}">
         <i class="bi bi-box fs-5"></i> Mis productos
     </a>
+    @if(auth()->user()->company && auth()->user()->company->isColombian())
     <a href="{{ route('business.expenses.index') }}" class="vs-nav-link {{ request()->routeIs('business.expenses*') ? 'active' : '' }}">
         <i class="bi bi-cash-stack fs-5"></i> Egresos & Finanzas
     </a>
-    @if(auth()->user()->company && auth()->user()->company->isColombian())
     <a href="{{ route('business.billing.index') }}" class="vs-nav-link {{ request()->routeIs('business.billing*') && !request()->routeIs('business.billing.sales*') ? 'active' : '' }}">
         <i class="bi bi-shield-check fs-5"></i> Facturación DIAN
     </a>

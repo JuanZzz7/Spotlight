@@ -117,13 +117,13 @@
                                     <span>Mis productos</span>
                                 </a>
                             </li>
+                            @if(auth()->user()->company && auth()->user()->company->isColombian())
                             <li>
                                 <a class="dropdown-item d-flex align-items-center gap-2 py-2 fw-semibold {{ request()->routeIs('business.expenses*') ? 'active-dropdown-item' : 'text-dark' }}" href="{{ route('business.expenses.index') }}">
                                     <i class="bi bi-cash-stack fs-5"></i>
                                     <span>Ventas y egresos</span>
                                 </a>
                             </li>
-                            @if(auth()->user()->company && auth()->user()->company->isColombian())
                             <li>
                                 <a class="dropdown-item d-flex align-items-center gap-2 py-2 fw-semibold {{ request()->routeIs('business.billing*') ? 'active-dropdown-item' : 'text-dark' }}" href="{{ route('business.billing.index') }}">
                                     <i class="bi bi-receipt-cutoff fs-5"></i>

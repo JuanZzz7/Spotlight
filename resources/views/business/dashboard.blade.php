@@ -189,41 +189,77 @@
     $marginPct = $income > 0 ? round(($net / $income) * 100, 1) : 0;
 
     $bizCurrency = ($company && $company->isMexican()) ? 'MXN' : 'COP';
-    $cards = [
-        [
-            'label'=>'INGRESOS TOTALES',
-            'value'=>'$'.number_format($income,0,',','.').' '.$bizCurrency,
-            'icon'=>'bi-arrow-up',
-            'color'=>'#7F1D3F',
-            'subtext'=> $income > 0
-                ? '<span style="color:#7F1D3F; font-weight:600;"><i class="bi bi-graph-up me-1"></i>Activo</span> <span class="ms-1">ventas acumuladas</span>'
-                : '<span class="text-muted">0 ventas registradas</span>'
-        ],
-        [
-            'label'=>'EGRESOS TOTALES',
-            'value'=>'$'.number_format($expenses,0,',','.').' '.$bizCurrency,
-            'icon'=>'bi-arrow-down',
-            'color'=>'#64748b',
-            'subtext'=>'Gastos operativos <span class="float-end fw-semibold">'.$expensePct.'% total</span>'
-        ],
-        [
-            'label'=>'GANANCIA NETA',
-            'value'=>'$'.number_format($net,0,',','.').' '.$bizCurrency,
-            'icon'=>'bi-graph-up',
-            'color'=>'#10b981',
-            'subtext'=> $income > 0
-                ? '<span class="badge text-success me-2 rounded-pill px-2" style="background:#d1fae5;">Margen '.$marginPct.'%</span> <span class="float-end">'.($net >= 0 ? 'Saludable' : 'Ajustar').'</span>'
-                : '<span class="badge text-secondary me-2 rounded-pill px-2" style="background:#f1f5f9;">Margen 0%</span> <span class="float-end">Sin movimientos</span>',
-            'valueColor' => '#10b981'
-        ],
-        [
-            'label'=>'PRODUCTOS',
-            'value'=>$prodCount,
-            'icon'=>'bi-box-seam',
-            'color'=>'#D98C9A',
-            'subtext'=>'<span style="color:#7F1D3F; font-weight:600;">'.($prodCount > 0 ? ($stockPct.'% con stock') : '0 publicados').'</span> <a href="'.route('business.products.create').'" class="float-end text-decoration-none fw-bold" style="color:#7F1D3F;">+ Agregar</a>'
-        ],
-    ];
+    if ($company && $company->isMexican()) {
+        $totalStockUnits = $company->products->sum('stock');
+        $featuredProdCount = $company->products->where('featured', true)->count();
+        $cards = [
+            [
+                'label'=>'PRODUCTOS PUBLICADOS',
+                'value'=>$prodCount,
+                'icon'=>'bi-box-seam',
+                'color'=>'#7F1D3F',
+                'subtext'=>'<span style="color:#7F1D3F; font-weight:600;">'.($prodCount > 0 ? ($stockPct.'% con stock') : '0 publicados').'</span> <a href="'.route('business.products.create').'" class="float-end text-decoration-none fw-bold" style="color:#7F1D3F;">+ Agregar</a>'
+            ],
+            [
+                'label'=>'UNIDADES EN STOCK',
+                'value'=>$totalStockUnits,
+                'icon'=>'bi-layers',
+                'color'=>'#10b981',
+                'subtext'=>'<span class="badge text-success me-2 rounded-pill px-2" style="background:#d1fae5;">'.$inStockCount.' activos</span> <span class="float-end">Inventario disponible</span>',
+                'valueColor' => '#10b981'
+            ],
+            [
+                'label'=>'DESTACADOS EN VITRINA',
+                'value'=>$featuredProdCount,
+                'icon'=>'bi-star-fill',
+                'color'=>'#D98C9A',
+                'subtext'=>'Productos destacados <span class="float-end fw-semibold">Catálogo MXN</span>'
+            ],
+            [
+                'label'=>'CALIFICACIÓN TIENDA',
+                'value'=>number_format($company->average_rating ?? 5.0, 1).' ★',
+                'icon'=>'bi-award',
+                'color'=>'#64748b',
+                'subtext'=>'<span class="text-muted">'.($company->reviews_count ?? 0).' reseñas de clientes</span>'
+            ],
+        ];
+    } else {
+        $cards = [
+            [
+                'label'=>'INGRESOS TOTALES',
+                'value'=>'$'.number_format($income,0,',','.').' '.$bizCurrency,
+                'icon'=>'bi-arrow-up',
+                'color'=>'#7F1D3F',
+                'subtext'=> $income > 0
+                    ? '<span style="color:#7F1D3F; font-weight:600;"><i class="bi bi-graph-up me-1"></i>Activo</span> <span class="ms-1">ventas acumuladas</span>'
+                    : '<span class="text-muted">0 ventas registradas</span>'
+            ],
+            [
+                'label'=>'EGRESOS TOTALES',
+                'value'=>'$'.number_format($expenses,0,',','.').' '.$bizCurrency,
+                'icon'=>'bi-arrow-down',
+                'color'=>'#64748b',
+                'subtext'=>'Gastos operativos <span class="float-end fw-semibold">'.$expensePct.'% total</span>'
+            ],
+            [
+                'label'=>'GANANCIA NETA',
+                'value'=>'$'.number_format($net,0,',','.').' '.$bizCurrency,
+                'icon'=>'bi-graph-up',
+                'color'=>'#10b981',
+                'subtext'=> $income > 0
+                    ? '<span class="badge text-success me-2 rounded-pill px-2" style="background:#d1fae5;">Margen '.$marginPct.'%</span> <span class="float-end">'.($net >= 0 ? 'Saludable' : 'Ajustar').'</span>'
+                    : '<span class="badge text-secondary me-2 rounded-pill px-2" style="background:#f1f5f9;">Margen 0%</span> <span class="float-end">Sin movimientos</span>',
+                'valueColor' => '#10b981'
+            ],
+            [
+                'label'=>'PRODUCTOS',
+                'value'=>$prodCount,
+                'icon'=>'bi-box-seam',
+                'color'=>'#D98C9A',
+                'subtext'=>'<span style="color:#7F1D3F; font-weight:600;">'.($prodCount > 0 ? ($stockPct.'% con stock') : '0 publicados').'</span> <a href="'.route('business.products.create').'" class="float-end text-decoration-none fw-bold" style="color:#7F1D3F;">+ Agregar</a>'
+            ],
+        ];
+    }
     @endphp
     @foreach($cards as $c)
     <div class="col-sm-6 col-xl-3">
@@ -246,6 +282,7 @@
 </div>
 
 <div class="row g-4 mb-4">
+    @if($company && $company->isColombian())
     <!-- Chart -->
     <div class="col-lg-7">
         <div class="vs-card h-100 border-0 shadow-sm p-4">
@@ -286,9 +323,10 @@
             </div>
         </div>
     </div>
+    @endif
     
     <!-- Quick Actions -->
-    <div class="col-lg-5">
+    <div class="{{ ($company && $company->isColombian()) ? 'col-lg-5' : 'col-12' }}">
         <div class="vs-card h-100 border-0 shadow-sm p-4">
             <h6 class="fw-bold text-dark mb-1" style="font-family: 'Outfit', sans-serif;">Acciones Rápidas</h6>
             <div class="text-muted mb-4" style="font-size: 0.75rem;">Herramientas ágiles para tu negocio</div>
@@ -301,11 +339,37 @@
                         </div>
                         <div>
                             <div class="fw-bold text-dark text-sm">Publicar nuevo producto</div>
-                            <div class="text-muted" style="font-size: 0.7rem;">Subir fotos y fijar precios</div>
+                            <div class="text-muted" style="font-size: 0.7rem;">Subir fotos y fijar precios en {{ $bizCurrency }}</div>
                         </div>
                         <i class="bi bi-arrow-right text-muted ms-auto"></i>
                     </div>
                 </a>
+                @if($company && $company->isMexican())
+                <a href="{{ route('business.products.index') }}" class="text-decoration-none">
+                    <div class="d-flex align-items-center gap-3 p-3 rounded-4 border bg-white shadow-sm" style="transition: all 0.2s;">
+                        <div class="rounded-3 d-flex align-items-center justify-content-center" style="width: 42px; height: 42px; background: var(--sl-primary-soft, #F6E7EB);">
+                            <i class="bi bi-box-seam fs-5" style="color: var(--sl-primary, #7F1D3F);"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold text-dark text-sm">Administrar catálogo de productos</div>
+                            <div class="text-muted" style="font-size: 0.7rem;">Gestionar inventario, precios MXN y categorías</div>
+                        </div>
+                        <i class="bi bi-arrow-right text-muted ms-auto"></i>
+                    </div>
+                </a>
+                <a href="{{ route('chat.index') }}" class="text-decoration-none">
+                    <div class="d-flex align-items-center gap-3 p-3 rounded-4 border bg-white shadow-sm" style="transition: all 0.2s;">
+                        <div class="rounded-3 d-flex align-items-center justify-content-center" style="width: 42px; height: 42px; background: #f1f5f9;">
+                            <i class="bi bi-chat-dots text-secondary fs-5"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold text-dark text-sm">Mensajes con compradores</div>
+                            <div class="text-muted" style="font-size: 0.7rem;">Atención directa y coordinación de pedidos</div>
+                        </div>
+                        <i class="bi bi-arrow-right text-muted ms-auto"></i>
+                    </div>
+                </a>
+                @endif
                 @if($company && $company->isColombian())
                 <a href="{{ route('business.shipments.index') }}" class="text-decoration-none">
                     <div class="d-flex align-items-center gap-3 p-3 rounded-4 border bg-white shadow-sm" style="transition: all 0.2s;">
@@ -333,18 +397,21 @@
                 @endif
             </div>
             
+            @if($company && $company->isColombian())
             <div class="d-flex align-items-center gap-3 p-3 rounded-3 mt-auto" style="background-color: var(--sl-primary-soft, #F6E7EB); border: 1px dashed rgba(127,29,63,0.3);">
                 <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 36px; height: 36px; background: #7F1D3F;">
                     <i class="bi bi-shield-lock-fill text-white"></i>
                 </div>
                 <div class="text-dark" style="font-size: 0.75rem; line-height: 1.4;">
-                    Tus fondos están respaldados por la pasarela segura de <span class="fw-bold" style="color: #7F1D3F;">SPOTLIGHT {{ ($company && $company->isMexican()) ? 'México' : 'Ubaté' }}</span>.
+                    Tus fondos están respaldados por la pasarela segura de <span class="fw-bold" style="color: #7F1D3F;">SPOTLIGHT Ubaté</span>.
                 </div>
             </div>
+            @endif
         </div>
     </div>
 </div>
 
+@if($company && $company->isColombian())
 <div class="vs-card border-0 shadow-sm p-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div class="d-flex align-items-center gap-3">
@@ -449,4 +516,5 @@
         @endif
     </div>
 </div>
+@endif
 @endsection

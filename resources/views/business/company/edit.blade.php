@@ -26,8 +26,9 @@
     </div>
 
     {{-- Barra de Botones Desplegables / Selectores de Sección --}}
+    @php $showBankingTab = !$company->isMexican(); $tabColClass = $showBankingTab ? 'col-6 col-md-3' : 'col-4'; @endphp
     <div class="row g-2 g-md-3 mb-4" id="settings-button-group">
-        <div class="col-6 col-md-3">
+        <div class="{{ $tabColClass }}">
             <button type="button" class="settings-nav-btn active" data-target="panel-general">
                 <div class="d-flex align-items-center gap-2 min-w-0">
                     <div class="btn-icon-box bg-primary-subtle text-primary">
@@ -41,7 +42,7 @@
                 <i class="bi bi-chevron-right chevron-icon d-none d-md-inline text-xs"></i>
             </button>
         </div>
-        <div class="col-6 col-md-3">
+        <div class="{{ $tabColClass }}">
             <button type="button" class="settings-nav-btn" data-target="panel-legal">
                 <div class="d-flex align-items-center gap-2 min-w-0">
                     <div class="btn-icon-box bg-success-subtle text-success">
@@ -55,7 +56,7 @@
                 <i class="bi bi-chevron-right chevron-icon d-none d-md-inline text-xs"></i>
             </button>
         </div>
-        <div class="col-6 col-md-3">
+        <div class="{{ $tabColClass }}">
             <button type="button" class="settings-nav-btn" data-target="panel-contact">
                 <div class="d-flex align-items-center gap-2 min-w-0">
                     <div class="btn-icon-box bg-info-subtle text-info">
@@ -69,6 +70,7 @@
                 <i class="bi bi-chevron-right chevron-icon d-none d-md-inline text-xs"></i>
             </button>
         </div>
+        @if($showBankingTab)
         <div class="col-6 col-md-3">
             <button type="button" class="settings-nav-btn" data-target="panel-banking">
                 <div class="d-flex align-items-center gap-2 min-w-0">
@@ -83,6 +85,7 @@
                 <i class="bi bi-chevron-right chevron-icon d-none d-md-inline text-xs"></i>
             </button>
         </div>
+        @endif
     </div>
 
     {{-- ═══════════════════════════════════
@@ -632,6 +635,7 @@
     </form>
     </div>
 
+    @if(!$company->isMexican())
     {{-- ═══════════════════════════════════
          SECCIÓN 4: DATOS BANCARIOS Y DISPERSIÓN DE PAGOS (WOMPI)
     ═══════════════════════════════════ --}}
@@ -721,6 +725,7 @@
         </div>
     </form>
     </div>
+    @endif
 
 </div>
 @endsection
