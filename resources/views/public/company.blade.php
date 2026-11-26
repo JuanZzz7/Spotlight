@@ -30,12 +30,12 @@
 {{-- Hero de la empresa --}}
 <div style="position: relative; height: 260px; background: linear-gradient(135deg, #7F1D3F 0%, #D98C9A 100%); overflow: hidden;">
     @if($company->banner)
-        <img src="{{ asset('storage/'.$company->banner) }}" class="w-100 h-100" style="object-fit:cover; opacity:0.4;">
+        <img src="{{ asset('storage/'.$company->banner) }}" class="w-100 h-100" style="position: absolute; inset: 0; object-fit:cover; opacity:0.4; z-index: 0;">
     @endif
-    <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(24, 18, 38, 0.75) 0%, transparent 60%);"></div>
+    <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(24, 18, 38, 0.78) 0%, transparent 65%); z-index: 1;"></div>
 
     <div class="container h-100 d-flex align-items-end pb-4" style="position: relative; z-index: 2;">
-        <div class="d-flex align-items-center gap-4">
+        <div class="d-flex align-items-center gap-3 gap-sm-4">
             <div class="bg-white rounded-circle shadow-lg d-flex align-items-center justify-content-center flex-shrink-0" style="width:90px;height:90px;border:4px solid white;">
                 @if($company->logo)
                     <img src="{{ asset('storage/'.$company->logo) }}" class="rounded-circle w-100 h-100" style="object-fit:cover;">
@@ -44,7 +44,7 @@
                 @endif
             </div>
             <div class="text-white">
-                <h1 class="fw-bold mb-1" style="font-size:1.8rem; text-shadow: 0 2px 8px rgba(0,0,0,0.4);">{{ $company->name }}</h1>
+                <h1 class="fw-bold mb-1 text-white" style="font-size:1.8rem; text-shadow: 0 2px 10px rgba(0,0,0,0.55);">{{ $company->name }}</h1>
                 <div class="d-flex align-items-center gap-3 flex-wrap">
                     <span class="badge rounded-pill px-3 py-1" style="background:rgba(255,255,255,0.2); backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,0.3); font-size:0.8rem;">
                         {{ $company->category }}
