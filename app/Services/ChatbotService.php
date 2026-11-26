@@ -9,6 +9,12 @@ use Illuminate\Support\Facades\Log;
 class ChatbotService
 {
     private string $apiKey;
+    private string $groqKey;
+    private array $groqModels = [
+        'llama-3.3-70b-versatile',
+        'llama-3.1-8b-instant',
+        'mixtral-8x7b-32768',
+    ];
     private array $geminiModels = [
         'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent',
         'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent',
@@ -17,7 +23,8 @@ class ChatbotService
 
     public function __construct()
     {
-        $this->apiKey = (string) config('services.gemini.key', '');
+        $this->apiKey  = (string) config('services.gemini.key', '');
+        $this->groqKey = (string) (config('services.groq.key') ?: env('GROQ_API_KEY', ''));
     }
 
     /* ──────────────────────────────────────────────────────────
@@ -144,7 +151,15 @@ class ChatbotService
      * ────────────────────────────────────────────────────────── */
     public function chat(string $message, string $lang, array $history = []): array
     {
-        // 1. Intentar Google Gemini API si la llave está configurada
+        // 1. Intentar Groq API (ultra-rápido, multidominio) si GROQ_API_KEY está configurada
+        if (!empty($this->groqKey)) {
+            $groqResult = $this->callGroqCurl($message, $lang, $history);
+            if ($groqResult !== null) {
+                return $groqResult;
+            }
+        }
+
+        // 2. Intentar Google Gemini API si la llave está configurada
         if (!empty($this->apiKey)) {
             $result = $this->callGeminiCurl($message, $lang, $history);
             if ($result !== null) {
@@ -152,14 +167,82 @@ class ChatbotService
             }
         }
 
-        // 2. Intentar motor LLM generativo abierto (compatible con OpenAI, sin llave requerida)
+        // 3. Intentar motor LLM generativo abierto (compatible con OpenAI, sin llave requerida)
         $openLlmResult = $this->callOpenGenerativeLlm($message, $lang, $history);
         if ($openLlmResult !== null) {
             return $openLlmResult;
         }
 
-        // 3. Respaldo local inteligente multidominio + consulta directa a BD
+        // 4. Respaldo local inteligente multidominio + consulta directa a BD
         return $this->localFallback($message, $lang);
+    }
+
+    /* ──────────────────────────────────────────────────────────
+     * Engine 0: Groq API via cURL (OpenAI-compatible)
+     * ────────────────────────────────────────────────────────── */
+    private function callGroqCurl(string $message, string $lang, array $history): ?array
+    {
+        $messages = [
+            ['role' => 'system', 'content' => $this->buildSystemPrompt($lang)],
+        ];
+
+        foreach (array_slice($history, -8) as $turn) {
+            if (!empty($turn['content'])) {
+                $messages[] = [
+                    'role'    => ($turn['role'] ?? 'user') === 'user' ? 'user' : 'assistant',
+                    'content' => (string) $turn['content'],
+                ];
+            }
+        }
+
+        $messages[] = ['role' => 'user', 'content' => $message];
+
+        foreach ($this->groqModels as $model) {
+            $payload = json_encode([
+                'model'       => $model,
+                'messages'    => $messages,
+                'temperature' => 0.7,
+                'max_tokens'  => 900,
+            ]);
+
+            $ch = curl_init('https://api.groq.com/openai/v1/chat/completions');
+            curl_setopt_array($ch, [
+                CURLOPT_POST           => true,
+                CURLOPT_POSTFIELDS     => $payload,
+                CURLOPT_HTTPHEADER     => [
+                    'Content-Type: application/json',
+                    'Authorization: Bearer ' . $this->groqKey,
+                ],
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_SSL_VERIFYPEER => false,
+                CURLOPT_SSL_VERIFYHOST => false,
+                CURLOPT_TIMEOUT        => 18,
+                CURLOPT_CONNECTTIMEOUT => 8,
+            ]);
+
+            $response  = curl_exec($ch);
+            $httpCode  = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlError = curl_error($ch);
+            curl_close($ch);
+
+            if ($curlError || $response === false) {
+                Log::warning('Chatbot Groq cURL error: ' . $curlError);
+                continue;
+            }
+
+            $json = json_decode($response, true);
+            $text = $json['choices'][0]['message']['content'] ?? null;
+
+            if ($httpCode === 200 && is_string($text) && trim($text) !== '') {
+                return [
+                    'reply'   => trim($text),
+                    'lang'    => $lang,
+                    'success' => true,
+                ];
+            }
+        }
+
+        return null;
     }
 
     /* ──────────────────────────────────────────────────────────
@@ -439,6 +522,13 @@ class ChatbotService
             . "2. Sé muy empático, claro y amigable.\n"
             . "3. NO incluyas introducciones como 'Aquí tienes la respuesta:', devuelve DIRECTAMENTE el texto exacto que el comerciante enviará al cliente.\n"
             . "4. Si el comerciante solicita información de horarios, envíos o pagos, incluye los datos pertinentes.";
+
+        if (!empty($this->groqKey)) {
+            $groqRes = $this->callGroqCurl($prompt, 'es', []);
+            if ($groqRes && !empty($groqRes['reply'])) {
+                return trim($groqRes['reply'], "\"'");
+            }
+        }
 
         if (!empty($this->apiKey)) {
             $res = $this->callGeminiCurl($prompt, 'es', []);

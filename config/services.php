@@ -47,6 +47,10 @@ return [
         'key' => env('GEMINI_API_KEY'),
     ],
 
+    'groq' => [
+        'key' => env('GROQ_API_KEY'),
+    ],
+
     'wompi' => [
         'public_key'       => env('WOMPI_PUBLIC_KEY', 'pub_test_Q5yDA9xoKdePzhSGeVe9KStPUUO0edeN'),
         'private_key'      => env('WOMPI_PRIVATE_KEY', 'prv_test_X2v0oE2O0o5hUe2hVj5bW0e7Z0e9X8u7'),

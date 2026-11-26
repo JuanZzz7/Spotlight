@@ -468,13 +468,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const selectedCountry = getSelectedCountry();
 
-        // Remove required attributes from step 1 so browser doesn't block hidden inputs
+        // Remove required and constraint attributes from step 1 so browser doesn't block hidden inputs
         nameInput.removeAttribute('required');
+        nameInput.removeAttribute('pattern');
         emailInput.removeAttribute('required');
         pwdInput.removeAttribute('required');
         pwdConfInput.removeAttribute('required');
+        if (phoneInput) {
+            phoneInput.removeAttribute('required');
+            phoneInput.removeAttribute('pattern');
+            phoneInput.removeAttribute('minlength');
+        }
 
         roleInput.value = 'business';
+
+        // Copy Step 1 phone into Mexico Step 2 phone field if empty
+        const mxPhoneEl = document.getElementById('mx_phone');
+        if (mxPhoneEl && !mxPhoneEl.value && phoneInput && phoneInput.value) {
+            mxPhoneEl.value = phoneInput.value;
+        }
 
         // Hide Step 1, Show Step 2
         gsap.to(step1, { opacity: 0, x: -20, duration: 0.3, onComplete: () => {
@@ -506,6 +518,10 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('#step-1 input[name="email"]').setAttribute('required', 'required');
         document.querySelector('#step-1 input[name="password"]').setAttribute('required', 'required');
         document.querySelector('#step-1 input[name="password_confirmation"]').setAttribute('required', 'required');
+        if (phoneInput) {
+            phoneInput.setAttribute('pattern', '[0-9]{10}');
+            phoneInput.setAttribute('minlength', '10');
+        }
 
         // Hide Step 2, Show Step 1
         gsap.to(step2, { opacity: 0, x: 20, duration: 0.3, onComplete: () => {
@@ -543,6 +559,17 @@ document.addEventListener('DOMContentLoaded', () => {
     handleCountryChange(getSelectedCountry());
 
     if (roleInput.value === 'business') {
+        const nameInput = document.querySelector('#step-1 input[name="name"]');
+        const emailInput = document.querySelector('#step-1 input[name="email"]');
+        if (nameInput) { nameInput.removeAttribute('required'); nameInput.removeAttribute('pattern'); }
+        if (emailInput) emailInput.removeAttribute('required');
+        if (pwdInput) pwdInput.removeAttribute('required');
+        if (pwdConfInput) pwdConfInput.removeAttribute('required');
+        if (phoneInput) {
+            phoneInput.removeAttribute('required');
+            phoneInput.removeAttribute('pattern');
+            phoneInput.removeAttribute('minlength');
+        }
         step1.style.display = 'none';
         step2.style.display = 'block';
         if (typeof window.switchRegistrationCountry === 'function') {

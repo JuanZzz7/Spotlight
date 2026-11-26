@@ -62,17 +62,8 @@
         </div>
     </div>
 
-    {{-- Input & Quick Replies Area --}}
+    {{-- Input Area --}}
     <div class="sbot-bottom-area">
-        {{-- Quick Replies --}}
-        <div class="sbot-quick-replies" id="sbot-quick-replies">
-            <button class="sbot-chip" type="button">Recomiéndame productos</button>
-            <button class="sbot-chip" type="button">Ver tiendas locales</button>
-            <button class="sbot-chip" type="button">Consejos de ventas y negocios</button>
-            <button class="sbot-chip" type="button">¿Cómo rastrear mi pedido?</button>
-            <button class="sbot-chip" type="button">Hazme una recomendación o cálculo</button>
-        </div>
-
         {{-- Form --}}
         <form id="sbot-form" autocomplete="off" novalidate>
             @csrf

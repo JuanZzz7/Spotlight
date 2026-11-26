@@ -55,15 +55,8 @@
         </div>
     </div>
 
-    {{-- Input & Quick Replies Area --}}
+    {{-- Input Area --}}
     <div class="sbot-bottom-area bg-white border-top">
-        {{-- Quick Replies --}}
-        <div class="sbot-quick-replies d-flex gap-2 px-4 pt-3 pb-2" id="sbot-quick-replies" style="overflow-x: auto; white-space: nowrap; scrollbar-width: none;">
-            <button class="sbot-chip" type="button">Rastrear mi pedido</button>
-            <button class="sbot-chip" type="button">Ver ofertas</button>
-            <button class="sbot-chip" type="button">Soporte técnico</button>
-        </div>
-
         {{-- Form --}}
         <form id="sbot-form" autocomplete="off" novalidate class="p-3 px-4 pb-4">
             @csrf
@@ -192,9 +185,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 input.placeholder = LANGS[currentLang].placeholder;
                 bannerText.textContent = LANGS[currentLang].banner;
                 
-                chips[0].textContent = LANGS[currentLang].chip1;
-                chips[1].textContent = LANGS[currentLang].chip2;
-                chips[2].textContent = LANGS[currentLang].chip3;
+                if (chips.length >= 3) {
+                    chips[0].textContent = LANGS[currentLang].chip1;
+                    chips[1].textContent = LANGS[currentLang].chip2;
+                    chips[2].textContent = LANGS[currentLang].chip3;
+                }
             }
         });
     });
