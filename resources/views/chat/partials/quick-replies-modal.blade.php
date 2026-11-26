@@ -170,7 +170,7 @@
                         <div class="mb-3">
                             <label class="form-label text-2xs fw-bold text-dark mb-1">Ideas rápidas:</label>
                             <div class="d-flex flex-wrap gap-1.5">
-                                <button type="button" class="btn btn-sm btn-light border rounded-pill px-2.5 py-0.5 text-2xs ai-prompt-chip" data-prompt="Informar nuestros horarios de atención y punto físico en Ubaté">Horarios y punto físico</button>
+                                <button type="button" class="btn btn-sm btn-light border rounded-pill px-2.5 py-0.5 text-2xs ai-prompt-chip" data-prompt="Informar nuestros horarios de atención y punto físico en {{ (auth()->user()->company && auth()->user()->company->isMexican()) ? (auth()->user()->company->city ?: 'Puebla') : 'Ubaté' }}">Horarios y punto físico</button>
                                 <button type="button" class="btn btn-sm btn-light border rounded-pill px-2.5 py-0.5 text-2xs ai-prompt-chip" data-prompt="Confirmar disponibilidad inmediata de stock y envío local">Stock y envíos locales</button>
                                 <button type="button" class="btn btn-sm btn-light border rounded-pill px-2.5 py-0.5 text-2xs ai-prompt-chip" data-prompt="Explicar los medios de pago disponibles (Nequi, Daviplata, PSE/Wompi)">Medios de pago</button>
                                 <button type="button" class="btn btn-sm btn-light border rounded-pill px-2.5 py-0.5 text-2xs ai-prompt-chip" data-prompt="Avisar que hay congestión en la tienda pero que atenderemos su pedido en breve">Aviso de congestión</button>

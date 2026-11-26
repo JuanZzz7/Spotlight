@@ -9,7 +9,7 @@
         <div>
             <div class="d-flex align-items-center gap-2 mb-2">
                 <span class="text-uppercase fw-bold text-dark" style="font-size: 0.75rem; letter-spacing: 0.5px;">CANAL DIRECTO CLIENTES</span>
-                <span class="text-muted fw-bold" style="font-size: 0.75rem;">/ Ubaté & Región</span>
+                <span class="text-muted fw-bold" style="font-size: 0.75rem;">/ {{ (auth()->user()->company && auth()->user()->company->isMexican()) ? (auth()->user()->company->city ?: 'Puebla') . ', México' : 'Ubaté & Región' }}</span>
             </div>
             <h3 class="fw-bold text-dark mb-1" style="letter-spacing: -0.5px;">Centro de Mensajes</h3>
             <p class="text-muted mb-0" style="font-size: 0.85rem; max-width: 650px;">Gestiona consultas de inventario, garantías y despachos en tiempo real</p>

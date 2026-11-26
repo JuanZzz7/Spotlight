@@ -235,7 +235,7 @@
                 <h3 class="fw-bold mb-1" style="color:var(--sl-text-heading);">
                     <i class="bi bi-shop me-2" style="color:var(--sl-primary);"></i>Nuestro Establecimiento
                 </h3>
-                <p class="text-muted small mb-0">Conoce nuestras instalaciones, vitrina física y punto de atención en Ubaté.</p>
+                <p class="text-muted small mb-0">Conoce nuestras instalaciones, vitrina física y punto de atención en {{ $company->isMexican() ? ($company->city ?: 'Puebla') . ', México' : ($company->city ?: 'Ubaté') }}.</p>
             </div>
             <span class="badge bg-light text-primary border rounded-pill px-3 py-1.5 text-xs fw-semibold">
                 {{ count($company->establishment_photo_urls) }} {{ count($company->establishment_photo_urls) === 1 ? 'foto del local' : 'fotos del local' }}

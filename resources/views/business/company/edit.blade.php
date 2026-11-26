@@ -277,7 +277,7 @@
                                     <div class="p-3.5 rounded-4 border bg-light text-center text-muted">
                                         <i class="bi bi-shop fs-3 d-block text-secondary mb-1"></i>
                                         <span class="text-xs fw-semibold text-dark d-block mb-0.5">Aún no has agregado fotos del establecimiento</span>
-                                        <span class="text-2xs text-muted">Haz clic en <strong>"+ Subir fotos del local"</strong> para exhibir tu negocio local en Ubaté.</span>
+                                        <span class="text-2xs text-muted">Haz clic en <strong>"+ Subir fotos del local"</strong> para exhibir tu negocio local en {{ $company->isMexican() ? ($company->city ?: 'Puebla') . ', México' : ($company->city ?: 'Ubaté') }}.</span>
                                     </div>
                                 </div>
                             @endif
