@@ -121,11 +121,11 @@ class DashboardController extends Controller
                     'reviews_count'    => $reviewsCount,
                     'products'         => $company->products->map(function ($product) {
                         $formattedPrice = $product->effective_currency === 'MXN'
-                            ? $product->formatted_price_cop
+                            ? '$' . number_format($product->price, 2, ',', '.') . ' MXN'
                             : '$' . number_format($product->price, 0, ',', '.') . ' COP';
 
                         $originalMxn = $product->effective_currency === 'MXN'
-                            ? '$' . number_format($product->price, 0, ',', '.') . ' MXN'
+                            ? '$' . number_format($product->price, 2, ',', '.') . ' MXN'
                             : null;
 
                         return [

@@ -139,12 +139,14 @@
                                 </a>
                             </li>
                             @endif
+                            @if(auth()->user()->company && auth()->user()->company->isColombian())
                             <li>
                                 <a class="dropdown-item d-flex align-items-center gap-2 py-2 fw-semibold {{ request()->routeIs('business.shipments*') ? 'active-dropdown-item' : 'text-dark' }}" href="{{ route('business.shipments.index') }}">
                                     <i class="bi bi-truck fs-5"></i>
                                     <span>Despachos y Envíos</span>
                                 </a>
                             </li>
+                            @endif
                             <li>
                                 <a class="dropdown-item d-flex align-items-center gap-2 py-2 fw-semibold {{ request()->is('chat*') ? 'active-dropdown-item' : 'text-dark' }}" href="{{ route('chat.index') }}">
                                     <i class="bi bi-chat-dots fs-5"></i>

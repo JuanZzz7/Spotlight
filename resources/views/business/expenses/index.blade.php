@@ -43,6 +43,7 @@
     </div>
 </div>
 
+@php $bizCur = (auth()->user()->company && auth()->user()->company->isMexican()) ? 'MXN' : 'COP'; @endphp
 {{-- Stats Row --}}
 <div class="row g-4 mb-4">
     <!-- Card 1: Ingresos -->
@@ -54,7 +55,7 @@
                     <i class="bi bi-arrow-up-short fs-4 text-success"></i>
                 </div>
             </div>
-            <div class="fw-bold text-dark mb-2" style="font-size: 1.6rem; letter-spacing: -0.5px;">${{ number_format($incomes->sum('amount') ?: 0, 0, ',', '.') }} <span class="text-muted fw-bold" style="font-size: 0.65rem;">COP</span></div>
+            <div class="fw-bold text-dark mb-2" style="font-size: 1.6rem; letter-spacing: -0.5px;">${{ number_format($incomes->sum('amount') ?: 0, 0, ',', '.') }} <span class="text-muted fw-bold" style="font-size: 0.65rem;">{{ $bizCur }}</span></div>
             <div class="d-flex align-items-center gap-1 mt-auto" style="font-size: 0.75rem;">
                 <span class="text-success fw-bold" style="background: #dcfce7; padding: 2px 6px; border-radius: 4px;">{{ $incomes->count() }} ventas</span> <span class="text-muted ms-1">registradas</span>
             </div>
@@ -70,7 +71,7 @@
                     <i class="bi bi-arrow-down-short fs-4 text-danger"></i>
                 </div>
             </div>
-            <div class="fw-bold text-danger mb-2" style="font-size: 1.6rem; letter-spacing: -0.5px;">${{ number_format($expenses->sum('amount') ?: 0, 0, ',', '.') }} <span class="text-muted fw-bold" style="font-size: 0.65rem;">COP</span></div>
+            <div class="fw-bold text-danger mb-2" style="font-size: 1.6rem; letter-spacing: -0.5px;">${{ number_format($expenses->sum('amount') ?: 0, 0, ',', '.') }} <span class="text-muted fw-bold" style="font-size: 0.65rem;">{{ $bizCur }}</span></div>
             <div class="d-flex align-items-center gap-1 mt-auto" style="font-size: 0.75rem;">
                 <span class="fw-bold text-dark">{{ $expenses->count() }} registros</span> <span class="text-muted">acumulados</span>
             </div>
@@ -87,7 +88,7 @@
                 </div>
             </div>
             @php $balance = $incomes->sum('amount') - $expenses->sum('amount'); @endphp
-            <div class="fw-bold text-dark mb-2" style="font-size: 1.6rem; letter-spacing: -0.5px;">${{ number_format($balance, 0, ',', '.') }} <span class="text-muted fw-bold" style="font-size: 0.65rem;">COP</span></div>
+            <div class="fw-bold text-dark mb-2" style="font-size: 1.6rem; letter-spacing: -0.5px;">${{ number_format($balance, 0, ',', '.') }} <span class="text-muted fw-bold" style="font-size: 0.65rem;">{{ $bizCur }}</span></div>
             <div class="d-flex align-items-center gap-2 mt-auto" style="font-size: 0.75rem;">
                 <span class="badge fw-bold text-dark px-2 py-1 shadow-sm" style="background: #fef08a; border: 1px solid #fde047;">Margen Neto</span>
                 <span class="{{ $balance >= 0 ? 'text-success' : 'text-danger' }} fw-bold ms-1">{{ $balance >= 0 ? 'Positivo' : 'Déficit' }}</span>
@@ -216,7 +217,7 @@
                 <td class="border-top border-bottom p-3" style="border-color: #f1f5f9 !important;">
                     <div class="d-flex align-items-center gap-2">
                         <span class="rounded-circle" style="width: 6px; height: 6px; background: {{ $expense->type === 'income' ? '#10b981' : '#ef4444' }};"></span>
-                        <span class="fw-bold {{ $expense->type === 'income' ? 'text-success' : 'text-danger' }}" style="font-size: 0.95rem;">${{ number_format($expense->amount, floor($expense->amount) != $expense->amount ? 2 : 0, ',', '.') }} <span style="font-size: 0.65rem;">COP</span></span>
+                        <span class="fw-bold {{ $expense->type === 'income' ? 'text-success' : 'text-danger' }}" style="font-size: 0.95rem;">${{ number_format($expense->amount, floor($expense->amount) != $expense->amount ? 2 : 0, ',', '.') }} <span style="font-size: 0.65rem;">{{ $bizCur }}</span></span>
                     </div>
                 </td>
                 <td class="border-top border-bottom p-3 text-muted" style="border-color: #f1f5f9 !important;">

@@ -90,9 +90,11 @@
                         @endif
                     </div>
                     <div class="d-flex align-items-center text-muted gap-3 mt-2 fw-medium small">
-                        <span><i class="bi bi-geo-alt me-1 text-secondary"></i>Aldea Digital</span>
+                        <span><i class="bi bi-geo-alt me-1 text-secondary"></i>{{ $company->isMexican() ? ($company->city ?: 'Puebla') . ', México' : 'Aldea Digital' }}</span>
                         <span><i class="bi bi-star-fill text-warning me-1"></i>{{ number_format($company->average_rating ?? 0, 1) }} <span class="opacity-75">({{ $company->reviews_count ?? 0 }} {{ ($company->reviews_count ?? 0) === 1 ? 'calificación' : 'calificaciones' }})</span></span>
-                        <span class="text-sl-primary"><i class="bi bi-truck me-1"></i>Envíos nacionales</span>
+                        @if($company->isColombian())
+                            <span class="text-sl-primary"><i class="bi bi-truck me-1"></i>Envíos nacionales</span>
+                        @endif
                     </div>
                 </div>
                 <div class="d-flex gap-2">
@@ -186,10 +188,11 @@
     $expensePct = $income > 0 ? round(($expenses / $income) * 100, 1) : 0;
     $marginPct = $income > 0 ? round(($net / $income) * 100, 1) : 0;
 
+    $bizCurrency = ($company && $company->isMexican()) ? 'MXN' : 'COP';
     $cards = [
         [
             'label'=>'INGRESOS TOTALES',
-            'value'=>'$'.number_format($income,0,',','.'),
+            'value'=>'$'.number_format($income,0,',','.').' '.$bizCurrency,
             'icon'=>'bi-arrow-up',
             'color'=>'#7F1D3F',
             'subtext'=> $income > 0
@@ -198,14 +201,14 @@
         ],
         [
             'label'=>'EGRESOS TOTALES',
-            'value'=>'$'.number_format($expenses,0,',','.'),
+            'value'=>'$'.number_format($expenses,0,',','.').' '.$bizCurrency,
             'icon'=>'bi-arrow-down',
             'color'=>'#64748b',
             'subtext'=>'Gastos operativos <span class="float-end fw-semibold">'.$expensePct.'% total</span>'
         ],
         [
             'label'=>'GANANCIA NETA',
-            'value'=>'$'.number_format($net,0,',','.'),
+            'value'=>'$'.number_format($net,0,',','.').' '.$bizCurrency,
             'icon'=>'bi-graph-up',
             'color'=>'#10b981',
             'subtext'=> $income > 0
@@ -303,6 +306,7 @@
                         <i class="bi bi-arrow-right text-muted ms-auto"></i>
                     </div>
                 </a>
+                @if($company && $company->isColombian())
                 <a href="{{ route('business.shipments.index') }}" class="text-decoration-none">
                     <div class="d-flex align-items-center gap-3 p-3 rounded-4 border bg-white shadow-sm" style="transition: all 0.2s;">
                         <div class="rounded-3 d-flex align-items-center justify-content-center" style="width: 42px; height: 42px; background: var(--sl-primary-soft, #F6E7EB);">
@@ -315,7 +319,6 @@
                         <i class="bi bi-arrow-right text-muted ms-auto"></i>
                     </div>
                 </a>
-                @if($company && $company->isColombian())
                 <a href="{{ route('business.billing.reports.index') }}" class="text-decoration-none">
                     <div class="d-flex align-items-center gap-3 p-3 rounded-4 border bg-white shadow-sm" style="transition: all 0.2s;">
                         <div class="rounded-3 d-flex align-items-center justify-content-center" style="width: 42px; height: 42px; background: #f1f5f9;">
@@ -353,11 +356,13 @@
                 <div class="text-muted" style="font-size: 0.75rem;">Transacciones registradas en tiempo real</div>
             </div>
         </div>
+        @if($company && $company->isColombian())
         <div class="d-flex gap-2">
             <a href="{{ route('business.billing.sales') }}" class="btn btn-sm text-white rounded-pill px-4 py-2 fw-medium shadow-sm d-flex align-items-center gap-2 border-0" style="background: var(--sl-primary, #7F1D3F);">
                 <i class="bi bi-eye"></i> Ver todas las ventas ({{ $totalOrdersCount ?? $sales->count() }})
             </a>
         </div>
+        @endif
     </div>
 
     <div class="table-responsive mt-2">
@@ -420,9 +425,13 @@
                 <td class="border-top border-bottom p-3 text-start fw-bold" style="color: #7F1D3F;">${{ number_format($sale->subtotal ?: ($sale->price * $sale->quantity),0,',','.') }}</td>
                 <td class="border-top border-bottom p-3 text-start text-muted text-sm">{{ $sale->created_at->format('d/m/Y') }}</td>
                 <td class="border-end border-top border-bottom rounded-end-4 p-3 text-end pe-4">
+                    @if($company && $company->isColombian())
                     <a href="{{ route('business.billing.sales', ['search' => $sale->order_id]) }}" class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1" style="font-size: 0.75rem;">
                         Ver en Ventas &rarr;
                     </a>
+                    @else
+                    <span class="badge bg-light text-muted border rounded-pill px-3 py-1" style="font-size: 0.72rem;">Orden #{{ $sale->order_id }}</span>
+                    @endif
                 </td>
             </tr>
             @empty
@@ -433,9 +442,11 @@
     </div>
     <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
         <span class="text-muted fw-medium" style="font-size: 0.75rem;">Mostrando {{ $sales->count() }} ventas recientes</span>
+        @if($company && $company->isColombian())
         <a href="{{ route('business.billing.sales') }}" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1 fw-semibold" style="font-size: 0.8rem;">
             Ir al Panel Completo de Ventas &rarr;
         </a>
+        @endif
     </div>
 </div>
 @endsection

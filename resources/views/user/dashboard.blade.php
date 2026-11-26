@@ -283,18 +283,13 @@
                                             <div class="product-price-tag"
                                                  data-cop="${{ number_format($product->price_in_cop, 0, ',', '.') }}"
                                                  data-mxn="${{ number_format($product->price, 2, ',', '.') }}"
-                                                 data-mode="COP">
-                                                <span class="js-card-price-val">${{ number_format($product->price_in_cop, 0, ',', '.') }}</span>
-                                                <small class="js-card-price-cur">COP</small>
+                                                 data-mode="MXN">
+                                                <span class="js-card-price-val">${{ number_format($product->price, 2, ',', '.') }}</span>
+                                                <small class="js-card-price-cur">MXN</small>
                                             </div>
-                                            <button type="button"
-                                                    class="btn btn-sm p-0 border-0 bg-transparent text-start d-inline-flex align-items-center gap-1 mt-0.5"
-                                                    style="font-size: 0.7rem; color: #7F1D3F; font-weight: 600;"
-                                                    onclick="const tag = this.previousElementSibling; const isCop = tag.dataset.mode === 'COP'; tag.dataset.mode = isCop ? 'MXN' : 'COP'; tag.querySelector('.js-card-price-val').textContent = isCop ? tag.dataset.mxn : tag.dataset.cop; tag.querySelector('.js-card-price-cur').textContent = isCop ? 'MXN' : 'COP'; this.querySelector('.js-alt-currency-label').textContent = isCop ? ('≈ ' + tag.dataset.cop + ' COP') : (tag.dataset.mxn + ' MXN');"
-                                                    title="Haz clic para alternar entre Pesos Colombianos (COP) y Pesos Mexicanos (MXN)">
-                                                <i class="bi bi-currency-exchange"></i>
-                                                <span class="js-alt-currency-label">${{ number_format($product->price, 2, ',', '.') }} MXN</span>
-                                            </button>
+                                            <span class="d-inline-flex align-items-center gap-1 mt-0.5" style="font-size: 0.7rem; color: #7F1D3F; font-weight: 600;">
+                                                🇲🇽 Pesos Mexicanos (MXN)
+                                            </span>
                                         @else
                                             <div class="product-price-tag">
                                                 ${{ number_format($product->price, (floor($product->price) != $product->price ? 2 : 0), ',', '.') }}

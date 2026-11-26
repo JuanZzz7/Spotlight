@@ -31,12 +31,7 @@
                 <div class="col-md-4">
                     <label class="form-label text-sm fw-semibold text-dark">Precio de venta ({{ $editCurrency }}) *</label>
                     <input type="number" name="price" id="prod_price" class="form-control" value="{{ old('price', $product->price) }}" min="0" step="0.01" required>
-                    <small class="text-muted d-block" style="font-size: 0.7rem;">A lo que lo vendes al público (permite decimales)</small>
-                    @if($editCurrency === 'MXN')
-                        <small class="d-block mt-1 fw-semibold" style="font-size: 0.7rem; color: #7F1D3F;">
-                            🇨🇴 Equivalente visible para Colombia: ≈ {{ $product->formatted_price_cop }}
-                        </small>
-                    @endif
+                    <small class="text-muted d-block" style="font-size: 0.7rem;">A lo que lo vendes al público en {{ $editCurrency }} (permite decimales)</small>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label text-sm fw-semibold text-dark">Costo del producto ({{ $editCurrency }})</label>

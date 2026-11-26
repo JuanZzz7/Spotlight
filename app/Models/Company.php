@@ -203,9 +203,14 @@ class Company extends Model
         return $this->isMexican() ? '🇲🇽' : '🇨🇴';
     }
 
+    public function getEffectiveCurrencyAttribute(): string
+    {
+        return $this->isMexican() ? 'MXN' : ($this->currency ?: 'COP');
+    }
+
     public function getCurrencySymbolAttribute(): string
     {
-        return ($this->currency ?? 'COP') === 'MXN' ? '$ MXN' : '$ COP';
+        return $this->effective_currency === 'MXN' ? '$ MXN' : '$ COP';
     }
 
     public function canIssueElectronicInvoices(): bool

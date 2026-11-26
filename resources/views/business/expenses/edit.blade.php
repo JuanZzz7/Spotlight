@@ -58,7 +58,7 @@
 
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label class="form-label text-sm fw-semibold text-dark">Monto en Pesos (COP) *</label>
+                            <label class="form-label text-sm fw-semibold text-dark">Monto en Pesos ({{ (auth()->user()->company && auth()->user()->company->isMexican()) ? 'MXN' : 'COP' }}) *</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light text-muted fw-bold">$</span>
                                 <input type="number" name="amount" class="form-control rounded-end-3" value="{{ old('amount', (float)$expense->amount) }}" min="0" step="0.01" placeholder="0.00" required>

@@ -171,10 +171,10 @@
                             <div class="mt-auto mb-3">
                                 @if($product->effective_currency === 'MXN')
                                     <div class="fw-bold fs-4 lh-1" style="color:var(--sl-primary);">
-                                        ${{ number_format($product->price_in_cop, 0, ',', '.') }} <small class="fs-6 text-muted">COP</small>
+                                        ${{ number_format($product->price, 2, ',', '.') }} <small class="fs-6 text-muted">MXN</small>
                                     </div>
                                     <small class="text-muted fw-semibold d-block mt-1" style="font-size: 0.75rem;">
-                                        🇲🇽 Precio origen: ${{ number_format($product->price, 2, ',', '.') }} MXN
+                                        🇲🇽 Pesos Mexicanos
                                     </small>
                                 @else
                                     <div class="fw-bold fs-4" style="color:var(--sl-primary);">

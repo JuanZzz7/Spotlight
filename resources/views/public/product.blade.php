@@ -308,37 +308,14 @@
                                 <span class="lang-en">Unit Price</span><span class="lang-es">Precio oficial</span>:
                             </span>
                             @if($product->effective_currency === 'MXN')
-                                <div class="d-flex flex-wrap align-items-baseline gap-2" id="heroPriceBlock"
-                                     data-cop="${{ number_format($product->price_in_cop, 0, ',', '.') }}"
-                                     data-mxn="${{ number_format($product->price, 2, ',', '.') }}"
-                                     data-mode="COP">
+                                <div class="d-flex flex-wrap align-items-baseline gap-2" id="heroPriceBlock">
                                     <span class="fw-black display-5" id="heroMainPriceVal" style="color: var(--sl-primary, #7F1D3F); font-family: 'Outfit', sans-serif;">
-                                        ${{ number_format($product->price_in_cop, 0, ',', '.') }}
+                                        ${{ number_format($product->price, 2, ',', '.') }}
                                     </span>
-                                    <span class="fw-bold text-muted fs-5" id="heroMainPriceCur">COP</span>
+                                    <span class="fw-bold text-muted fs-5" id="heroMainPriceCur">MXN</span>
                                     <span class="badge rounded-pill bg-light text-dark border px-2.5 py-1 ms-1" style="font-size: 0.72rem;">
-                                        <i class="bi bi-currency-exchange text-primary me-1"></i>Conversión automática para Colombia
+                                        🇲🇽 Pesos Mexicanos (MXN)
                                     </span>
-                                </div>
-
-                                <div class="mt-2 p-2.5 px-3 rounded-4 border d-flex flex-wrap align-items-center justify-content-between gap-2"
-                                     style="background: #FAF5F6; border-color: rgba(127, 29, 63, 0.18) !important;">
-                                    <div class="d-flex flex-wrap align-items-center gap-2 text-xs">
-                                        <span class="fw-bold text-dark">
-                                            Precio de origen: <span style="color: #7F1D3F;">${{ number_format($product->price, 2, ',', '.') }} MXN</span>
-                                        </span>
-                                        <span class="text-muted">•</span>
-                                        <span class="text-muted">
-                                            Equivalente: <strong>≈ ${{ number_format($product->price_in_cop, 0, ',', '.') }} COP</strong>
-                                            <small class="text-muted">(1 MXN ≈ ${{ number_format(\App\Models\Product::mxnToCopRate(), 0, ',', '.') }} COP)</small>
-                                        </span>
-                                    </div>
-                                    <button type="button"
-                                            class="btn btn-sm rounded-pill px-3 py-1 fw-bold shadow-2xs"
-                                            style="background: #7F1D3F; color: #fff; font-size: 0.72rem;"
-                                            onclick="const blk = document.getElementById('heroPriceBlock'); const isCop = blk.dataset.mode === 'COP'; blk.dataset.mode = isCop ? 'MXN' : 'COP'; document.getElementById('heroMainPriceVal').textContent = isCop ? blk.dataset.mxn : blk.dataset.cop; document.getElementById('heroMainPriceCur').textContent = isCop ? 'MXN' : 'COP'; this.innerHTML = isCop ? '<i class=\'bi bi-arrow-left-right me-1\'></i>Ver en Pesos Colombianos (COP)' : '<i class=\'bi bi-arrow-left-right me-1\'></i>Ver en Pesos Mexicanos (MXN)';">
-                                        <i class="bi bi-arrow-left-right me-1"></i>Ver en Pesos Mexicanos (MXN)
-                                    </button>
                                 </div>
                             @else
                                 <div class="d-flex align-items-baseline gap-2">
@@ -366,12 +343,21 @@
 
                         <!-- Value Props -->
                         <div class="row g-2 mb-4">
+                            @if(($product->company?->country ?? $product->country ?? 'CO') === 'CO')
                             <div class="col-sm-6">
                                 <div class="p-2 rounded-3 bg-light border d-flex align-items-center gap-2" style="font-size: 0.8rem;">
                                     <i class="bi bi-truck text-primary fs-5"></i>
                                     <span class="text-muted">Despacho seguro nacional e internacional</span>
                                 </div>
                             </div>
+                            @else
+                            <div class="col-sm-6">
+                                <div class="p-2 rounded-3 bg-light border d-flex align-items-center gap-2" style="font-size: 0.8rem;">
+                                    <i class="bi bi-globe2 text-primary fs-5"></i>
+                                    <span class="text-muted">Atención directa y compra internacional asistida</span>
+                                </div>
+                            </div>
+                            @endif
                             <div class="col-sm-6">
                                 <div class="p-2 rounded-3 bg-light border d-flex align-items-center gap-2" style="font-size: 0.8rem;">
                                     <i class="bi bi-shield-check text-success fs-5"></i>
@@ -740,11 +726,8 @@
                                         <div class="mt-auto">
                                             @if($rel->effective_currency === 'MXN')
                                                 <div class="fw-bold fs-6 lh-1" style="color: var(--sl-primary, #7F1D3F);">
-                                                    ${{ number_format($rel->price_in_cop, 0, ',', '.') }} <span class="text-muted text-xs">COP</span>
+                                                    ${{ number_format($rel->price, 2, ',', '.') }} <span class="text-muted text-xs">MXN</span>
                                                 </div>
-                                                <small class="text-muted d-block mt-0.5" style="font-size: 0.68rem;">
-                                                    🇲🇽 ${{ number_format($rel->price, 2, ',', '.') }} MXN
-                                                </small>
                                             @else
                                                 <div class="fw-bold fs-6" style="color: var(--sl-primary, #7F1D3F);">
                                                     ${{ number_format($rel->price, 0, ',', '.') }} <span class="text-muted text-xs">COP</span>

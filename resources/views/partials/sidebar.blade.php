@@ -47,9 +47,11 @@
         <i class="bi bi-mortarboard fs-5"></i> Tutoriales Formalización
     </a>
     @endif
+    @if(auth()->user()->company && auth()->user()->company->isColombian())
     <a href="{{ route('business.shipments.index') }}" class="vs-nav-link {{ request()->routeIs('business.shipments*') ? 'active' : '' }}">
         <i class="bi bi-truck fs-5"></i> Despachos y Envíos
     </a>
+    @endif
     <a href="{{ route('chat.index') }}" class="vs-nav-link {{ request()->is('chat*') ? 'active' : '' }}" id="sidebar-messages-link">
         <i class="bi bi-chat-dots fs-5"></i> Mensajes
         <span id="unread-badge" class="badge badge-warning ms-auto d-none vs-sidebar-unread-badge">0</span>

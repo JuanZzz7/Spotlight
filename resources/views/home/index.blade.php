@@ -282,10 +282,10 @@
                                 <div>
                                     @if($product->effective_currency === 'MXN')
                                         <div class="product-price-tag lh-1">
-                                            ${{ number_format($product->price_in_cop, 0, ',', '.') }} <span class="text-muted" style="font-size: 0.7rem;">COP</span>
+                                            ${{ number_format($product->price, 2, ',', '.') }} <span class="text-muted" style="font-size: 0.7rem;">MXN</span>
                                         </div>
                                         <small class="d-block text-muted mt-0.5" style="font-size: 0.68rem; font-weight: 600;">
-                                            🇲🇽 ${{ number_format($product->price, 2, ',', '.') }} MXN
+                                            🇲🇽 Pesos Mexicanos
                                         </small>
                                     @else
                                         <div class="product-price-tag">

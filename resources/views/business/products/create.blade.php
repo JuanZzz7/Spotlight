@@ -61,12 +61,7 @@
                             <label class="form-label text-sm fw-semibold text-dark">Precio de venta ({{ $companyCurrency }}) *</label>
                             <input type="number" name="price" id="prod_price" class="form-control"
                                    value="{{ old('price') }}" min="0" step="0.01" required placeholder="{{ $company->isMexican() ? '250.00' : '50000.00' }}">
-                            <small class="text-muted d-block" style="font-size: 0.7rem;">Precio visible al público (permite decimales)</small>
-                            @if($company->isMexican())
-                                <small id="mxn_to_cop_live_hint" class="d-block mt-1 fw-semibold" style="font-size: 0.7rem; color: #7F1D3F;">
-                                    🇨🇴 En Colombia se verá: ≈ $0 COP
-                                </small>
-                            @endif
+                            <small class="text-muted d-block" style="font-size: 0.7rem;">Precio visible al público en {{ $companyCurrency }} (permite decimales)</small>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label text-sm fw-semibold text-dark">Costo unitario ({{ $companyCurrency }})</label>
@@ -347,7 +342,7 @@
                         <div>
                             <span class="text-2xs text-muted d-block text-uppercase fw-semibold">Precio al público</span>
                             <div id="preview_price" class="product-price-tag fw-black fs-5" style="color: #7F1D3F;">
-                                $ 50.000 <small class="text-xs fw-normal text-muted">COP</small>
+                                {{ $company->isMexican() ? '$ 250.00' : '$ 50.000' }} <small class="text-xs fw-normal text-muted">{{ $companyCurrency }}</small>
                             </div>
                         </div>
 
@@ -398,15 +393,7 @@ document.getElementById('prod_price')?.addEventListener('input', function() {
         maximumFractionDigits: 2
     }).format(rawVal);
 
-    if (currencyCode === 'MXN') {
-        const copEquiv = Math.round(rawVal * mxnToCopRate);
-        const formattedCop = new Intl.NumberFormat('es-CO', { maximumFractionDigits: 0 }).format(copEquiv);
-        document.getElementById('preview_price').innerHTML = `$ ${formattedCop} <small class="text-xs fw-normal text-muted">COP</small><div class="text-2xs fw-semibold text-muted mt-0.5">🇲🇽 $ ${formatted} MXN</div>`;
-        const hintEl = document.getElementById('mxn_to_cop_live_hint');
-        if (hintEl) hintEl.textContent = `🇨🇴 En Colombia se verá: ≈ $${formattedCop} COP`;
-    } else {
-        document.getElementById('preview_price').innerHTML = `$ ${formatted} <small class="text-xs fw-normal text-muted">${currencyCode}</small>`;
-    }
+    document.getElementById('preview_price').innerHTML = `$ ${formatted} <small class="text-xs fw-normal text-muted">${currencyCode}</small>`;
 });
 
 document.getElementById('prod_stock')?.addEventListener('input', function() {

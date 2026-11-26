@@ -264,8 +264,11 @@ class ProductController extends Controller
         ]);
 
         $data = $request->except(['image', 'gallery', 'delete_gallery_images', '_token', '_method', 'tags', 'new_tag_label', 'new_tag_color', 'new_tag_icon']);
+        $company = $this->company();
         $data['active']   = $request->boolean('active');
         $data['featured'] = $request->boolean('featured');
+        $data['country']  = $company?->country ?: ($product->country ?: 'CO');
+        $data['currency'] = ($company && $company->isMexican()) ? 'MXN' : ($company?->currency ?: 'COP');
         if ($request->has('tax_rate')) {
             $data['tax_rate'] = $request->input('tax_rate');
         }

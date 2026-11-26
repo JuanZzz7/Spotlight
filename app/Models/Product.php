@@ -43,6 +43,9 @@ class Product extends Model
 
     public function getEffectiveCurrencyAttribute(): string
     {
+        if ($this->isMexican()) {
+            return 'MXN';
+        }
         return $this->currency ?: ($this->company?->currency ?: 'COP');
     }
 

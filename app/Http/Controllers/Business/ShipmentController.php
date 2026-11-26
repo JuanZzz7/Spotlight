@@ -24,6 +24,11 @@ class ShipmentController extends Controller
             return redirect()->route('business.company.edit')->with('warning', 'Primero configura los datos de tu empresa.');
         }
 
+        if ($company->isMexican()) {
+            return redirect()->route('business.dashboard')
+                ->with('info', 'El módulo de despachos y envíos nacionales está habilitado exclusivamente para comercios en Colombia.');
+        }
+
         // Aseguramos que órdenes que aún no tengan shipment creado lo tengan
         $unassignedOrders = Order::where('company_id', $company->id)
             ->whereDoesntHave('shipment')

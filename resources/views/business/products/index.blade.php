@@ -76,8 +76,8 @@
             <div>
                 <div class="text-muted text-uppercase fw-bold" style="font-size: 0.65rem; letter-spacing: 0.5px;">VALOR INVENTARIO</div>
                 <div class="d-flex align-items-baseline gap-1 mt-1">
-                    <span class="fw-bold text-dark lh-1" style="font-size: 1.35rem;">${{ number_format($totalStockValue, 0, ',', '.') }}</span>
-                    <span class="text-muted fw-bold" style="font-size: 0.65rem;">COP</span>
+                    <span class="fw-bold text-dark lh-1" style="font-size: 1.35rem;">${{ number_format($totalStockValue, ($company && $company->isMexican()) ? 2 : 0, ',', '.') }}</span>
+                    <span class="text-muted fw-bold" style="font-size: 0.65rem;">{{ ($company && $company->isMexican()) ? 'MXN' : 'COP' }}</span>
                 </div>
             </div>
         </div>
@@ -208,11 +208,6 @@
                     <div class="fw-bold mb-3 text-dark" style="font-size: 1.25rem; letter-spacing: -0.5px;">
                         ${{ number_format($product->price, ($product->effective_currency === 'MXN' || floor($product->price) != $product->price) ? 2 : 0, ',', '.') }}
                         <small class="text-muted fw-semibold" style="font-size: 0.72rem;">{{ $product->effective_currency }}</small>
-                        @if($product->effective_currency === 'MXN')
-                            <div class="text-muted fw-semibold mt-0.5" style="font-size: 0.7rem; letter-spacing: 0;">
-                                🇨🇴 ≈ ${{ number_format($product->price_in_cop, 0, ',', '.') }} COP
-                            </div>
-                        @endif
                     </div>
                     
                     <div class="d-flex flex-wrap align-items-center gap-2 mt-auto">
@@ -310,11 +305,6 @@
                         <td class="py-3 fw-bold text-dark">
                             ${{ number_format($product->price, ($product->effective_currency === 'MXN' || floor($product->price) != $product->price) ? 2 : 0, ',', '.') }}
                             <small class="text-muted">{{ $product->effective_currency }}</small>
-                            @if($product->effective_currency === 'MXN')
-                                <div class="text-muted fw-normal" style="font-size: 0.72rem;">
-                                    🇨🇴 ≈ ${{ number_format($product->price_in_cop, 0, ',', '.') }} COP
-                                </div>
-                            @endif
                         </td>
                         <td class="py-3 text-center">
                             @if($product->stock <= 0)
