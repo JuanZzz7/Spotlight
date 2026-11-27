@@ -7,10 +7,11 @@
     "license": "MIT",
     "require": {
         "php": "^8.3",
-        "laravel/framework": "^12.0",
-        "laravel/socialite": "*",
+        "guzzlehttp/guzzle": "^7.17",
+        "laravel/framework": "^12.74",
+        "laravel/socialite": "^5.33",
         "laravel/tinker": "^2.10.1",
-        "resend/resend-laravel": "^1.4"
+        "resend/resend-laravel": "^1.7"
     },
     "require-dev": {
         "beyondcode/laravel-er-diagram-generator": "^6.0",
