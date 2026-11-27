@@ -287,7 +287,7 @@
                                     </span>
                                 </div>
                                 <div class="text-muted small mt-1">
-                                    <strong>{{ $expense->concept }}</strong> • Monto: ${{ number_format($expense->amount, 0, ',', '.') }} COP • Fecha: {{ \Carbon\Carbon::parse($expense->date)->format('d/m/Y') }}
+                                    <strong>{{ $expense->concept }}</strong> • Monto: ${{ number_format($expense->amount, 0, ',', '.') }} {{ $bizCur }} • Fecha: {{ \Carbon\Carbon::parse($expense->date)->format('d/m/Y') }}
                                 </div>
                             </div>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>

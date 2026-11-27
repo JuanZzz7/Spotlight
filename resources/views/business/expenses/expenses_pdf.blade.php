@@ -245,14 +245,15 @@
                 <img src="{{ asset('images/logo-symbol-burgundy.png') }}" alt="Spotlight" class="logo-img">
             @endif
             <div class="company-info">
+                @php $pdfCur = $company->isMexican() ? 'MXN' : 'COP'; @endphp
                 <h2>{{ $company->razon_social ?: $company->name }}</h2>
-                <p>NIT: {{ $company->nit ?: 'N/A' }} | Tel: {{ $company->phone ?: 'N/A' }}</p>
-                <p>{{ $company->address ?: 'Ubaté, Cundinamarca' }} | Email: {{ $company->email ?: 'comercio@spotlight.local' }}</p>
+                <p>{{ $company->isMexican() ? 'RFC: ' . ($company->tax_id ?: 'N/A') : 'NIT: ' . ($company->nit ?: 'N/A') }} | Tel: {{ $company->phone ?: 'N/A' }}</p>
+                <p>{{ $company->address ?: ($company->isMexican() ? ($company->city ?: 'Puebla') . ', México' : 'Ubaté, Cundinamarca') }} | Email: {{ $company->email ?: 'comercio@spotlight.local' }}</p>
             </div>
         </div>
         <div class="report-meta">
             <span class="report-badge">Control Financiero Spotlight</span>
-            <h1>Reporte de Egresos</h1>
+            <h1>Reporte de Egresos ({{ $pdfCur }})</h1>
             <p><strong>Fecha de Emisión:</strong> {{ date('d/m/Y H:i') }}</p>
             @if($month)
                 <p><strong>Periodo:</strong> {{ \Carbon\Carbon::createFromFormat('Y-m', $month)->translatedFormat('F Y') }}</p>
@@ -268,8 +269,8 @@
     {{-- Stats Grid --}}
     <div class="stats-grid">
         <div class="stat-card">
-            <div class="stat-label">Total Egresos</div>
-            <div class="stat-value danger">${{ number_format($totalAmount, 0, ',', '.') }}</div>
+            <div class="stat-label">Total Egresos ({{ $pdfCur }})</div>
+            <div class="stat-value danger">${{ number_format($totalAmount, 0, ',', '.') }} {{ $pdfCur }}</div>
         </div>
         <div class="stat-card">
             <div class="stat-label">Registros</div>
@@ -277,7 +278,7 @@
         </div>
         <div class="stat-card">
             <div class="stat-label">Promedio por Gasto</div>
-            <div class="stat-value">${{ number_format($averageAmount, 0, ',', '.') }}</div>
+            <div class="stat-value">${{ number_format($averageAmount, 0, ',', '.') }} {{ $pdfCur }}</div>
         </div>
         <div class="stat-card">
             <div class="stat-label">Con Soporte Adjunto</div>
@@ -295,7 +296,7 @@
                 <th style="width: 140px;">Categoría</th>
                 <th>Descripción / Observación</th>
                 <th style="width: 130px;">Soporte Factura</th>
-                <th style="text-align: right; width: 110px;">Monto (COP)</th>
+                <th style="text-align: right; width: 110px;">Monto ({{ $pdfCur }})</th>
             </tr>
         </thead>
         <tbody>
@@ -329,9 +330,9 @@
         </tbody>
         <tfoot>
             <tr class="tfoot-total">
-                <td colspan="6" style="text-align: right; padding: 12px; font-size: 13px;">TOTAL EGRESOS REGISTRADOS:</td>
+                <td colspan="6" style="text-align: right; padding: 12px; font-size: 13px;">TOTAL EGRESOS REGISTRADOS ({{ $pdfCur }}):</td>
                 <td style="text-align: right; padding: 12px; font-size: 14px; color: #b91c1c;">
-                    ${{ number_format($totalAmount, 0, ',', '.') }}
+                    ${{ number_format($totalAmount, 0, ',', '.') }} {{ $pdfCur }}
                 </td>
             </tr>
         </tfoot>

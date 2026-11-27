@@ -27,10 +27,6 @@ class ExpenseController extends Controller
     public function index(Request $request)
     {
         $company  = Auth::user()->company;
-        if ($company && $company->isMexican()) {
-            return redirect()->route('business.dashboard')
-                ->with('info', 'El módulo de Finanzas y pasarela de pagos estará disponible próximamente para comercios en México.');
-        }
         $tab      = $request->get('tab', 'egresos');
         $search   = $request->get('search');
         $category = $request->get('category');
